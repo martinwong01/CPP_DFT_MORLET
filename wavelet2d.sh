@@ -7,5 +7,5 @@
 
 
 export OMP_NUM_THREADS=4
-./wavelet2d.exe olr_asym_0 outputfile 16071 144 35 33 1 1
+./wavelet2d.exe olr_sym_0 outputfile 16071 144 35 33 1 1
 

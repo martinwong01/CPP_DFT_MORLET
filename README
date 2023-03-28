@@ -15,6 +15,3 @@ Programs to compute Discrete Fourier Transform and Morlet continuous wavelet tra
 * compile.sh:       script to compile the test programs     
 * wavelet2D.sh:     script to run wavelet2D.cpp
 
-
-Documentation of Morlet 2D CWT, including reconstruction and covariance/power formulas, can be found at:
-https://www.wmohk.com/Morlet_2D.pdf  

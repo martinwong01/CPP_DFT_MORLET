@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
     complex<float> ***cwt2;
     double **yseries1;                  // dummy array.                                             Dim: [threads][Ny]
     double **yseries2;
-    complex<double> ***transform_real;  // transform of Re{xtransform[Ny][Sx][Nx]} in y direction   Dim: [Nx][Sy][Ny]
-    complex<double> ***transform_imga;  // transform of Im{xtransform[Ny][Sx][Nx]} in y direction   
+    complex<double> ***transform_real;  // transform of Re{xtransform[:][Sx][Nx]} in y direction   Dim: [Nx][Sy][Ny]
+    complex<double> ***transform_imga;  // transform of Im{xtransform[:][Sx][Nx]} in y direction   
 
 
     FILE *fp,*fp1,*fp2;

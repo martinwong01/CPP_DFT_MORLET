@@ -27,7 +27,6 @@ int main(int argc, char *argv[]) {
     double **data;                      // data input.                                              Dim: [Ny][Nx]
     complex<double> ***xtransform;      // for each y, the transform in x direction.                Dim: [Ny][Sx][Nx] 
 
-    // number of threads
     complex<float> ***cwt1;             // output in float (save disk)                              Dim: [Nx][Sy][Ny] 
     complex<float> ***cwt2;
     double **yseries1;                  // dummy array.                                             Dim: [threads][Ny]

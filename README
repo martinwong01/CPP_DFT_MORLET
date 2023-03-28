@@ -1,4 +1,4 @@
-Programs to compute Discrete Fourier Transform and Morlet continuous wavelet transform. May only work with GNU g++ compiler.
+Programs to compute Discrete Fourier Transform and Morlet continuous wavelet transform. Probably only work with GNU g++ compiler.
 
 
 4 header files, 3 test cpp files, 2 bash scripts:

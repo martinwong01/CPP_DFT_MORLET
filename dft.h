@@ -4,6 +4,9 @@
 int smallfactor(int,int);
 
 template <class Type>
+void Rader(complex<Type> *,complex<Type> *,complex<Type> *,int,Type);
+
+template <class Type>
 void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int static thread_local i,j,k,m,n,p,q,t;
     complex<Type> static thread_local datasub1[maxN];
@@ -84,7 +87,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     datasub1[q] = roots[p]*data[k*kright+q*nright+t];
 		    datasub2[q] = roots[((q*Product)%PF)*NoverPF];
 		}
-		Rader(datasub1,datasub2,datasub3,Factor,pi);
+		Rader<T(datasub1,datasub2,datasub3,Factor,pi);
 	        for(m=1;m<Factor;m++) 
 		    out[k*kleft+m*mleft+t] = data[k*kright+t] + datasub3[m];	    
 	    }

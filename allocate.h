@@ -1,24 +1,24 @@
-template <typename T>
-T **allocate2D(int i,int j) {
-    T **pointer;
+template <typename Type>
+Type **allocate2D(int i,int j) {
+    Type **pointer;
     int m;
 
-    pointer = new T*[i];
-    pointer[0] = new T[i*j];
+    pointer = new Type*[i];
+    pointer[0] = new Type[i*j];
     for(m=1;m<i;m++) pointer[m] = pointer[m-1] + j;
 
     return pointer;
 }
 
-template <typename T>
-T ***allocate3D(int i,int j,int k) {
-    T ***pointer;
+template <typename Type>
+Type ***allocate3D(int i,int j,int k) {
+    Type ***pointer;
     int m,n;
     int oldm,oldn;
 
-    pointer = new T**[i];
-    for(m=0;m<i;m++) pointer[m] = new T*[j];
-    pointer[0][0] = new T[i*j*k];
+    pointer = new Type**[i];
+    for(m=0;m<i;m++) pointer[m] = new Type*[j];
+    pointer[0][0] = new Type[i*j*k];
 
     oldm = 0;
     oldn = 0;
@@ -32,16 +32,16 @@ T ***allocate3D(int i,int j,int k) {
     return pointer;
 }
 
-template <typename T>
-T ****allocate4D(int i,int j,int k,int l) {
-    T ****pointer;
+template <typename Type>
+Type ****allocate4D(int i,int j,int k,int l) {
+    Type ****pointer;
     int m,n,o;
     int oldm,oldn,oldo;
 
-    pointer = new T***[i];
-    for(m=0;m<i;m++) pointer[m] = new T**[j];
-    for(m=0;m<i;m++) for(n=0;n<j;n++) pointer[m][n] = new T*[k];
-    pointer[0][0][0] = new T[i*j*k*l];
+    pointer = new Type***[i];
+    for(m=0;m<i;m++) pointer[m] = new Type**[j];
+    for(m=0;m<i;m++) for(n=0;n<j;n++) pointer[m][n] = new Type*[k];
+    pointer[0][0][0] = new Type[i*j*k*l];
 
     oldm = 0;
     oldn = 0;
@@ -58,17 +58,17 @@ T ****allocate4D(int i,int j,int k,int l) {
     return pointer;
 }
 
-template <typename T>
-T *****allocate5D(int i,int j,int k,int l,int m) {
-    T *****pointer;
+template <typename Type>
+Type *****allocate5D(int i,int j,int k,int l,int m) {
+    Type *****pointer;
     int n,o,p,q;
     int oldn,oldo,oldp,oldq;
 
-    pointer = new T****[i];
-    for(n=0;n<i;n++) pointer[n] = new T***[j];
-    for(n=0;n<i;n++) for(o=0;o<j;o++) pointer[n][o] = new T**[k];
-    for(n=0;n<i;n++) for(o=0;o<j;o++) for(p=0;p<k;p++) pointer[n][o][p] = new T*[l];
-    pointer[0][0][0][0] = new T[i*j*k*l*m];
+    pointer = new Type****[i];
+    for(n=0;n<i;n++) pointer[n] = new Type***[j];
+    for(n=0;n<i;n++) for(o=0;o<j;o++) pointer[n][o] = new Type**[k];
+    for(n=0;n<i;n++) for(o=0;o<j;o++) for(p=0;p<k;p++) pointer[n][o][p] = new Type*[l];
+    pointer[0][0][0][0] = new Type[i*j*k*l*m];
 
     oldn = 0;
     oldo = 0;

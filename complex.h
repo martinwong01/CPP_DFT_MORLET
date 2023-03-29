@@ -13,38 +13,38 @@ class complex {
         real = c.real;
 	imga = c.imga;
     }
-    complex operator+(complex<Type> c) {
+    complex<Type> operator+(complex<Type> c) {
         complex<Type> cc;
 	cc.real = real + c.real;
 	cc.imga = imga + c.imga;
 	return cc;
     }
-    complex operator-(complex<Type> c) {
+    complex<Type> operator-(complex<Type> c) {
         complex<Type> cc;
 	cc.real = real - c.real;
 	cc.imga = imga - c.imga;
 	return cc;
     }
-    complex operator*(complex<Type> c) {
+    complex<Type> operator*(complex<Type> c) {
         complex<Type> cc;
 	cc.real = real*c.real - imga*c.imga;
 	cc.imga = real*c.imga + imga*c.real;
 	return cc;
     }
-    complex operator*(Type c) {
+    complex<Type> operator*(Type c) {
         complex<Type> cc;
 	cc.real = real*c;
 	cc.imga = imga*c;
 	return cc;
     }
-    complex operator/(complex<Type> c) {
+    complex<Type> operator/(complex<Type> c) {
         complex<Type> cc;
 	Type a = c.real*c.real+c.imga*c.imga;
 	cc.real = (real*c.real+imga*c.imga)/a;
 	cc.imga = (imga*c.real-real*c.imga)/a;
 	return cc;
     }
-    complex conjugate() {
+    complex<Type> conjugate() {
         complex<Type> cc;
         cc.real = real;
 	cc.imga = -1.*imga;

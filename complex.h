@@ -9,56 +9,56 @@ class complex {
     complex() { real = 0.; imga = 0.; }                                  // constructors
     complex(T r,T i) { real = r; imga = i; }
     complex(T angle) { real = cos(angle); imga = sin(angle); } 
-    void operator=(complex c) {
+    void operator=(complex<T> c) {
         real = c.real;
 	imga = c.imga;
     }
-    complex operator+(complex c) {
-        complex cc;
+    complex operator+(complex<T> c) {
+        complex<T> cc;
 	cc.real = real + c.real;
 	cc.imga = imga + c.imga;
 	return cc;
     }
-    complex operator-(complex c) {
-        complex cc;
+    complex operator-(complex<T> c) {
+        complex<T> cc;
 	cc.real = real - c.real;
 	cc.imga = imga - c.imga;
 	return cc;
     }
-    complex operator*(complex c) {
-        complex cc;
+    complex operator*(complex<T> c) {
+        complex<T> cc;
 	cc.real = real*c.real - imga*c.imga;
 	cc.imga = real*c.imga + imga*c.real;
 	return cc;
     }
     complex operator*(T c) {
-        complex cc;
+        complex<T> cc;
 	cc.real = real*c;
 	cc.imga = imga*c;
 	return cc;
     }
-    complex operator/(complex c) {
-        complex cc;
+    complex operator/(complex<T> c) {
+        complex<T> cc;
 	T a = c.real*c.real+c.imga*c.imga;
 	cc.real = (real*c.real+imga*c.imga)/a;
 	cc.imga = (imga*c.real-real*c.imga)/a;
 	return cc;
     }
     complex conjugate() {
-        complex cc;
+        complex<T> cc;
         cc.real = real;
 	cc.imga = -1.*imga;
 	return cc;
     }
-    void operator+=(complex c) {
+    void operator+=(complex<T> c) {
 	real += c.real;
 	imga += c.imga;
     }
-    void operator-=(complex c) {
+    void operator-=(complex<T> c) {
 	real -= c.real;
 	imga -= c.imga;
     }
-    void operator*=(complex c) {
+    void operator*=(complex<T> c) {
         T a,b;
 	a = real*c.real - imga*c.imga;
 	b = real*c.imga + imga*c.real;
@@ -69,7 +69,7 @@ class complex {
         real *= c;
 	imga *= c;
     }
-    void operator/=(complex c) {
+    void operator/=(complex<T> c) {
         T a,u,v;
 	a = c.real*c.real+c.imga*c.imga;
         u = (real*c.real+imga*c.imga)/a;

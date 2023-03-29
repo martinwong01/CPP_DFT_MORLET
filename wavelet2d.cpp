@@ -82,9 +82,9 @@ int main(int argc, char *argv[]) {
 
 
     sprintf(cmd,"%s1",argv[2]);
-    fp1 = fopen(cmd,"rb+");
+    fp1 = fopen(cmd,"wb");
     sprintf(cmd,"%s2",argv[2]);
-    fp2 = fopen(cmd,"rb+");
+    fp2 = fopen(cmd,"wb");
 
 
     #pragma omp parallel default(shared)

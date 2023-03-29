@@ -32,7 +32,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);
     
-    dft_func(datacomplex,dft,N,1,pi,1);
+    dft_func<Type>(datacomplex,dft,N,1,pi,1);
 
     for(s=0;s<S;s++)
     for(k=0;k<N;k++) {
@@ -40,7 +40,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     }
     
     for(s=0;s<S;s++) {
-	dftinv_func(dft_product[s],transform[s],N,pi);        // this also modifies dft_product[s]
+	dftinv_func<Type>(dft_product[s],transform[s],N,pi);        // this also modifies dft_product[s]
     }
 
     for(s=0;s<S;s++) {

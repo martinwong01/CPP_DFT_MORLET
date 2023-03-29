@@ -1,76 +1,76 @@
 #include <cstring>
 using namespace std;
 
-template <class T>
+template <class Type>
 class complex {
-    T real;
-    T imga;
+    Type real;
+    Type imga;
     public:
     complex() { real = 0.; imga = 0.; }                                  // constructors
-    complex(T r,T i) { real = r; imga = i; }
-    complex(T angle) { real = cos(angle); imga = sin(angle); } 
-    void operator=(complex<T> c) {
+    complex(Type r,Type i) { real = r; imga = i; }
+    complex(Type angle) { real = cos(angle); imga = sin(angle); } 
+    void operator=(complex<Type> c) {
         real = c.real;
 	imga = c.imga;
     }
-    complex operator+(complex<T> c) {
-        complex<T> cc;
+    complex operator+(complex<Type> c) {
+        complex<Type> cc;
 	cc.real = real + c.real;
 	cc.imga = imga + c.imga;
 	return cc;
     }
-    complex operator-(complex<T> c) {
-        complex<T> cc;
+    complex operator-(complex<Type> c) {
+        complex<Type> cc;
 	cc.real = real - c.real;
 	cc.imga = imga - c.imga;
 	return cc;
     }
-    complex operator*(complex<T> c) {
-        complex<T> cc;
+    complex operator*(complex<Type> c) {
+        complex<Type> cc;
 	cc.real = real*c.real - imga*c.imga;
 	cc.imga = real*c.imga + imga*c.real;
 	return cc;
     }
-    complex operator*(T c) {
-        complex<T> cc;
+    complex operator*(Type c) {
+        complex<Type> cc;
 	cc.real = real*c;
 	cc.imga = imga*c;
 	return cc;
     }
-    complex operator/(complex<T> c) {
-        complex<T> cc;
-	T a = c.real*c.real+c.imga*c.imga;
+    complex operator/(complex<Type> c) {
+        complex<Type> cc;
+	Type a = c.real*c.real+c.imga*c.imga;
 	cc.real = (real*c.real+imga*c.imga)/a;
 	cc.imga = (imga*c.real-real*c.imga)/a;
 	return cc;
     }
     complex conjugate() {
-        complex<T> cc;
+        complex<Type> cc;
         cc.real = real;
 	cc.imga = -1.*imga;
 	return cc;
     }
-    void operator+=(complex<T> c) {
+    void operator+=(complex<Type> c) {
 	real += c.real;
 	imga += c.imga;
     }
-    void operator-=(complex<T> c) {
+    void operator-=(complex<Type> c) {
 	real -= c.real;
 	imga -= c.imga;
     }
-    void operator*=(complex<T> c) {
-        T a,b;
+    void operator*=(complex<Type> c) {
+        Type a,b;
 	a = real*c.real - imga*c.imga;
 	b = real*c.imga + imga*c.real;
 	real = a;
 	imga = b;
     }
-    void operator*=(T c) {
+    void operator*=(Type c) {
         real *= c;
 	imga *= c;
     }
-    void operator/=(complex<T> c) {
-        T a,u,v;
+    void operator/=(complex<Type> c) {
+        Type a,u,v;
 	a = c.real*c.real+c.imga*c.imga;
         u = (real*c.real+imga*c.imga)/a;
 	v = (imga*c.real-real*c.imga)/a;
@@ -81,17 +81,17 @@ class complex {
         real = 0.;
 	imga = 0.;
     }
-    void setrealimga(T r,T i) {
+    void setrealimga(Type r,Type i) {
         real = r;
 	imga = i;
     }
-    void setreal(T r) { real = r; }
-    void setimga(T i) { imga = i; }
-    void setangle(T angle) { real = cos(angle); imga = sin(angle); }
-    T realpart() {
+    void setreal(Type r) { real = r; }
+    void setimga(Type i) { imga = i; }
+    void setangle(Type angle) { real = cos(angle); imga = sin(angle); }
+    Type realpart() {
         return real;
     }
-    T imgapart() {
+    Type imgapart() {
         return imga;
     }
     void print() {

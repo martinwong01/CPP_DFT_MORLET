@@ -87,7 +87,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     datasub1[q] = roots[p]*data[k*kright+q*nright+t];
 		    datasub2[q] = roots[((q*Product)%PF)*NoverPF];
 		}
-		Rader<T(datasub1,datasub2,datasub3,Factor,pi);
+		Rader<Type>(datasub1,datasub2,datasub3,Factor,pi);
 	        for(m=1;m<Factor;m++) 
 		    out[k*kleft+m*mleft+t] = data[k*kright+t] + datasub3[m];	    
 	    }

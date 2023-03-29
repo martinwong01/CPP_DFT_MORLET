@@ -8,18 +8,17 @@ void Rader(complex<Type> *,complex<Type> *,complex<Type> *,int,Type);
 
 template <class Type>
 void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
-    int static thread_local i,j,k,m,n,p,q,t;
-    complex<Type> static thread_local datasub1[maxN];
-    complex<Type> static thread_local datasub2[maxN];
-    complex<Type> static thread_local datasub3[maxN];
-    complex<Type> static thread_local c1[1];                                                                    // default constructor not called
-    complex<Type> static thread_local c2[1];
-    Type static thread_local a;
-    int static thread_local PF,NoverPF;
-    int static thread_local kleft,kright,mleft,nright,tail;
-    complex<Type> static thread_local roots[maxN];
-    int static thread_local Factor;
-//    #pragma omp threadprivate(i,j,k,m,n,p,q,t,datasub1,datasub2,datasub3,c1,c2,a,PF,NoverPF,kleft,kright,mleft,nright,tail,roots,Factor) 
+    int thread_local i,j,k,m,n,p,q,t;
+    complex<Type> thread_local datasub1[maxN];
+    complex<Type> thread_local datasub2[maxN];
+    complex<Type> thread_local datasub3[maxN];
+    complex<Type> thread_local c1[1];                                                                    // default constructor not called
+    complex<Type> thread_local c2[1];
+    Type thread_local a;
+    int thread_local PF,NoverPF;
+    int thread_local kleft,kright,mleft,nright,tail;
+    complex<Type> thread_local roots[maxN];
+    int thread_local Factor;
 
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
@@ -108,18 +107,17 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 
 template <class Type>
 void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
-    int static thread_local i,j,k,m,n,p,q,t;
-    complex<Type> static thread_local datasub1[maxN];
-    complex<Type> static thread_local datasub2[maxN];
-    complex<Type> static thread_local datasub3[maxN];
-    complex<Type> static thread_local c1[1];                                                                    // default constructor not called
-    complex<Type> static thread_local c2[1];
-    Type static thread_local a;
-    int static thread_local PF,NoverPF;
-    int static thread_local kleft,kright,mleft,nright,tail;
-    complex<Type> static thread_local roots[maxN];
-    int static thread_local Factor;
-//    #pragma omp threadprivate(i,j,k,m,n,p,q,t,datasub1,datasub2,datasub3,c1,c2,a,PF,NoverPF,kleft,kright,mleft,nright,tail,roots,Factor) 
+    int thread_local i,j,k,m,n,p,q,t;
+    complex<Type> thread_local datasub1[maxN];
+    complex<Type> thread_local datasub2[maxN];
+    complex<Type> thread_local datasub3[maxN];
+    complex<Type> thread_local c1[1];                                                                    // default constructor not called
+    complex<Type> thread_local c2[1];
+    Type thread_local a;
+    int thread_local PF,NoverPF;
+    int thread_local kleft,kright,mleft,nright,tail;
+    complex<Type> thread_local roots[maxN];
+    int thread_local Factor;
 
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
@@ -250,16 +248,15 @@ int modulo_inverse(int g,int p) {
 
 template <class Type>
 void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,int N,Type pi) {
-    int static thread_local g,ginv;
-    int static thread_local mapg[maxN];
-    int static thread_local mapginv[maxN];
-    int static thread_local newN;
-    int static thread_local i;
-    complex<Type> static thread_local padded1[maxN];
-    complex<Type> static thread_local padded2[maxN];
-    complex<Type> static thread_local result1[maxN];
-    complex<Type> static thread_local result2[maxN];
-//    #pragma omp threadprivate(g,ginv,mapg,mapginv,newN,padded1,padded2,result1,result2)
+    int thread_local g,ginv;
+    int thread_local mapg[maxN];
+    int thread_local mapginv[maxN];
+    int thread_local newN;
+    int thread_local i;
+    complex<Type> thread_local padded1[maxN];
+    complex<Type> thread_local padded2[maxN];
+    complex<Type> thread_local result1[maxN];
+    complex<Type> thread_local result2[maxN];
 
     g = generator(N);
     ginv = modulo_inverse(g,N);

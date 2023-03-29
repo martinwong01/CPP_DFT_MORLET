@@ -3,16 +3,15 @@
 
 template <class Type>
 void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,Type pi) {
-    int static thread_local k,n,s;
-    Type static thread_local a2[maxN][maxS],b2[maxN][maxS];
-    Type static thread_local a,b;
-    Type static thread_local freq[maxN];
-    Type static thread_local scale[maxS];
-    Type static thread_local wavefunc[maxS][maxN];
-    complex<Type> static thread_local dft[maxN];
-    complex<Type> static thread_local dft_product[maxS][maxN];
-    complex<Type> static thread_local datacomplex[maxN];
-//    #pragma omp threadprivate(k,n,s,a2,b2,a,b,freq,scale,wavefunc,dft,dft_product,datacomplex)
+    int thread_local k,n,s;
+    Type thread_local a2[maxN][maxS],b2[maxN][maxS];
+    Type thread_local a,b;
+    Type thread_local freq[maxN];
+    Type thread_local scale[maxS];
+    Type thread_local wavefunc[maxS][maxN];
+    complex<Type> thread_local dft[maxN];
+    complex<Type> thread_local dft_product[maxS][maxN];
+    complex<Type> thread_local datacomplex[maxN];
 
     for(s=0;s<S;s++) scale[s] = pow(2.,s/4.);                                        // set scales with dj=0.25
 

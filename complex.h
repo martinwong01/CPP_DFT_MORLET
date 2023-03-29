@@ -6,9 +6,9 @@ class complex {
     Type real;
     Type imga;
     public:
-    complex() { real = 0.; imga = 0.; }                                  // constructors
-    complex(Type r,Type i) { real = r; imga = i; }
-    complex(Type angle) { real = cos(angle); imga = sin(angle); } 
+    complex<Type>() { real = 0.; imga = 0.; }                                  // constructors
+    complex<Type>(Type r,Type i) { real = r; imga = i; }
+    complex<Type>(Type angle) { real = cos(angle); imga = sin(angle); } 
     void operator=(complex<Type> c) {
         real = c.real;
 	imga = c.imga;

@@ -84,7 +84,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(k=0;k<Product;k++) {
 	    kkleft = k*kleft;
 	    kkright = k*kright;
-	    nnright = n*nright;
 	    for(n=0;n<Factor;n++) {                                                       //    m=0, summation index
 		p = n*k;
 		p = p%PF;

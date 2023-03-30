@@ -22,9 +22,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local datatemp[maxN];
     complex<Type> thread_local outtemp[maxN];
     int thread_local kkleft,kkright,mmleft,nnright;
+    complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
-    if(sign < 0) for(i=0;i<N;i++) datatemp[i] *= (Type)N;
+    if(sign < 0) {
+        a = N;
+        for(i=0;i<N;i++) datatemp[i] *= a;
+    }
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         c1[0].setangle(-2.*pi/N);
@@ -38,9 +42,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(i=1;i<N/2+1;i++) { roots[i] = roots[i-1]*c1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
     }
 
-
+  outptr = outtemp;
+  dataptr = datatemp;
   while(1) {
-    for(n=0;n<N;n++) outtemp[n].setzero();
+    for(n=0;n<N;n++) outptr[n].setzero();
     Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
 
     PF = Product*Factor;
@@ -58,9 +63,9 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkleft = k*kleft;
 	    kkright = k*kright;
             for(t=0;t<tail;t++) {
-                c2[0] = roots[p]*datatemp[kkright+nright+t];
-                outtemp[kkleft+t] += datatemp[kkright+t] + c2[0];
-		outtemp[kkleft+mleft+t] += datatemp[kkright+t] - c2[0]; 
+                c2[0] = roots[p]*dataptr[kkright+nright+t];
+                outptr[kkleft+t] += dataptr[kkright+t] + c2[0];
+		outptr[kkleft+mleft+t] += dataptr[kkright+t] - c2[0]; 
             }
 	}
     } else if(Factor <= maxCooleyTukey) {
@@ -75,7 +80,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    p = p*NoverPF;
 		    nnright = n*nright;
                     for(t=0;t<tail;t++) {
-                        outtemp[kkleft+mmleft+t] += roots[p]*datatemp[kkright+nnright+t];
+                        outptr[kkleft+mmleft+t] += roots[p]*dataptr[kkright+nnright+t];
 		    }
 		} 
             }
@@ -90,7 +95,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		p = p*NoverPF;
 		nnright = n*nright;
                 for(t=0;t<tail;t++) 
-		    outtemp[kkleft+0*mleft+t] += roots[p]*datatemp[kkright+nnright+t];
+		    outptr[kkleft+0*mleft+t] += roots[p]*dataptr[kkright+nnright+t];
 	    }
 
 	    for(t=0;t<tail;t++) {                                                         //    m=1,.....
@@ -98,20 +103,20 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     p = q*k;
                     p = p%PF;		
 	            p = p*NoverPF;	    
-                    datasub1[q] = roots[p]*datatemp[kkright+q*nright+t];
+                    datasub1[q] = roots[p]*dataptr[kkright+q*nright+t];
 		    datasub2[q] = roots[((q*Product)%PF)*NoverPF];
 		}
 		Rader<Type>(datasub1,datasub2,datasub3,Factor,pi);
 	        for(m=1;m<Factor;m++) 
-		    outtemp[kkleft+m*mleft+t] = datatemp[kkright+t] + datasub3[m];	    
+		    outptr[kkleft+m*mleft+t] = dataptr[kkright+t] + datasub3[m];	    
 	    }
 	}
     }
 
     if(PF != N) {
-        std::swap(outtemp,datatemp);
+        std::swap(outptr,dataptr);
     } else {
-        memcpy(out,outtemp,N*sizeof(complex<Type>));
+        memcpy(out,outptr,N*sizeof(complex<Type>));
 	a = 1./N;
         for(n=0;n<N;n++) out[n] *= a;
         break;	
@@ -137,9 +142,13 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     complex<Type> thread_local datatemp[maxN];
     complex<Type> thread_local outtemp[maxN];
     int thread_local kkleft,kkright,mmleft,nnright;
+    complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
-    if(sign < 0) for(i=0;i<N;i++) datatemp[i] *= (Type)N;
+    if(sign < 0) {
+        a = N;
+        for(i=0;i<N;i++) datatemp[i] *= a;
+    }
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         c1[0].setangle(-2.*pi/N);
@@ -153,8 +162,10 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
         for(i=1;i<N/2+1;i++) { roots[i] = roots[i-1]*c1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
     }
 
+  outptr = outtemp;
+  dataptr = datatemp;
   while(1) {
-    for(n=0;n<N;n++) outtemp[n].setzero();
+    for(n=0;n<N;n++) outptr[n].setzero();
     Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
 
     PF = Product*Factor;
@@ -172,9 +183,9 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
 	    kkright = k*kright;
             p = k*NoverPF; 
             for(t=0;t<tail;t++) {
-                c2[0] = roots[p]*datatemp[kkright+nright+t];
-                outtemp[kkleft+t] += datatemp[kkright+t] + c2[0];
-	        outtemp[kkleft+mleft+t] += datatemp[kkright+t] - c2[0]; 
+                c2[0] = roots[p]*dataptr[kkright+nright+t];
+                outptr[kkleft+t] += dataptr[kkright+t] + c2[0];
+	        outptr[kkleft+mleft+t] += dataptr[kkright+t] - c2[0]; 
             }
 	}
     } else {
@@ -182,9 +193,9 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     }
 
     if(PF != N) {
-        std::swap(outtemp,datatemp);
+        std::swap(outptr,dataptr);
     } else {
-        memcpy(out,outtemp,N*sizeof(complex<Type>));
+        memcpy(out,outptr,N*sizeof(complex<Type>));
 	a = 1./N;
         for(n=0;n<N;n++) out[n] *= a;
         break;	

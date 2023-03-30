@@ -73,6 +73,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		for(n=0;n<Factor;n++) {                                               // summation index
 		    p = (n*j)%PF;
 		    p = p*NoverPF;
+		    nnright = n*nright;
                     for(t=0;t<tail;t++) {
                         outtemp[kkleft+mmleft+t] += roots[p]*datatemp[kkright+nnright+t];
 		    }
@@ -88,6 +89,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		p = n*k;
 		p = p%PF;
 		p = p*NoverPF;
+		nnright = n*nright;
                 for(t=0;t<tail;t++) 
 		    outtemp[kkleft+0*mleft+t] += roots[p]*datatemp[kkright+nnright+t];
 	    }

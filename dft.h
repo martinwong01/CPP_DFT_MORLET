@@ -25,10 +25,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
-    if(sign < 0) {
-        a = N;
-        for(i=0;i<N;i++) datatemp[i] *= a;
-    }
+//    if(sign < 0) {
+//        a = N;
+//        for(i=0;i<N;i++) datatemp[i] *= a;
+//    }
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         c1[0].setangle(-2.*pi/N);
@@ -91,7 +91,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkright = k*kright;
 	    for(n=0;n<Factor;n++) {                                                       //    m=0, summation index
 		p = n*k;
-		p = p%PF;
+		//p = p%PF;
 		p = p*NoverPF;
 		nnright = n*nright;
                 for(t=0;t<tail;t++) 
@@ -101,7 +101,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    for(t=0;t<tail;t++) {                                                         //    m=1,.....
 		for(q=1;q<Factor;q++) {
                     p = q*k;
-                    p = p%PF;		
+                    //p = p%PF;		
 	            p = p*NoverPF;	    
                     datasub1[q] = roots[p]*dataptr[kkright+q*nright+t];
 		    datasub2[q] = roots[((q*Product)%PF)*NoverPF];
@@ -117,8 +117,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         std::swap(outptr,dataptr);
     } else {
         memcpy(out,outptr,N*sizeof(complex<Type>));
-	a = 1./N;
-        for(n=0;n<N;n++) out[n] *= a;
+	if(sign > 0) {
+            a = 1./N;
+            for(n=0;n<N;n++) out[n] *= a;
+	}
         break;	
     }
 
@@ -145,10 +147,10 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
-    if(sign < 0) {
-        a = N;
-        for(i=0;i<N;i++) datatemp[i] *= a;
-    }
+//    if(sign < 0) {
+//        a = N;
+//        for(i=0;i<N;i++) datatemp[i] *= a;
+//    }
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         c1[0].setangle(-2.*pi/N);
@@ -196,8 +198,10 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
         std::swap(outptr,dataptr);
     } else {
         memcpy(out,outptr,N*sizeof(complex<Type>));
-	a = 1./N;
-        for(n=0;n<N;n++) out[n] *= a;
+	if(sign > 0) {
+            a = 1./N;
+            for(n=0;n<N;n++) out[n] *= a;
+	}
         break;	
     }
 

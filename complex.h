@@ -44,6 +44,12 @@ class complex {
 	cc.imga = (imga*c.real-real*c.imga)/a;
 	return cc;
     }
+    complex<Type> turnleft() {
+        complex<Type> cc;
+	cc.real = -imga;
+	cc.imga = real;
+	return cc;
+    }
     complex<Type> conjugate() {
         complex<Type> cc;
         cc.real = real;

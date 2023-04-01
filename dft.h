@@ -68,6 +68,23 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		outptr[kkleft+mleft+t] += dataptr[kkright+t] - c2[0]; 
             }
 	}
+/*    } else if(Factor <= maxCooleyTukey) {
+	for(k=0;k<Product;k++) {
+	    kkleft = k*kleft;
+	    kkright = k*kright;
+	    for(m=0;m<Factor;m++) {
+	        j = k+m*Product;
+		mmleft = m*mleft;
+		for(n=0;n<Factor;n++) {                                               // summation index
+		    p = (n*j)%PF;
+		    p = p*NoverPF;
+		    nnright = n*nright;
+                    for(t=0;t<tail;t++) {
+                        outptr[kkleft+mmleft+t] += roots[p]*dataptr[kkright+nnright+t];
+		    }
+		} 
+            }
+	}*/
     } else if(Factor <= maxCooleyTukey) {
 	for(k=0;k<Product;k++) {
 	    kkleft = k*kleft;

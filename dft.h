@@ -15,6 +15,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local c1[1];                                                                    // default constructor not called
     complex<Type> thread_local c2[1];
     complex<Type> thread_local c3[1];
+    complex<Type> thread_local c4[1];
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
@@ -75,13 +76,16 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkright = k*kright;
 	    for(n=0;n<Factor;n++) {                                               // summation index
 	        nnright = n*nright;
+		i = n*k*NoverPF;
                 for(t=0;t<tail;t++) {
-		    c2[0] = roots[n*k*NoverPF]*dataptr[kkright+nnright+t];
+		    c2[0] = roots[i]*dataptr[kkright+nnright+t];
 		    outptr[kkleft+0*mleft+t] += c2[0];                            // m = 0
 		    for(m=1;m<(Factor+1)/2;m++) {
-		        c3[0] = c2[0]*roots[n*m*mleft%N];
-			outptr[kkleft+m*mleft+t] += c3[0];
-			outptr[kkleft+(Factor-m)*mleft+t] += c3[0].conjugate();
+		        j = n*m*mleft%N;
+		        c3[0] = c2[0]*roots[j].realpart();
+			c4[0] = c2[0].turnleft()*roots[j].imgapart();
+			outptr[kkleft+m*mleft+t] += c3[0]+c4[0];
+			outptr[kkleft+(Factor-m)*mleft+t] += c3[0]-c4[0];
 		    }
 		}
 	    } 

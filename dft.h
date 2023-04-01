@@ -14,6 +14,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local datasub3[maxN];
     complex<Type> thread_local c1[1];                                                                    // default constructor not called
     complex<Type> thread_local c2[1];
+    complex<Type> thread_local c3[1];
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
@@ -68,23 +69,23 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		outptr[kkleft+mleft+t] += dataptr[kkright+t] - c2[0]; 
             }
 	}
-/*    } else if(Factor <= maxCooleyTukey) {
+    } else if(Factor <= maxCooleyTukey) {
 	for(k=0;k<Product;k++) {
 	    kkleft = k*kleft;
 	    kkright = k*kright;
-	    for(m=0;m<Factor;m++) {
-	        j = k+m*Product;
-		mmleft = m*mleft;
-		for(n=0;n<Factor;n++) {                                               // summation index
-		    p = (n*j)%PF;
-		    p = p*NoverPF;
-		    nnright = n*nright;
-                    for(t=0;t<tail;t++) {
-                        outptr[kkleft+mmleft+t] += roots[p]*dataptr[kkright+nnright+t];
+	    for(n=0;n<Factor;n++) {                                               // summation index
+	        nnright = n*nright;
+                for(t=0;t<tail;t++) {
+		    c2[0] = roots[n*k*NoverPF]*dataptr[kkright+nnright+t];
+		    outptr[kkleft+0*mleft+t] += c2[0];
+		    for(m=1;m<(Factor+1)/2;m++) {
+		        c3[0] = c2[0]*roots[n*m*N/Factor%N];
+			outptr[kkleft+m*mleft+t] += c3[0];
+			outptr[kkleft+(Factor-m)*mleft+t] += c3[0].conjugate();
 		    }
-		} 
-            }
-	}*/
+		}
+	    } 
+	}
     } else if(Factor <= maxCooleyTukey) {
 	for(k=0;k<Product;k++) {
 	    kkleft = k*kleft;

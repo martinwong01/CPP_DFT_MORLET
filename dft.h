@@ -79,7 +79,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    c2[0] = roots[n*k*NoverPF]*dataptr[kkright+nnright+t];
 		    outptr[kkleft+0*mleft+t] += c2[0];
 		    for(m=1;m<(Factor+1)/2;m++) {
-		        c3[0] = c2[0]*roots[n*m*N/Factor%N];
+		        c3[0] = c2[0]*roots[n*m*mleft%N];
 			outptr[kkleft+m*mleft+t] += c3[0];
 			outptr[kkleft+(Factor-m)*mleft+t] += c3[0].conjugate();
 		    }

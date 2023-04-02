@@ -40,6 +40,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
   outptr = outtemp;
   dataptr = datatemp;
   while(1) {
+    #pragma omd simd
     for(n=0;n<N;n++) outptr[n].setzero();
     Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
 
@@ -60,6 +61,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             p += NoverPF;
 	    kkleft += kleft;
 	    kkright += kright;
+	    #pragma omd simd
             for(t=0;t<tail;t++) {
                 datasub2[t] = roots[p]*dataptr[kkright+nright+t];
                 outptr[kkleft+t] += dataptr[kkright+t] + datasub2[t];
@@ -99,6 +101,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    for(n=0;n<Factor;n++) {                                                       //    m=0, summation index
 		p = n*k*NoverPF;
 		nnright += nright;
+		#pragma omd simd
                 for(t=0;t<tail;t++) 
 		    outptr[kkleft+0*mleft+t] += roots[p]*dataptr[kkright+nnright+t];
 	    }
@@ -109,6 +112,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    datasub2[q] = roots[q*Product*NoverPF];
 		}
 		Rader<Type>(datasub1,datasub2,datasub3,Factor,pi);
+		#pragma omd simd
 	        for(m=1;m<Factor;m++) 
 		    outptr[kkleft+m*mleft+t] = dataptr[kkright+t] + datasub3[m];	    
 	    }
@@ -121,6 +125,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         memcpy(out,outptr,N*sizeof(complex<Type>));
 	if(sign > 0) {
             a = 1./N;
+	    #pragma omd simd
             for(n=0;n<N;n++) out[n] *= a;
 	}
         break;	
@@ -158,6 +163,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     for(i=1;i<=k;i++) roots[i] = roots[i-1]*datasub1[0];                   //     1/8 quadrant values
     if(sign > 0) {
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap().reverse();     //     values in remaining quadrant 
+	#pragma omd simd
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnright();
 	    roots[i+(j<<1)] = roots[i].reverse();
@@ -165,6 +171,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         }
     } else {
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap();
+	#pragma omd simd
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnleft();
 	    roots[i+(j<<1)] = roots[i].reverse();
@@ -176,6 +183,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
   dataptr = datatemp;
   NoverPF = N;
   while(1) {
+    #pragma omd simd
     for(n=0;n<N;n++) outptr[n].setzero();
     Factor = 2;                                                       // find the smallest factor of N/Product
 
@@ -196,6 +204,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkleft += kleft;
 	    kkright += kright;
             p += NoverPF; 
+	    #pragma omd simd
             for(t=0;t<tail;t++) {
                 datasub2[t] = roots[p]*dataptr[kkright+nright+t];
                 outptr[kkleft+t] += dataptr[kkright+t] + datasub2[t];
@@ -212,6 +221,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         memcpy(out,outptr,N*sizeof(complex<Type>));
 	if(sign > 0) {
             a = 1./N;
+	    #pragma omd simd
             for(n=0;n<N;n++) out[n] *= a;
 	}
         break;	
@@ -320,14 +330,20 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
             newN <<= 1;
     }
 
+    #pragma omd simd
     for(int q=0;q<newN;q++) { padded1[q].setzero(); padded2[q].setzero(); }
+    #pragma omd simd
     for(int q=0;q<N-1;q++) padded1[q] = datasub1[mapg[q]];
+    #pragma omd simd
     for(int q=0;q<N-1;q++) padded2[q] = datasub2[mapginv[q]];
+    #pragma omd simd
     for(int q=1;q<N-1;q++) padded2[newN-N+1+q] = padded2[q];
     fft_func<Type>(padded1,result1,newN,1,pi,1);    
     fft_func<Type>(padded2,result2,newN,1,pi,1);
+    #pragma omd simd
     for(int q=0;q<newN;q++) result1[q] *= result2[q]*newN; 
     fftinv_func<Type>(result1,result2,newN,pi); 
+    #pragma omd simd
     for(int p=0;p<N-1;p++) out[mapginv[p]] = result2[p];                                     // rearrange    
 }
 

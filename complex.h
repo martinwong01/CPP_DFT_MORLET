@@ -50,6 +50,18 @@ class complex {
 	cc.imga = real;
 	return cc;
     }
+    complex<Type> turnright() {
+        complex<Type> cc;
+	cc.real = imga;
+	cc.imga = -real;
+	return cc;
+    }
+    complex<Type> reverse() {
+        complex<Type> cc;
+	cc.real = -real;
+	cc.imga = -imga;
+	return cc;
+    }
     complex<Type> conjugate() {
         complex<Type> cc;
         cc.real = real;

@@ -168,16 +168,17 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
 
   outptr = outtemp;
   dataptr = datatemp;
+  NoverPF = N;
   while(1) {
     for(n=0;n<N;n++) outptr[n].setzero();
-    Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
+    Factor = 2;                                                       // find the smallest factor of N/Product
 
-    PF = Product*Factor;
-    NoverPF = N/PF;
+    PF = Product<<1;
+    NoverPF >>= 1;
 
     kleft = NoverPF;
-    kright = N/Product; 
-    mleft = N/Factor;                                                 // when m increases by 1, n increases by this
+    kright = NoverPF<<1; 
+    mleft = N>>1;                                                 // when m increases by 1, n increases by this
     nright = NoverPF;
     tail = NoverPF;
 

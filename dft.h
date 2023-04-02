@@ -319,6 +319,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     mapg[0] = 1;
     for(int q=1;q<N-1;q++) mapg[q] = mapg[q-1]*g%N;                                         // n = g^q    (mod N)  , q=[0,N-2]
     mapginv[0] = 1;
+    #pragma omd simd
     for(int p=1;p<N-1;p++) mapginv[p] = mapg[N-p-1];                                        // k/m = ginv^p (mod N)  , p=[0,N-2]
 
     // padding to 2^

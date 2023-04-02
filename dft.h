@@ -159,8 +159,14 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     else
         c1[0].setangle(2.*pi/N);
 	
+    k = N>>3;
     j = N>>2;
-    for(i=1;i<j;i++) roots[i] = roots[i-1]*c1[0];                   // 1st quadrant values
+    for(i=1;i<=k;i++) roots[i] = roots[i-1]*c1[0];                   //     1/8 quadrant values
+    if(sign > 0) {
+        for(i=1;i<k;i++) roots[k-i] = roots[i].swap().reverse();   
+    } else {
+        for(i=1;i<k;i++) roots[k-i] = roots[i].swap();    
+    }
     if(sign > 0) {
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnright();

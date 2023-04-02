@@ -31,10 +31,14 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         datasub1[0].setangle(2.*pi/N);
 
     if(N%2 == 0) {
-        for(i=1;i<N/2;i++) { roots[i] = roots[i-1]*datasub1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
+        for(i=1;i<N/2;i++) roots[i] = roots[i-1]*datasub1[0];
+	#pramga omd simd
+        for(i=1;i<N/2;i++) roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart());
 	roots[N/2].setrealimga(-1.,0.);
     } else {
-        for(i=1;i<N/2+1;i++) { roots[i] = roots[i-1]*datasub1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
+        for(i=1;i<N/2+1;i++) roots[i] = roots[i-1]*datasub1[0];
+	#pragma omd simd
+        for(i=1;i<N/2+1;i++) roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart());
     }
 
   outptr = outtemp;
@@ -83,9 +87,9 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    outptr[kkleft+0*mleft+t] += datasub2[t];                            // m = 0
 		    #pragma omd simd
 		    for(m=1;m<(Factor+1)/2;m++) {
-		        //j = n*m*mleft%N;
-		        datasub3[m] = datasub2[t]*roots[n*m*mleft%N].realpart();
-			datasub4[m] = datasub2[t].turnleft()*roots[n*m*mleft%N].imgapart();
+		        datasub1[m] = roots[n*m*mleft%N];
+		        datasub3[m] = datasub2[t]*datasub1[m].realpart();
+			datasub4[m] = datasub2[t].turnleft()*datasub1[m].imgapart();
 			outptr[kkleft+m*mleft+t] += datasub3[m]+datasub4[m];
 			outptr[kkleft+(Factor-m)*mleft+t] += datasub3[m]-datasub4[m];
 		    }
@@ -164,6 +168,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     j = N>>2;
     for(i=1;i<=k;i++) roots[i] = roots[i-1]*datasub1[0];                   //     1/8 quadrant values
     if(sign > 0) {
+        #pragma omd simd
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap().reverse();     //     values in remaining quadrant 
 	#pragma omd simd
         for(i=0;i<j;i++) {
@@ -172,6 +177,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             roots[i+(j<<2)-j] = roots[i].turnleft();
         }
     } else {
+        #pragma omd simd
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap();
 	#pragma omd simd
         for(i=0;i<j;i++) {

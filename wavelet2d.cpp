@@ -106,6 +106,7 @@ int main(int argc, char *argv[]) {
 	for(x=0;x<Nx;x++) {                                                                         // each Nx
             thread = omp_get_thread_num();
 
+	    #pragma omp simd
             for(y=0;y<Ny;y++) {
                 yseries1[thread][y] = xtransform[y][s][x].realpart();
                 yseries2[thread][y] = xtransform[y][s][x].imgapart();
@@ -115,11 +116,13 @@ int main(int argc, char *argv[]) {
             morlet<double>(yseries2[thread],transform_imga[x],Ny,Sy,param,dy,pi);
 
 	    for(i=0;i<Sy;i++)
+            #pragma omp simd
 	    for(y=0;y<Ny;y++) {
                 cwt1[x][i][y].setreal((float)(transform_real[x][i][y].realpart() - transform_imga[x][i][y].imgapart()));
                 cwt1[x][i][y].setimga((float)(transform_real[x][i][y].imgapart() + transform_imga[x][i][y].realpart()));
             }
 	    for(i=0;i<Sy;i++)
+	    #pragma omp simd
 	    for(y=0;y<Ny;y++) {
                 cwt2[x][i][y].setreal((float)(transform_real[x][i][y].realpart() + transform_imga[x][i][y].imgapart()));
                 cwt2[x][i][y].setimga((float)(transform_imga[x][i][y].realpart() - transform_real[x][i][y].imgapart()));

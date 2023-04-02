@@ -1,5 +1,5 @@
 #define maxN 65536 
-#define maxCooleyTukey 100                                       // if prime factor larger than this, use Rader algorithm
+#define maxCooleyTukey 60                                       // if prime factor larger than this, use Rader algorithm
 
 int smallfactor(int,int);
 

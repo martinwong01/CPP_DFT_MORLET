@@ -27,10 +27,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
-//    if(sign < 0) {
-//        a = N;
-//        for(i=0;i<N;i++) datatemp[i] *= a;
-//    }
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         c1[0].setangle(-2.*pi/N);
@@ -90,31 +86,12 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		}
 	    } 
 	}
-/*    } else if(Factor <= maxCooleyTukey) {
-	for(k=0;k<Product;k++) {
-	    kkleft = k*kleft;
-	    kkright = k*kright;
-	    for(m=0;m<Factor;m++) {
-	        j = k+m*Product;
-		mmleft = m*mleft;
-		for(n=0;n<Factor;n++) {                                               // summation index
-		    p = (n*j)%PF;
-		    p = p*NoverPF;
-		    nnright = n*nright;
-                    for(t=0;t<tail;t++) {
-                        outptr[kkleft+mmleft+t] += roots[p]*dataptr[kkright+nnright+t];
-		    }
-		} 
-            }
-	}*/
     } else {
         for(k=0;k<Product;k++) {
 	    kkleft = k*kleft;
 	    kkright = k*kright;
 	    for(n=0;n<Factor;n++) {                                                       //    m=0, summation index
-		p = n*k;
-		//p = p%PF;
-		p = p*NoverPF;
+		p = n*k*NoverPF;
 		nnright = n*nright;
                 for(t=0;t<tail;t++) 
 		    outptr[kkleft+0*mleft+t] += roots[p]*dataptr[kkright+nnright+t];
@@ -122,11 +99,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 
 	    for(t=0;t<tail;t++) {                                                         //    m=1,.....
 		for(q=1;q<Factor;q++) {
-                    p = q*k;
-                    //p = p%PF;		
-	            p = p*NoverPF;	    
+	            p = q*k*NoverPF;	    
                     datasub1[q] = roots[p]*dataptr[kkright+q*nright+t];
-		    //datasub2[q] = roots[((q*Product)%PF)*NoverPF];
 		    datasub2[q] = roots[q*Product*NoverPF];
 		}
 		Rader<Type>(datasub1,datasub2,datasub3,Factor,pi);
@@ -170,10 +144,6 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
-//    if(sign < 0) {
-//        a = N;
-//        for(i=0;i<N;i++) datatemp[i] *= a;
-//    }
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         c1[0].setangle(-2.*pi/N);

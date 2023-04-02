@@ -81,12 +81,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 for(t=0;t<tail;t++) {
 		    datasub2[t] = roots[i]*dataptr[kkright+nnright+t];
 		    outptr[kkleft+0*mleft+t] += datasub2[t];                            // m = 0
+		    #pragma omd simd
 		    for(m=1;m<(Factor+1)/2;m++) {
-		        j = n*m*mleft%N;
-		        datasub3[t] = datasub2[t]*roots[j].realpart();
-			datasub4[t] = datasub2[t].turnleft()*roots[j].imgapart();
-			outptr[kkleft+m*mleft+t] += datasub3[t]+datasub4[t];
-			outptr[kkleft+(Factor-m)*mleft+t] += datasub3[t]-datasub4[t];
+		        //j = n*m*mleft%N;
+		        datasub3[m] = datasub2[t]*roots[n*m*mleft%N].realpart();
+			datasub4[m] = datasub2[t].turnleft()*roots[n*m*mleft%N].imgapart();
+			outptr[kkleft+m*mleft+t] += datasub3[m]+datasub4[m];
+			outptr[kkleft+(Factor-m)*mleft+t] += datasub3[m]-datasub4[m];
 		    }
 		}
 	    } 
@@ -107,6 +108,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    }
 
 	    for(t=0;t<tail;t++) {                                                         //    m=1,.....
+	        #pragma omd simd
 		for(q=1;q<Factor;q++) {
                     datasub1[q] = roots[q*k*NoverPF]*dataptr[kkright+q*nright+t];
 		    datasub2[q] = roots[q*Product*NoverPF];

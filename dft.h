@@ -163,14 +163,8 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     for(i=1;i<j;i++) roots[i] = roots[i-1]*c1[0];                   // 1st quadrant values
     for(i=0;i<j;i++) {
         roots[i+j] = roots[i].turnleft();
-        
-    }
-
-    if(N%2 == 0) {
-        for(i=1;i<N/2;i++) { roots[i] = roots[i-1]*c1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
-	roots[N/2].setrealimga(-1.,0.);
-    } else {
-        for(i=1;i<N/2+1;i++) { roots[i] = roots[i-1]*c1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
+	roots[i+(j<<1)] = roots[i].reverse();
+        roots[i+(j<<2)-j] = roots[i].turnright();
     }
 
   outptr = outtemp;

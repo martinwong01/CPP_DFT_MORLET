@@ -135,7 +135,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 }
 
 template <class Type>
-void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
@@ -236,8 +236,8 @@ void dftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
 }
 
 template <class Type>
-void dftinv_func2(complex<Type> *data,complex<Type> *out,int N,Type pi) {
-    dft_func2<Type>(data,out,N,1,pi,-1);
+void fftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
+    fft_func<Type>(data,out,N,1,pi,-1);
 }
 
 // find the smallest factor
@@ -333,10 +333,10 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     for(int q=0;q<N-1;q++) padded1[q] = datasub1[mapg[q]];
     for(int q=0;q<N-1;q++) padded2[q] = datasub2[mapginv[q]];
     for(int q=1;q<N-1;q++) padded2[newN-N+1+q] = padded2[q];
-    dft_func2<Type>(padded1,result1,newN,1,pi,1);    
-    dft_func2<Type>(padded2,result2,newN,1,pi,1);
+    fft_func<Type>(padded1,result1,newN,1,pi,1);    
+    fft_func<Type>(padded2,result2,newN,1,pi,1);
     for(int q=0;q<newN;q++) result1[q] *= result2[q]*newN; 
-    dftinv_func2<Type>(result1,result2,newN,pi); 
+    fftinv_func<Type>(result1,result2,newN,pi); 
     for(int p=0;p<N-1;p++) out[mapginv[p]] = result2[p];                                     // rearrange    
 }
 

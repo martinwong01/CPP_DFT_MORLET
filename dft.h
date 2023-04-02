@@ -56,10 +56,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     tail = NoverPF;
 
     if(Factor == 2) {
+        p = -NoverPF;
+	kkleft = -kleft;
+	kkright = -kright;
         for(k=0;k<Product;k++) {
-            p = k*NoverPF;
-	    kkleft = k*kleft;
-	    kkright = k*kright;
+            p += NoverPF;
+	    kkleft += kleft;
+	    kkright += kright;
             for(t=0;t<tail;t++) {
                 c2[0] = roots[p]*dataptr[kkright+nright+t];
                 outptr[kkleft+t] += dataptr[kkright+t] + c2[0];
@@ -67,11 +70,14 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             }
 	}
     } else if(Factor <= maxCooleyTukey) {
+        kkleft = -kleft;
+	kkright = -kright;
 	for(k=0;k<Product;k++) {
-	    kkleft = k*kleft;
-	    kkright = k*kright;
+	    kkleft += kleft;
+	    kkright += kright;
+	    nnright = -nright;
 	    for(n=0;n<Factor;n++) {                                               // summation index
-	        nnright = n*nright;
+	        nnright += nright;
 		i = n*k*NoverPF;
                 for(t=0;t<tail;t++) {
 		    c2[0] = roots[i]*dataptr[kkright+nnright+t];
@@ -87,12 +93,15 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    } 
 	}
     } else {
+        kkleft = -kleft;
+	kkright = -kright;
         for(k=0;k<Product;k++) {
-	    kkleft = k*kleft;
-	    kkright = k*kright;
+	    kkleft += kleft;
+	    kkright += kright;
+	    nnright = -nright;
 	    for(n=0;n<Factor;n++) {                                                       //    m=0, summation index
 		p = n*k*NoverPF;
-		nnright = n*nright;
+		nnright += nright;
                 for(t=0;t<tail;t++) 
 		    outptr[kkleft+0*mleft+t] += roots[p]*dataptr[kkright+nnright+t];
 	    }
@@ -173,10 +182,13 @@ void dft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     tail = NoverPF;
 
     if(Factor == 2) {
+        kkleft = -kleft;
+	kkright = -kright;
+	p = -NoverPF;
         for(k=0;k<Product;k++) {
-	    kkleft = k*kleft;
-	    kkright = k*kright;
-            p = k*NoverPF; 
+	    kkleft += kleft;
+	    kkright += kright;
+            p += NoverPF; 
             for(t=0;t<tail;t++) {
                 c2[0] = roots[p]*dataptr[kkright+nright+t];
                 outptr[kkleft+t] += dataptr[kkright+t] + c2[0];

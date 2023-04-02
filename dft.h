@@ -12,10 +12,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
     complex<Type> thread_local datasub3[maxN];
-    complex<Type> thread_local c1[1];                                                                    // default constructor not called
-    complex<Type> thread_local c2[1];
-    complex<Type> thread_local c3[1];
-    complex<Type> thread_local c4[1];
+    complex<Type> thread_local datasub4[maxN];
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
@@ -29,15 +26,15 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     memcpy(datatemp,data,N*sizeof(complex<Type>));
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
-        c1[0].setangle(-2.*pi/N);
+        datasub1[0].setangle(-2.*pi/N);
     else
-        c1[0].setangle(2.*pi/N);
+        datasub1[0].setangle(2.*pi/N);
 
     if(N%2 == 0) {
-        for(i=1;i<N/2;i++) { roots[i] = roots[i-1]*c1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
+        for(i=1;i<N/2;i++) { roots[i] = roots[i-1]*datasub1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
 	roots[N/2].setrealimga(-1.,0.);
     } else {
-        for(i=1;i<N/2+1;i++) { roots[i] = roots[i-1]*c1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
+        for(i=1;i<N/2+1;i++) { roots[i] = roots[i-1]*datasub1[0]; roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart()); }
     }
 
   outptr = outtemp;
@@ -64,9 +61,9 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkleft += kleft;
 	    kkright += kright;
             for(t=0;t<tail;t++) {
-                c2[0] = roots[p]*dataptr[kkright+nright+t];
-                outptr[kkleft+t] += dataptr[kkright+t] + c2[0];
-		outptr[kkleft+mleft+t] += dataptr[kkright+t] - c2[0]; 
+                datasub2[t] = roots[p]*dataptr[kkright+nright+t];
+                outptr[kkleft+t] += dataptr[kkright+t] + datasub2[t];
+		outptr[kkleft+mleft+t] += dataptr[kkright+t] - datasub2[t]; 
             }
 	}
     } else if(Factor <= maxCooleyTukey) {
@@ -80,14 +77,14 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	        nnright += nright;
 		i = n*k*NoverPF;
                 for(t=0;t<tail;t++) {
-		    c2[0] = roots[i]*dataptr[kkright+nnright+t];
-		    outptr[kkleft+0*mleft+t] += c2[0];                            // m = 0
+		    datasub2[t] = roots[i]*dataptr[kkright+nnright+t];
+		    outptr[kkleft+0*mleft+t] += datasub2[t];                            // m = 0
 		    for(m=1;m<(Factor+1)/2;m++) {
 		        j = n*m*mleft%N;
-		        c3[0] = c2[0]*roots[j].realpart();
-			c4[0] = c2[0].turnleft()*roots[j].imgapart();
-			outptr[kkleft+m*mleft+t] += c3[0]+c4[0];
-			outptr[kkleft+(Factor-m)*mleft+t] += c3[0]-c4[0];
+		        datasub3[t] = datasub2[t]*roots[j].realpart();
+			datasub4[t] = datasub2[t].turnleft()*roots[j].imgapart();
+			outptr[kkleft+m*mleft+t] += datasub3[t]+datasub4[t];
+			outptr[kkleft+(Factor-m)*mleft+t] += datasub3[t]-datasub4[t];
 		    }
 		}
 	    } 
@@ -140,8 +137,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
     complex<Type> thread_local datasub3[maxN];
-    complex<Type> thread_local c1[1];                                                                    // default constructor not called
-    complex<Type> thread_local c2[1];
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
@@ -155,13 +150,13 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     memcpy(datatemp,data,N*sizeof(complex<Type>));
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
-        c1[0].setangle(-2.*pi/N);
+        datasub1[0].setangle(-2.*pi/N);
     else
-        c1[0].setangle(2.*pi/N);
+        datasub1[0].setangle(2.*pi/N);
 	
     k = N>>3;
     j = N>>2;
-    for(i=1;i<=k;i++) roots[i] = roots[i-1]*c1[0];                   //     1/8 quadrant values
+    for(i=1;i<=k;i++) roots[i] = roots[i-1]*datasub1[0];                   //     1/8 quadrant values
     if(sign > 0) {
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap().reverse();     //     values in remaining quadrant 
         for(i=0;i<j;i++) {
@@ -203,9 +198,9 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkright += kright;
             p += NoverPF; 
             for(t=0;t<tail;t++) {
-                c2[0] = roots[p]*dataptr[kkright+nright+t];
-                outptr[kkleft+t] += dataptr[kkright+t] + c2[0];
-	        outptr[kkleft+mleft+t] += dataptr[kkright+t] - c2[0]; 
+                datasub2[t] = roots[p]*dataptr[kkright+nright+t];
+                outptr[kkleft+t] += dataptr[kkright+t] + datasub2[t];
+	        outptr[kkleft+mleft+t] += dataptr[kkright+t] - datasub2[t]; 
             }
 	}
     } else {

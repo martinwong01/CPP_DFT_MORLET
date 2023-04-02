@@ -32,7 +32,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 
     if(N%2 == 0) {
         for(i=1;i<N/2;i++) roots[i] = roots[i-1]*datasub1[0];
-	#pramga omp simd
+	#pragma omp simd
         for(i=1;i<N/2;i++) roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart());
 	roots[N/2].setrealimga(-1.,0.);
     } else {

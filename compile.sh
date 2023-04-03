@@ -1,7 +1,7 @@
 #!/bin/bash
 
-optim="fast"
+optim="-fopenmp -Ofast -fopt-info-vec-all"
 
-g++ -fopenmp -O$optim -o testdft.exe testdft.cpp
-g++ -fopenmp -O$optim -o testmorlet.exe testmorlet.cpp
-g++ -fopenmp -O$optim -o wavelet2d.exe wavelet2d.cpp
+g++ $optim -o testdft.exe testdft.cpp
+g++ $optim -o testmorlet.exe testmorlet.cpp
+g++ $optim -o wavelet2d.exe wavelet2d.cpp

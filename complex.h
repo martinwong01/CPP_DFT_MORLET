@@ -112,11 +112,11 @@ class complex {
     void setreal(Type r) { real = r; }
     void setimga(Type i) { imga = i; }
     void setangle(Type angle) { real = cos(angle); imga = sin(angle); }
-    Type realpart() {
-        return real;
+    Type Re(complex<Type> c) {
+        return c.real;
     }
-    Type imgapart() {
-        return imga;
+    Type Im(complex<Type> c) {
+        return c.imga;
     }
     void print() {
         cout << real << " " << imga << endl;

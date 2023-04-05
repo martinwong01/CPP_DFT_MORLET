@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
             thread = omp_get_thread_num();
 
             for(y=0;y<Ny;y++) {
-                yseries1[thread][y] = xtransform[y][s][x].realpart();
-                yseries2[thread][y] = xtransform[y][s][x].imgapart();
+                yseries1[thread][y] = Re(xtransform[y][s][x]);
+                yseries2[thread][y] = Im(xtransform[y][s][x]);
 	    }
 
             morlet<double>(yseries1[thread],transform_real[x],Ny,Sy,param,dy,pi);
@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
 
 	    for(i=0;i<Sy;i++)
 	    for(y=0;y<Ny;y++) {
-                cwt1[x][i][y].setreal((float)(transform_real[x][i][y].realpart() - transform_imga[x][i][y].imgapart()));
-                cwt1[x][i][y].setimga((float)(transform_real[x][i][y].imgapart() + transform_imga[x][i][y].realpart()));
+                cwt1[x][i][y].setreal((float)(Re(transform_real[x][i][y]) - Im(transform_imga[x][i][y])));
+                cwt1[x][i][y].setimga((float)(Im(transform_real[x][i][y]) + Re(transform_imga[x][i][y])));
             }
 	    for(i=0;i<Sy;i++)
 	    for(y=0;y<Ny;y++) {
-                cwt2[x][i][y].setreal((float)(transform_real[x][i][y].realpart() + transform_imga[x][i][y].imgapart()));
-                cwt2[x][i][y].setimga((float)(transform_imga[x][i][y].realpart() - transform_real[x][i][y].imgapart()));
+                cwt2[x][i][y].setreal((float)(Re(transform_real[x][i][y]) + Im(transform_imga[x][i][y])));
+                cwt2[x][i][y].setimga((float)(Re(transform_imga[x][i][y]) - Im(transform_real[x][i][y])));
             }
 	}
         }

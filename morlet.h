@@ -51,5 +51,47 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     }
 }
 
+template <class Type>
+Type integral_reconstruction(Type param) {
+    Type thread_local sum;
+    Type thread_local localbnd = 0.0001;
+    Type thread_local upperbnd = 10000.;
+    Type thread_local dx = localbnd;
+    unsigned int thread_local intervals;
+    unsigned int i;
+    Type thread_local x;
+    Type thread_local pi = atan(1.)*4.;
 
+    intervals = (unsigned int)(upperbnd/localbnd);
+    sum = 0.;
+
+    for(i=1;i<=intervals;i++) {
+        x = i*localbnd;
+        sum += exp(-0.5*(x-param)*(x-param))/x;
+    }
+    sum *= pow(pi,-0.25)*dx;
+    return sum;
+}
+
+template <class Type>
+Type integral_covariance(Type param) {
+    Type thread_local sum;
+    Type thread_local localbnd = 0.0001;
+    Type thread_local upperbnd = 10000.;
+    Type thread_local dx = localbnd;
+    unsigned int thread_local intervals;
+    unsigned int i;
+    Type thread_local x;
+    Type thread_local pi = atan(1.)*4.;
+
+    intervals = (unsigned int)(upperbnd/localbnd);
+    sum = 0.;
+
+    for(i=1;i<=intervals;i++) {
+        x = i*localbnd;
+        sum += exp(-(x-param)*(x-param))/x;
+    }
+    sum *= pow(pi,-0.5)*dx;
+    return sum;
+}
 

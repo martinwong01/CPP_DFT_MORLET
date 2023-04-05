@@ -32,11 +32,11 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 
     if(N%2 == 0) {
         for(i=1;i<N/2;i++) roots[i] = roots[i-1]*datasub1[0];
-        for(i=1;i<N/2;i++) roots[N-i].setrealimga(roots[i].getreal,-roots[i].getimga);
+        for(i=1;i<N/2;i++) roots[N-i].setrealimga(roots[i].getreal(),-roots[i].getimga());
 	roots[N/2].setrealimga(-1.,0.);
     } else {
         for(i=1;i<N/2+1;i++) roots[i] = roots[i-1]*datasub1[0];
-        for(i=1;i<N/2+1;i++) roots[N-i].setrealimga(roots[i].getreal,-roots[i].getimga);
+        for(i=1;i<N/2+1;i++) roots[N-i].setrealimga(roots[i].getreal(),-roots[i].getimga());
     }
 
   outptr = outtemp;

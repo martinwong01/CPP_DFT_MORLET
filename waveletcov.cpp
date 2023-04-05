@@ -2,6 +2,8 @@
 #include <cmath>
 #include "allocate.h"
 #include "complex.h"
+#include "dft.h"
+#include "morlet.h"
 #include "omp.h"
 using namespace std;
 

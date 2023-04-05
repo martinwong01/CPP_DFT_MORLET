@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
     // set constants
     pi = atan(1.)*4.;
-    param = 
+    param = 16.*pi/9.-9./32./pi;
 
     Nthreads = omp_get_max_threads();
     printf("THREADS = %d\n",Nthreads);

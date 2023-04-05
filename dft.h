@@ -32,11 +32,11 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 
     if(N%2 == 0) {
         for(i=1;i<N/2;i++) roots[i] = roots[i-1]*datasub1[0];
-        for(i=1;i<N/2;i++) roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart());
+        for(i=1;i<N/2;i++) roots[N-i].setrealimga(Re(roots[i]),-Im(roots[i]));
 	roots[N/2].setrealimga(-1.,0.);
     } else {
         for(i=1;i<N/2+1;i++) roots[i] = roots[i-1]*datasub1[0];
-        for(i=1;i<N/2+1;i++) roots[N-i].setrealimga(roots[i].realpart(),-roots[i].imgapart());
+        for(i=1;i<N/2+1;i++) roots[N-i].setrealimga(Re(roots[i]),-Im(roots[i]));
     }
 
   outptr = outtemp;
@@ -83,8 +83,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    outptr[kkleft+0*mleft+t] += datasub2[t];                            // m = 0
 		    for(m=1;m<(Factor+1)/2;m++) {
 		        datasub1[m] = roots[n*m*mleft%N];
-		        datasub3[m] = datasub2[t]*datasub1[m].realpart();
-			datasub4[m] = datasub2[t].turnleft()*datasub1[m].imgapart();
+		        datasub3[m] = datasub2[t]*Re(datasub1[m]);
+			datasub4[m] = datasub2[t].turnleft()*Im(datasub1[m]);
 			outptr[kkleft+m*mleft+t] += datasub3[m]+datasub4[m];
 			outptr[kkleft+(Factor-m)*mleft+t] += datasub3[m]-datasub4[m];
 		    }

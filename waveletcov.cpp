@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     double a;
     double b;
     double pi;
+    double param;
 
     // number of threads
     complex<float> ***cwt1;                     // input                                      Dim: [Nx][Sy][Ny]
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
 
     // set constants
     pi = atan(1.)*4.;
+    param = 
 
     Nthreads = omp_get_max_threads();
     printf("THREADS = %d\n",Nthreads);
@@ -151,7 +153,7 @@ int main(int argc, char *argv[]) {
 	}
     }
 
-    a = 0.5*dx*dy/Ny/Nx*pow(0.25*log(2.)/pi/0.185142,2.);
+    a = 0.5*dx*dy/Ny/Nx*pow(0.25*log(2.)/pi/integral_covariance(param),2.);
 
     for(s=0;s<Sx;s++)
     for(k=0;k<Sy;k++)

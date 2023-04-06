@@ -200,8 +200,8 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             p += NoverPF; 
             for(t=0;t<tail;t++) {
                 datasub2[t] = roots[p]*dataptr[kkright+nright+t];
-                outptr[kkleft+t] += dataptr[kkright+t] + datasub2[t];
-	        outptr[kkleft+mleft+t] += dataptr[kkright+t] - datasub2[t]; 
+                outptr[kkleft+t] = dataptr[kkright+t] + datasub2[t];
+	        outptr[kkleft+mleft+t] = dataptr[kkright+t] - datasub2[t]; 
             }
 	}
     } else {

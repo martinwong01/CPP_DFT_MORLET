@@ -1,5 +1,6 @@
-#define maxN 65536 
+#define maxN 131072 
 #define maxCooleyTukey 60                                       // if prime factor larger than this, use Rader algorithm
+#include "table.h"
 
 int smallfactor(int,int);
 
@@ -224,12 +225,101 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 }
 
 template <class Type>
+void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+    int thread_local i,j,k,m,n,p,q,h;
+    complex<Type> thread_local datasub1[maxN];
+    complex<Type> thread_local datasub2[maxN];
+    complex<Type> thread_local c1,c2;
+    Type thread_local a;
+    int thread_local PF,NoverPF;
+    int thread_local head,hhead;
+    complex<Type> thread_local roots[maxN];
+    int thread_local Factor;
+
+    i = N;
+    j = 0;
+    while(i != 1) { i>>=1; j++; }
+    for(i=0;i<N;i++)
+        out[table[j][i]] = data[i];
+    roots[0].setrealimga(1.,0.);
+    if(sign > 0)
+        datasub1[0].setangle(-2.*pi/N);
+    else
+        datasub1[0].setangle(2.*pi/N);
+
+    k = N>>3;
+    j = N>>2;
+    for(i=1;i<=k;i++) roots[i] = roots[i-1]*datasub1[0];                   //     1/8 quadrant values
+    if(sign > 0) {
+        for(i=1;i<k;i++) roots[j-i] = roots[i].swap().reverse();     //     values in remaining quadrant
+        for(i=0;i<j;i++) {
+            roots[i+j] = roots[i].turnright();
+            roots[i+(j<<1)] = roots[i].reverse();
+            roots[i+(j<<2)-j] = roots[i].turnleft();
+        }
+    } else {
+        for(i=1;i<k;i++) roots[j-i] = roots[i].swap();
+        for(i=0;i<j;i++) {
+            roots[i+j] = roots[i].turnleft();
+            roots[i+(j<<1)] = roots[i].reverse();
+            roots[i+(j<<2)-j] = roots[i].turnright();
+        }
+    }
+
+  NoverPF = N;
+  while(1) {
+    Factor = 2;                                                       // find the smallest factor of N/Product
+
+    PF = Product<<1;
+    NoverPF >>= 1;
+
+    head = NoverPF;
+
+    if(Factor == 2) {
+        p = -NoverPF;
+        for(k=0;k<Product;k++) {
+            p += NoverPF;
+            hhead = -PF;
+            for(h=0;h<head;h++) {
+                hhead += PF;
+                //datasub1[hhead] = out[hhead+k];
+                //datasub2[hhead] = roots[p]*out[hhead+Product+k];
+                //out[hhead+k] = datasub1[hhead] + datasub2[hhead];
+                //out[hhead+Product+k] = datasub1[hhead] - datasub2[hhead];
+                c1 = out[hhead+k];
+                c2 = roots[p]*out[hhead+Product+k];
+                out[hhead+k] = c1 + c2;
+                out[hhead+Product+k] = c1 - c2;
+            }
+        }
+    } else {
+        printf("ERROR Rader\n");
+    }
+
+    if(PF == N) {
+        if(sign > 0) {
+            a = 1./N;
+            for(n=0;n<N;n++) out[n] *= a;
+        }
+        break;
+    }
+
+    Product = PF;
+  }
+}
+
+template <class Type>
 void dftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
     dft_func<Type>(data,out,N,1,pi,-1);
 }
 
 template <class Type>
 void fftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
+    fft_func<Type>(data,out,N,1,pi,-1);
+}
+
+template <class Type>
+void fftinv_func2(complex<Type> *data,complex<Type> *out,int N,Type pi) {
     fft_func<Type>(data,out,N,1,pi,-1);
 }
 

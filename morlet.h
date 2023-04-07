@@ -1,4 +1,4 @@
-#define maxN 65536
+#define maxN 131072
 #define maxS 128
 
 template <class Type>

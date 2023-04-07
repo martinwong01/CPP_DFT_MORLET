@@ -22,7 +22,7 @@ int main() {
 
   m = log2(maxn);
 
-  for(int n=3;n<=m;n++) {
+  for(int n=0;n<=m;n++) {
     i = 1;
     for(int j=1;j<=n;j++) i<<=1;
     printf("int table%d[] = {",n);
@@ -31,9 +31,9 @@ int main() {
   }
 
   printf("\n");
-  printf("int *table[] = {NULL,NULL,NULL,");
+  printf("int *table[] = {");
 
-  for(int n=3;n<=m-1;n++) {
+  for(int n=0;n<=m-1;n++) {
     printf("table%d,",n);
   }
   printf("table%d};\n",m);

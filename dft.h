@@ -276,6 +276,19 @@ void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     head = NoverPF;
 
     if(Factor == 2) {
+        hhead = -PF;
+        for(h=0;h<head;h++) {
+            hhead += PF;
+            p = -NoverPF;
+            for(k=0;k<Product;k++) {
+                p += NoverPF;
+                c1 = out[hhead+k];
+                c2 = roots[p]*out[hhead+Product+k];
+                out[hhead+k] = c1 + c2;
+                out[hhead+Product+k] = c1 - c2;
+            }
+        }
+/*    
         p = -NoverPF;
         for(k=0;k<Product;k++) {
             p += NoverPF;
@@ -292,6 +305,7 @@ void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
                 out[hhead+Product+k] = c1 - c2;
             }
         }
+*/
     } else {
         printf("ERROR Rader\n");
     }

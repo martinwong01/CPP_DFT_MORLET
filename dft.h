@@ -134,7 +134,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 }
 
 template <class Type>
-void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
@@ -225,7 +225,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 }
 
 template <class Type>
-void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,h;
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
@@ -334,7 +334,7 @@ void fftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
 
 template <class Type>
 void fftinv_func2(complex<Type> *data,complex<Type> *out,int N,Type pi) {
-    fft_func<Type>(data,out,N,1,pi,-1);
+    fft_func2<Type>(data,out,N,1,pi,-1);
 }
 
 // find the smallest factor

@@ -1,6 +1,7 @@
 #define maxN 131072 
-#define maxCooleyTukey 40                                       // if prime factor larger than this, use Rader algorithm
+#define maxCooleyTukey 40                                    // if prime factor larger than this, use Rader algorithm
 #define fft_bit_reverse 1
+#define keep_data 0                                          // keep data or not for the out-of-place fft. some speed up if 0 (not keep) 
 
 #if fft_bit_reverse == 1
     #include "table.h"
@@ -145,6 +146,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 }
 
 #if fft_bit_reverse != 1
+// out-of-place fft
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
@@ -238,6 +240,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #endif
 
 #if fft_bit_reverse == 1
+// in-place fft
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,h;

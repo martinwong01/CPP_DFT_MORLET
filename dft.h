@@ -1,7 +1,7 @@
 #define maxN 131072 
 #define maxCooleyTukey 40                                    // if prime factor larger than this, use Rader algorithm
-#define fft_bit_reverse 1
-#define keep_data 0                                          // keep data or not for the out-of-place fft. some speed up if 0 (not keep) 
+#define fft_bit_reverse 1                                    // in-place (1) or out-of-place (0) fft. 
+#define keep_data 0                                          // keep data or not if using out-of-place fft. some speed up if 0 (not keep) 
 
 #if fft_bit_reverse == 1
     #include "table.h"

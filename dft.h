@@ -1,6 +1,6 @@
 #define maxN 131072 
 #define maxCooleyTukey 40                                       // if prime factor larger than this, use Rader algorithm
-#define fft_bit_reverse 0
+#define fft_bit_reverse 1
 
 #if fft_bit_reverse == 1
     #include "table.h"

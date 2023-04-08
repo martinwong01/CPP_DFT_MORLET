@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 
     system("date");
     for(int y=0;y<1000;y++)
-        fft_func2<double>(data_d,result1_d,i,1,pi_d,1);
+        dft_func<double>(data_d,result1_d,i,1,pi_d,1);
     system("date");
 
 

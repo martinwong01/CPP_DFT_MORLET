@@ -43,7 +43,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
   outptr = outtemp;
   dataptr = datatemp;
   while(1) {
-    for(n=0;n<N;n++) outptr[n].setzero();
+    memset(outptr,'0',N*sizeof(complex<Type>));
+//    for(n=0;n<N;n++) outptr[n].setzero();
     Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
 
     PF = Product*Factor;
@@ -179,7 +180,8 @@ void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
   dataptr = datatemp;
   NoverPF = N;
   while(1) {
-    for(n=0;n<N;n++) outptr[n].setzero();
+    memset(outptr,'0',N*sizeof(complex<Type>));
+//    for(n=0;n<N;n++) outptr[n].setzero();
     Factor = 2;                                                       // find the smallest factor of N/Product
 
     PF = Product<<1;
@@ -193,11 +195,10 @@ void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
 
     if(Factor == 2) {
         kkleft = -kleft;
-	kkright = -kright;
 	p = -NoverPF;
         for(k=0;k<Product;k++) {
 	    kkleft += kleft;
-	    kkright += kright;
+	    kkright = kkleft<<1;
             p += NoverPF; 
             for(t=0;t<tail;t++) {
                 datasub2[t] = roots[p]*dataptr[kkright+nright+t];

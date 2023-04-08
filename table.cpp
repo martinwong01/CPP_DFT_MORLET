@@ -17,7 +17,7 @@ unsigned int bitReverse(unsigned int x, int log2n) {
 }
   
 int main() {
-  int maxn = 131072;
+  int maxn = 131072;                         // must be set to 2^
   int m,n,i;
 
   m = log2(maxn);

@@ -1,6 +1,10 @@
 #define maxN 131072 
 #define maxCooleyTukey 60                                       // if prime factor larger than this, use Rader algorithm
-#include "table.h"
+#define fft_bit_reverse 1
+
+#if fft_bit_reverse == 1
+    #include "table.h"
+#endif
 
 int smallfactor(int,int);
 
@@ -140,6 +144,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
   }
 }
 
+#if fft_bit_reverse != 1
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
@@ -230,9 +235,11 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     Product = PF;
   }
 }
+#endif
 
+#if fft_bit_reverse == 1
 template <class Type>
-void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,h;
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
@@ -328,6 +335,7 @@ void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
     Product = PF;
   }
 }
+#endif
 
 template <class Type>
 void dftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
@@ -337,11 +345,6 @@ void dftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
 template <class Type>
 void fftinv_func(complex<Type> *data,complex<Type> *out,int N,Type pi) {
     fft_func<Type>(data,out,N,1,pi,-1);
-}
-
-template <class Type>
-void fftinv_func2(complex<Type> *data,complex<Type> *out,int N,Type pi) {
-    fft_func2<Type>(data,out,N,1,pi,-1);
 }
 
 // find the smallest factor

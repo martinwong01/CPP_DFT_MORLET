@@ -20,4 +20,4 @@ Programs to compute Discrete Fourier Transform and Morlet continuous wavelet tra
 
 Tips:
 * You may want to read wavelet2D.pdf for the formulas to reconstruct and compute variance/covariance
-* To use the bit-reverse fft code, change fft_bit_reverse to 1 in dft.h before compiling.
+* To disable the bit-reverse fft code, change fft_bit_reverse to 0 in dft.h before compiling.

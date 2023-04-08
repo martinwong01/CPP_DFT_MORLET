@@ -23,6 +23,12 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local outtemp[maxN];
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr,*swapptr;
+    
+    i = N & (N - 1);                                                                            //  if 2^, use fft
+    if(i == 0) {
+        fft_func(data,out,N,Product,pi,sign);
+	return;
+    }
 
     memcpy(datatemp,data,N*sizeof(complex<Type>));
     roots[0].setrealimga(1.,0.);
@@ -135,7 +141,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 }
 
 template <class Type>
-void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];
@@ -226,7 +232,7 @@ void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,
 }
 
 template <class Type>
-void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
+void fft_func2(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,h;
     complex<Type> thread_local datasub1[maxN];
     complex<Type> thread_local datasub2[maxN];

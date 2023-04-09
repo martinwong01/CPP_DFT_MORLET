@@ -6,6 +6,7 @@
     #include "table.h"
 #endif
 
+int primeFactors(int,int *);
 int smallfactor(int,int);
 
 template <class Type>

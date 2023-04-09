@@ -5,6 +5,7 @@ Type **allocate2D(int i,int j) {
 
     pointer = new Type*[i];
     pointer[0] = new Type[i*j];
+    memset(pointer[0],0,i*j*sizeof(Type));
     for(m=1;m<i;m++) pointer[m] = pointer[m-1] + j;
 
     return pointer;
@@ -19,6 +20,7 @@ Type ***allocate3D(int i,int j,int k) {
     pointer = new Type**[i];
     for(m=0;m<i;m++) pointer[m] = new Type*[j];
     pointer[0][0] = new Type[i*j*k];
+    memset(pointer[0][0],0,i*j*k*sizeof(Type));
 
     oldm = 0;
     oldn = 0;
@@ -42,6 +44,7 @@ Type ****allocate4D(int i,int j,int k,int l) {
     for(m=0;m<i;m++) pointer[m] = new Type**[j];
     for(m=0;m<i;m++) for(n=0;n<j;n++) pointer[m][n] = new Type*[k];
     pointer[0][0][0] = new Type[i*j*k*l];
+    memset(pointer[0][0][0],0,i*j*k*l*sizeof(Type));
 
     oldm = 0;
     oldn = 0;
@@ -69,6 +72,7 @@ Type *****allocate5D(int i,int j,int k,int l,int m) {
     for(n=0;n<i;n++) for(o=0;o<j;o++) pointer[n][o] = new Type**[k];
     for(n=0;n<i;n++) for(o=0;o<j;o++) for(p=0;p<k;p++) pointer[n][o][p] = new Type*[l];
     pointer[0][0][0][0] = new Type[i*j*k*l*m];
+    memset(pointer[0][0][0][0],0,i*j*k*l*m*sizeof(Type));
 
     oldn = 0;
     oldo = 0;

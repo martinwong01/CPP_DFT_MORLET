@@ -1,5 +1,5 @@
 #define maxN 131072 
-#define maxCooleyTukey 40                                    // if prime factor larger than this, use Rader algorithm
+#define maxCooleyTukey 25                                    // if prime factor larger than this, use Rader algorithm
 #define fft_bit_reverse 0                                    // in-place (1) or out-of-place (0) fft. 
 
 #if fft_bit_reverse == 1

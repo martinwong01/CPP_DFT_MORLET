@@ -461,8 +461,10 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         else 
             newN <<= 1;
     }
-
-    for(int q=0;q<newN;q++) { padded1[q].setzero(); padded2[q].setzero(); }
+    
+    memset(padded1,0,newN*sizeof(complex<Type>));
+    memset(padded2,0,newN*sizeof(complex<Type>));
+//    for(int q=0;q<newN;q++) { padded1[q].setzero(); padded2[q].setzero(); }
     for(int q=0;q<N-1;q++) padded1[q] = datasub1[mapg[q]];
     for(int q=0;q<N-1;q++) padded2[q] = datasub2[mapginv[q]];
     for(int q=1;q<N-1;q++) padded2[newN-N+1+q] = padded2[q];

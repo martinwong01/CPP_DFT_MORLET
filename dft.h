@@ -22,7 +22,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
     complex<Type> thread_local roots[maxN];
-    int thread_local Factor;
+    int thread_local Factor[100];
+    int thread_local NFactor;
     complex<Type> thread_local datatemp[maxN];
     complex<Type> thread_local outtemp[maxN];
     int thread_local kkleft,kkright,mmleft,nnright;
@@ -49,24 +50,44 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(i=1;i<N/2+1;i++) roots[i] = roots[i-1]*datasub1[0];
         for(i=1;i<N/2+1;i++) roots[N-i].setrealimga(roots[i].getreal(),-roots[i].getimga());
     }
-
-  outptr = outtemp;
-  dataptr = datatemp;
-  while(1) {
+    
+    
+    NFactor = primeFactors(N,Factor);
+    
+  
+//  outptr = outtemp;
+//  dataptr = datatemp;
+  
+  for(j=0;j<NFactor;j++) {
+     if(j == 0) {
+         dataptr = data;
+	 if(NFactor%2 == 0) outptr = datatemp; else outptr = out;
+     } else if(j == 1) {
+        if(NFactor%2 == 0) {
+            dataptr = datatemp;
+            outptr = out;
+        } else {
+            dataptr = out;
+            outptr = datatemp;
+        }
+     }
+//  while(1) {
+    
+  
     memset(outptr,'0',N*sizeof(complex<Type>));
 //    for(n=0;n<N;n++) outptr[n].setzero();
-    Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
+//    Factor = smallfactor(N,Product);                                                  // find the smallest factor of N/Product
 
-    PF = Product*Factor;
+    PF = Product*Factor[j];
     NoverPF = N/PF;
 
     kleft = NoverPF;
     kright = N/Product; 
-    mleft = N/Factor;                                                 // when m increases by 1, n increases by this
+    mleft = N/Factor[j];                                                 // when m increases by 1, n increases by this
     nright = NoverPF;
     tail = NoverPF;
 
-    if(Factor == 2) {
+    if(Factor[j] == 2) {
         p = -NoverPF;
 	kkleft = -kleft;
 	kkright = -kright;
@@ -80,25 +101,25 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		outptr[kkleft+mleft+t] = dataptr[kkright+t] - datasub2[t]; 
             }
 	}
-    } else if(Factor <= maxCooleyTukey) {
+    } else if(Factor[j] <= maxCooleyTukey) {
         kkleft = -kleft;
 	kkright = -kright;
 	for(k=0;k<Product;k++) {
 	    kkleft += kleft;
 	    kkright += kright;
 	    nnright = -nright;
-	    for(n=0;n<Factor;n++) {                                               // summation index
+	    for(n=0;n<Factor[j];n++) {                                               // summation index
 	        nnright += nright;
 		i = n*k*NoverPF;
                 for(t=0;t<tail;t++) {
 		    datasub2[t] = roots[i]*dataptr[kkright+nnright+t];
 		    outptr[kkleft+0*mleft+t] += datasub2[t];                            // m = 0
-		    for(m=1;m<(Factor+1)/2;m++) {
+		    for(m=1;m<(Factor[j]+1)/2;m++) {
 		        datasub1[m] = roots[n*m*mleft%N];
 		        datasub3[m] = datasub2[t]*datasub1[m].getreal();
 			datasub4[m] = datasub2[t].turnleft()*datasub1[m].getimga();
 			outptr[kkleft+m*mleft+t] += datasub3[m]+datasub4[m];
-			outptr[kkleft+(Factor-m)*mleft+t] += datasub3[m]-datasub4[m];
+			outptr[kkleft+(Factor[j]-m)*mleft+t] += datasub3[m]-datasub4[m];
 		    }
 		}
 	    } 
@@ -110,29 +131,29 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkleft += kleft;
 	    kkright += kright;
 	    nnright = -nright;
-	    for(n=0;n<Factor;n++) {                                                       //    m=0, summation index
+	    for(n=0;n<Factor[j];n++) {                                                       //    m=0, summation index
 		p = n*k*NoverPF;
 		nnright += nright;
                 for(t=0;t<tail;t++) 
 		    outptr[kkleft+0*mleft+t] += roots[p]*dataptr[kkright+nnright+t];
 	    }
 	    
-	    for(q=1;q<Factor;q++)
+	    for(q=1;q<Factor[j];q++)
 	        datasub2[q] = roots[q*Product*NoverPF];
 	    for(t=0;t<tail;t++) {                                                         //    m=1,.....
-		for(q=1;q<Factor;q++)
+		for(q=1;q<Factor[j];q++)
 		    datasub1[q] = roots[q*k*NoverPF]*dataptr[kkright+q*nright+t];
-		Rader<Type>(datasub1,datasub2,datasub3,Factor,pi);
-	        for(m=1;m<Factor;m++) 
+		Rader<Type>(datasub1,datasub2,datasub3,Factor[j],pi);
+	        for(m=1;m<Factor[j];m++) 
 		    outptr[kkleft+m*mleft+t] = dataptr[kkright+t] + datasub3[m];	    
 	    }
 	}
     }
 
     if(PF != N) {
-        std::swap(outptr,dataptr);
+        if(j > 0) std::swap(outptr,dataptr);
     } else {
-        memcpy(out,outptr,N*sizeof(complex<Type>));
+//        memcpy(out,outptr,N*sizeof(complex<Type>));
 	if(sign > 0) {
             a = 1./N;
             for(n=0;n<N;n++) out[n] *= a;
@@ -377,6 +398,28 @@ int smallfactor(int n,int p) {
         if(n%i == 0) return i;
     if(n > 2) return n;
     return -1;
+}
+
+int primeFactors(int N,int *f)
+{
+    int nfactors = 0;
+    while(N%2 == 0) {
+        N = N>>1;
+        f[nfactors] = 2;
+        nfactors++;
+    }
+    for(int i=3;i<=sqrt(N);i+=2) {
+        while(N%i == 0) {
+            f[nfactors] = i;
+            N = N/i;
+            nfactors++;
+        }
+    }
+    if(N > 2) {
+        f[nfactors] = N;
+        nfactors++;
+    }
+    return nfactors;
 }
 
 int powmod(int a,int b,int p) {

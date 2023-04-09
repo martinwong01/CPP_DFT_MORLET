@@ -36,7 +36,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	return;
     }
 
-    memcpy(datatemp,data,N*sizeof(complex<Type>));
+//    memcpy(datatemp,data,N*sizeof(complex<Type>));
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         datasub1[0].setangle(-2.*pi/N);

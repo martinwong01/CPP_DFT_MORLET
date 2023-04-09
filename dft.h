@@ -88,7 +88,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 }
 	    }
         } else if(Factor[j] <= maxCooleyTukey) {
-            memset(outptr,'0',N*sizeof(complex<Type>));
+            memset(outptr,0,N*sizeof(complex<Type>));
             kkleft = -kleft;
 	    kkright = -kright;
 	    for(k=0;k<Product;k++) {
@@ -112,7 +112,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	        } 
 	    }
         } else {
-            memset(outptr,'0',N*sizeof(complex<Type>));
+            memset(outptr,0,N*sizeof(complex<Type>));
             kkleft = -kleft;
 	    kkright = -kright;
             for(k=0;k<Product;k++) {

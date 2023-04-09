@@ -1,7 +1,6 @@
 #define maxN 131072 
 #define maxCooleyTukey 40                                    // if prime factor larger than this, use Rader algorithm
-#define fft_bit_reverse 1                                    // in-place (1) or out-of-place (0) fft. 
-#define keep_data 0                                          // keep data or not if using out-of-place fft. some speed up if 0 (not keep) 
+#define fft_bit_reverse 0                                    // in-place (1) or out-of-place (0) fft. 
 
 #if fft_bit_reverse == 1
     #include "table.h"
@@ -163,7 +162,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr,*swapptr;
 
-    memcpy(datatemp,data,N*sizeof(complex<Type>));
+    //memcpy(datatemp,data,N*sizeof(complex<Type>));
     roots[0].setrealimga(1.,0.);
     if(sign > 0)
         datasub1[0].setangle(-2.*pi/N);
@@ -188,12 +187,32 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             roots[i+(j<<2)-j] = roots[i].turnright();
         }
     }
-
-  outptr = outtemp;
-  dataptr = datatemp;
+    
+    
+    i = N;                                                       
+    j = 0;
+    while(i != 1) { i>>=1; j++; }                                // N = 2^j
+    j = j%2;
+    
   NoverPF = N;
   while(1) {
-    memset(outptr,'0',N*sizeof(complex<Type>));
+    if(Product == 1) {
+        dataptr = data;
+        if(j == 0) outptr = datatemp; else outptr = out;
+    } else if(Product == 2) {
+        if(j == 0) {
+            dataptr = datatemp;
+            outptr = out;
+        } else {
+            dataptr = out;
+            outptr = datatemp;
+        }
+    }
+
+
+  
+  
+//    memset(outptr,'0',N*sizeof(complex<Type>));
 //    for(n=0;n<N;n++) outptr[n].setzero();
     Factor = 2;                                                       // find the smallest factor of N/Product
 
@@ -224,9 +243,9 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     }
 
     if(PF != N) {
-        std::swap(outptr,dataptr);
+        if(Product > 1) std::swap(outptr,dataptr);
     } else {
-        memcpy(out,outptr,N*sizeof(complex<Type>));
+        //memcpy(out,outptr,N*sizeof(complex<Type>));
 	if(sign > 0) {
             a = 1./N;
             for(n=0;n<N;n++) out[n] *= a;

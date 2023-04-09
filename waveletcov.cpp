@@ -69,9 +69,6 @@ int main(int argc, char *argv[]) {
     cov = allocate3D<double>(Nx,Sy,Ny);
     data = allocate5D<double>(endyear-startyear+1,12,tiles,Sx,Sy);
     data_global = allocate2D<double>(Sx,Sy);
-    for(i=0;i<Nx*Sy*Ny;i++) cov[0][0][i] = 0.;
-    for(i=0;i<(endyear-startyear+1)*12*tiles*Sx*Sy;i++) data[0][0][0][0][i] = 0.;
-    for(i=0;i<Sx*Sy;i++) data_global[0][i] = 0.;
 
 
     fp = popen("date --date='19790101' +%s","r");

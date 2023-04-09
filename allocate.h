@@ -1,3 +1,5 @@
+#include <cstring>
+
 template <typename Type>
 Type **allocate2D(int i,int j) {
     Type **pointer;

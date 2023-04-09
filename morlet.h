@@ -58,7 +58,7 @@ Type integral_reconstruction(Type param) {
     Type thread_local upperbnd = 1000.;
     Type thread_local dx = lowerbnd;
     unsigned int thread_local intervals;
-    unsigned int i;
+    unsigned int thread_local i;
     Type thread_local x;
     Type thread_local pi = atan(1.)*4.;
 
@@ -80,7 +80,7 @@ Type integral_covariance(Type param) {
     Type thread_local upperbnd = 1000.;
     Type thread_local dx = lowerbnd;
     unsigned int thread_local intervals;
-    unsigned int i;
+    unsigned int thread_local i;
     Type thread_local x;
     Type thread_local pi = atan(1.)*4.;
 

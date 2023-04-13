@@ -2,6 +2,7 @@
 #include <complex>
 #include <cmath>
 #include <iterator>
+#define align 32
 
 using namespace std;
 
@@ -25,13 +26,13 @@ int main() {
   for(int n=0;n<=m;n++) {
     i = 1;
     for(int j=1;j<=n;j++) i<<=1;
-    printf("int table%d[] = {",n);
+    printf("alignas(%d) int table%d[] = {",align,n);
     for(int j=0;j<i-1;j++) printf("%d,",bitReverse(j,n));
     printf("%d};\n",bitReverse(i-1,n));
   }
 
   printf("\n");
-  printf("int *table[] = {");
+  printf("alignas(%d) int *table[] = {",align);
 
   for(int n=0;n<=m-1;n++) {
     printf("table%d,",n);

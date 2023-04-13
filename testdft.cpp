@@ -4,6 +4,7 @@
 #include "allocate.h"
 #include "complex.h"
 #include "dft.h"
+#define align 32
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -26,9 +27,9 @@ int main(int argc, char *argv[]) {
 
   // test 1, double computations
   if(1 == 1) {
-    data_d = new complex<double>[24];
-    result1_d = new complex<double>[24];
-    result2_d = new complex<double>[24];
+    data_d = allocate1D<complex<double>>(24,align);
+    result1_d = allocate1D<complex<double>>(24,align);
+    result2_d = allocate1D<complex<double>>(24,align);
     data_d[0].setrealimga(0.,1.);
     data_d[1].setrealimga(2.,-1.);
     data_d[2].setrealimga(1.,3.);
@@ -68,17 +69,17 @@ int main(int argc, char *argv[]) {
         result2_d[n].print();
     }
 
-    delete(data_d);
-    delete(result1_d);
-    delete(result2_d);
+    free(data_d);
+    free(result1_d);
+    free(result2_d);
   } 
 
 
   // test 2, float computations
   if(1 == 1) {
-    data_f = new complex<float>[24];
-    result1_f = new complex<float>[24];
-    result2_f = new complex<float>[24];
+    data_f = allocate1D<complex<float>>(24,align);
+    result1_f = allocate1D<complex<float>>(24,align);
+    result2_f = allocate1D<complex<float>>(24,align);
     data_f[0].setrealimga(0.,1.);
     data_f[1].setrealimga(2.,-1.);
     data_f[2].setrealimga(1.,3.);
@@ -116,9 +117,9 @@ int main(int argc, char *argv[]) {
     for(n=0;n<24;n++) {
         result2_f[n].print();
     }
-    delete(data_f);
-    delete(result1_f);
-    delete(result2_f);
+    free(data_f);
+    free(result1_f);
+    free(result2_f);
   } 
 
 
@@ -126,9 +127,9 @@ int main(int argc, char *argv[]) {
   // test 3, large prime. read double data, use double to compute
   if(1 == 1) {
     i = 10007;
-    data_d = new complex<double>[i]; 
-    result1_d = new complex<double>[i]; 
-    result2_d = new complex<double>[i]; 
+    data_d = allocate1D<complex<double>>(i,align); 
+    result1_d = allocate1D<complex<double>>(i,align); 
+    result2_d = allocate1D<complex<double>>(i,align); 
     fp = fopen("data10007","r");
     for(int y=0;y<i;y++) {
         n = fscanf(fp,"%lf %lf",&a_d,&b_d);
@@ -149,18 +150,18 @@ int main(int argc, char *argv[]) {
     for(n=0;n<i;n++) {
         result2_d[n].print();
     }
-    delete(data_d);
-    delete(result1_d);
-    delete(result2_d);
+    free(data_d);
+    free(result1_d);
+    free(result2_d);
     
   }
 
   // test 4, large prime. read double data, use float to compute
   if(1 == 1) {
     i = 10007;
-    data_f = new complex<float>[i]; 
-    result1_f = new complex<float>[i]; 
-    result2_f = new complex<float>[i]; 
+    data_f = allocate1D<complex<float>>(i,align); 
+    result1_f = allocate1D<complex<float>>(i,align); 
+    result2_f = allocate1D<complex<float>>(i,align); 
     fp = fopen("data10007","r");
     for(int y=0;y<i;y++) {
         n = fscanf(fp,"%lf %lf",&a_d,&b_d);
@@ -181,9 +182,9 @@ int main(int argc, char *argv[]) {
     for(n=0;n<i;n++) {
         result2_f[n].print();
     }
-    delete(data_f);
-    delete(result1_f);
-    delete(result2_f);
+    free(data_f);
+    free(result1_f);
+    free(result2_f);
     
   }
 
@@ -191,9 +192,9 @@ int main(int argc, char *argv[]) {
   // test 5, composite number, read double data, double compute  
   if(1 == 1) {
     i = 16071;
-    data_d = new complex<double>[i]; 
-    result1_d = new complex<double>[i]; 
-    result2_d = new complex<double>[i]; 
+    data_d = allocate1D<complex<double>>(i,align); 
+    result1_d = allocate1D<complex<double>>(i,align); 
+    result2_d = allocate1D<complex<double>>(i,align); 
     fp = fopen("data16071","r");
     for(int y=0;y<i;y++) {
         n = fscanf(fp,"%lf %lf",&a_d,&b_d);
@@ -215,9 +216,9 @@ int main(int argc, char *argv[]) {
         result2_d[n].print();
     }
     
-    delete(data_d);
-    delete(result1_d);
-    delete(result2_d);
+    free(data_d);
+    free(result1_d);
+    free(result2_d);
   }
 
 

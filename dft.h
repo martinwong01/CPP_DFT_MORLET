@@ -1,6 +1,7 @@
 #define maxN 131072 
 #define maxCooleyTukey 25                                    // if prime factor larger than this, use Rader algorithm
 #define fft_bit_reverse 0                                    // in-place (1) or out-of-place (0) fft. 
+#define align 32
 
 #if fft_bit_reverse == 1
     #include "table.h"
@@ -14,17 +15,17 @@ void Rader(complex<Type> *,complex<Type> *,complex<Type> *,int,Type);
 template <class Type>
 void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
-    complex<Type> thread_local datasub1[maxN];
-    complex<Type> thread_local datasub2[maxN];
-    complex<Type> thread_local datasub3[maxN];
-    complex<Type> thread_local datasub4[maxN];
+    alignas(align) complex<Type> thread_local datasub1[maxN];
+    alignas(align) complex<Type> thread_local datasub2[maxN];
+    alignas(align) complex<Type> thread_local datasub3[maxN];
+    alignas(align) complex<Type> thread_local datasub4[maxN];
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
-    complex<Type> thread_local roots[maxN];
-    int thread_local Factor[100];
+    alignas(align) complex<Type> thread_local roots[maxN];
+    alignas(align) int thread_local Factor[100];
     int thread_local NFactor;
-    complex<Type> thread_local datatemp[maxN];
+    alignas(align) complex<Type> thread_local datatemp[maxN];
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
     
@@ -157,13 +158,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,t;
-    complex<Type> thread_local datasub1[maxN];
+    alignas(align) complex<Type> thread_local datasub1[maxN];
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local kleft,kright,mleft,nright,tail;
-    complex<Type> thread_local roots[maxN];
+    alignas(align) complex<Type> thread_local roots[maxN];
     int thread_local Factor;
-    complex<Type> thread_local datatemp[maxN];
+    alignas(align) complex<Type> thread_local datatemp[maxN];
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 
@@ -258,13 +259,13 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign) {             // if called from main, set sign=1
     int thread_local i,j,k,m,n,p,q,h;
-    complex<Type> thread_local datasub1[maxN];
-    complex<Type> thread_local datasub2[maxN];
+    alignas(align) complex<Type> thread_local datasub1[maxN];
+    alignas(align) complex<Type> thread_local datasub2[maxN];
     complex<Type> thread_local c1,c2;
     Type thread_local a;
     int thread_local PF,NoverPF;
     int thread_local head,hhead;
-    complex<Type> thread_local roots[maxN];
+    alignas(align) complex<Type> thread_local roots[maxN];
     int thread_local Factor;
 
     i = N;
@@ -394,7 +395,7 @@ int powmod(int a,int b,int p) {
 }
 
 int generator(int p) {
-    int fact[100];
+    alignas(align) int fact[100];
     int m=0;
     int phi=p-1, n=phi;
     for (int i=2;i*i<=n;++i)
@@ -436,14 +437,14 @@ int modulo_inverse(int g,int p) {
 template <class Type>
 void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,int N,Type pi) {
     int thread_local g,ginv;
-    int thread_local mapg[maxN];
-    int thread_local mapginv[maxN];
+    alignas(align) int thread_local mapg[maxN];
+    alignas(align) int thread_local mapginv[maxN];
     int thread_local newN;
     int thread_local i;
-    complex<Type> thread_local padded1[maxN];
-    complex<Type> thread_local padded2[maxN];
-    complex<Type> thread_local result1[maxN];
-    complex<Type> thread_local result2[maxN];
+    alignas(align) complex<Type> thread_local padded1[maxN];
+    alignas(align) complex<Type> thread_local padded2[maxN];
+    alignas(align) complex<Type> thread_local result1[maxN];
+    alignas(align) complex<Type> thread_local result2[maxN];
 
     g = generator(N);
     ginv = modulo_inverse(g,N);

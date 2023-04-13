@@ -3,7 +3,7 @@
 
 g++ -mavx -o testsimd.exe testsimd.cpp
 g++ -o test.exe test.cpp
-
+g++ -o complexsimd.exe complexsimd.cpp
 
 g++ -mavx -S testsimd.cpp
 mv testsimd.s testsimd_noopt.s

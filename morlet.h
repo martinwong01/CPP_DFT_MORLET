@@ -1,17 +1,18 @@
 //#define maxN 131072
 #define maxS 128
+#define align 32
 
 template <class Type>
 void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,Type pi) {
     int thread_local k,n,s;
-    Type thread_local a2[maxN][maxS],b2[maxN][maxS];
+    alignas(align) Type thread_local a2[maxN][maxS],b2[maxN][maxS];
     Type thread_local a,b;
-    Type thread_local freq[maxN];
-    Type thread_local scale[maxS];
-    Type thread_local wavefunc[maxS][maxN];
-    complex<Type> thread_local dft[maxN];
-    complex<Type> thread_local dft_product[maxS][maxN];
-    complex<Type> thread_local datacomplex[maxN];
+    alignas(align) Type thread_local freq[maxN];
+    alignas(align) Type thread_local scale[maxS];
+    alignas(align) Type thread_local wavefunc[maxS][maxN];
+    alignas(align) complex<Type> thread_local dft[maxN];
+    alignas(align) complex<Type> thread_local dft_product[maxS][maxN];
+    alignas(align) complex<Type> thread_local datacomplex[maxN];
 
     for(s=0;s<S;s++) scale[s] = pow(2.,s/4.);                                        // set scales with dj=0.25
 

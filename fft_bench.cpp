@@ -4,6 +4,7 @@
 #include "allocate.h"
 #include "complex.h"
 #include "dft.h"
+#define align 32
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -27,9 +28,9 @@ int main(int argc, char *argv[]) {
   // test 3, large prime. read double data, use double to compute
   if(1 == 1) {
     i = 131072;
-    data_d = new complex<double>[i]; 
-    result1_d = new complex<double>[i]; 
-    result2_d = new complex<double>[i]; 
+    data_d = allocate1D<complex<double>>(i); 
+    result1_d = allocate1D<complex<double>>(i); 
+    result2_d = allocate1D<complex<double>>(i); 
     fp = fopen("data131072","r");
     for(int y=0;y<i;y++) {
         n = fscanf(fp,"%lf %lf",&a_d,&b_d);

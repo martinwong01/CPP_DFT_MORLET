@@ -5,6 +5,7 @@
 #include "dft.h"
 #include "morlet.h"
 #include "omp.h"
+#define align 32
 using namespace std;
 
 
@@ -64,11 +65,11 @@ int main(int argc, char *argv[]) {
     dx = atof(argv[8]);
 
 
-    cwt1 = allocate3D<complex<float>>(Nx,Sy,Ny);
-    cwt2 = allocate3D<complex<float>>(Nx,Sy,Ny);
-    cov = allocate3D<double>(Nx,Sy,Ny);
-    data = allocate5D<double>(endyear-startyear+1,12,tiles,Sx,Sy);
-    data_global = allocate2D<double>(Sx,Sy);
+    cwt1 = allocate3D<complex<float>>(Nx,Sy,Ny,align);
+    cwt2 = allocate3D<complex<float>>(Nx,Sy,Ny,align);
+    cov = allocate3D<double>(Nx,Sy,Ny,align);
+    data = allocate5D<double>(endyear-startyear+1,12,tiles,Sx,Sy,align);
+    data_global = allocate2D<double>(Sx,Sy,align);
 
 
     fp = popen("date --date='19790101' +%s","r");

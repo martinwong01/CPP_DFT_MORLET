@@ -5,6 +5,7 @@
 #include "dft.h"
 #include "morlet.h"
 #include "omp.h"
+#define align 32
 using namespace std;
 
 
@@ -63,14 +64,14 @@ int main(int argc, char *argv[]) {
     Nthreads = omp_get_max_threads();
     printf("THREADS = %d\n",Nthreads);
 
-    xtransform = allocate3D<complex<double>>(Ny,Sx,Nx);
-    yseries1 = allocate2D<double>(Nthreads,Ny);
-    yseries2 = allocate2D<double>(Nthreads,Ny);
-    transform_real = allocate3D<complex<double>>(Nx,Sy,Ny);
-    transform_imga = allocate3D<complex<double>>(Nx,Sy,Ny);
-    cwt1 = allocate3D<complex<float>>(Nx,Sy,Ny);
-    cwt2 = allocate3D<complex<float>>(Nx,Sy,Ny);
-    data = allocate2D<double>(Ny,Nx);
+    xtransform = allocate3D<complex<double>>(Ny,Sx,Nx,align);
+    yseries1 = allocate2D<double>(Nthreads,Ny,align);
+    yseries2 = allocate2D<double>(Nthreads,Ny,align);
+    transform_real = allocate3D<complex<double>>(Nx,Sy,Ny,align);
+    transform_imga = allocate3D<complex<double>>(Nx,Sy,Ny,align);
+    cwt1 = allocate3D<complex<float>>(Nx,Sy,Ny,align);
+    cwt2 = allocate3D<complex<float>>(Nx,Sy,Ny,align);
+    data = allocate2D<double>(Ny,Nx,align);
 
 
 

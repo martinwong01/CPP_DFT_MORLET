@@ -4,7 +4,6 @@
 #include "allocate.h"
 #include "complex.h"
 #include "dft.h"
-#define align 32
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -61,9 +60,9 @@ int main(int argc, char *argv[]) {
         result2_d[n].print();
     }
 */
-    delete(data_d);
-    delete(result1_d);
-    delete(result2_d);
+    free(data_d);
+    free(result1_d);
+    free(result2_d);
     
   }
 

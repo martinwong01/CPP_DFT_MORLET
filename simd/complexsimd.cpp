@@ -1,8 +1,8 @@
 #include <iostream>
 #include <immintrin.h>
 #include <cstdio>
-#include "allocate.h"
-#include "complex.h"
+#include "../allocate.h"
+#include "../complex.h"
 
 using namespace std;
 

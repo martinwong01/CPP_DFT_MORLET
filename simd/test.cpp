@@ -1,13 +1,14 @@
 #include <iostream>
 #include <immintrin.h>
 #include <cstdio>
+#define align 32
 
 
 int main() {
     size_t n = 1000000000;
-    float a[n];
-    float b[n];
-    float c[n];
+    alignas(align) float a[n];
+    alignas(align) float b[n];
+    alignas(align) float c[n];
 
     size_t i = 0;
 

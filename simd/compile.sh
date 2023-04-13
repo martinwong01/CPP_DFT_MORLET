@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-g++ -Ofast -mavx -o testsimd.exe testsimd.cpp
-g++ -Ofast -o test.exe test.cpp
+g++ -mavx -o testsimd.exe testsimd.cpp
+g++ -o test.exe test.cpp
 
 
 g++ -mavx -S testsimd.cpp

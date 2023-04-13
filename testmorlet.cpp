@@ -1,9 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include "allocate.h"
 #include "complex.h"
 #include "dft.h"
 #include "morlet.h"
+#define align 32
 using namespace std;
 
 
@@ -28,10 +30,9 @@ int main(int argc, char *argv[]) {
         Sx = 29;
         dx = 1.;
 
-        data = new double[Nx];
-        data2 = new double[Nx];
-        xtransform = new complex<double>*[Sx];
-        for(s=0;s<Sx;s++) xtransform[s] = new complex<double>[Nx];
+        data = allocate1D<double>(Nx,align);
+        data2 = allocate1D<double>(Nx,align);
+        xtransform = allocate2D<complex<double>>(Sx,Nx,align);
     
         // read data
         file.open("data10007");
@@ -47,10 +48,9 @@ int main(int argc, char *argv[]) {
             printf("S X = %d %d\n",s,x);
             xtransform[s][x].print();
 	}
-        delete(data);
-        delete(data2);
-        for(s=0;s<Sx;s++) delete(xtransform[s]);
-        delete(xtransform);        
+        free(data);
+        free(data2);
+        free(xtransform[0]);        
     }
 
 
@@ -61,9 +61,8 @@ int main(int argc, char *argv[]) {
         Sx = 33;
         dx = 1.;
 
-        data = new double[Nx];
-        xtransform = new complex<double>*[Sx];
-        for(s=0;s<Sx;s++) xtransform[s] = new complex<double>[Nx];
+        data = allocate1D<double>(Nx,align);
+        xtransform = allocate2D<complex<double>>(Sx,Nx,align);
    
         // read data
         file.open("data144");
@@ -79,8 +78,7 @@ int main(int argc, char *argv[]) {
             xtransform[s][x].print();
 	}
 
-        delete(data);
-        for(s=0;s<Sx;s++) delete(xtransform[s]);
-        delete(xtransform);        
+        free(data);
+        free(xtransform[0]);        
     }
 }

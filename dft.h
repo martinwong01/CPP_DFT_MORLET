@@ -30,7 +30,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     complex<Type> thread_local *dataptr,*outptr;
     
     i = N & (N - 1);                                                                            //  if 2^, use fft
-    if(i == 0) {
+    if(i == 0 && N >= 8) {
         fft_func(data,out,N,Product,pi,sign);
 	return;
     }

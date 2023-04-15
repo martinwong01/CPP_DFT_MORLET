@@ -123,3 +123,60 @@ class complex {
     }
 };
 
+
+inline __m256d complex_mul_256register(double a0r,double a0i,double a1r,double a1i,double *b) {
+    __m256d a_vals = _mm256_setr_pd(a0r,a0i,a1r,a1i);
+    __m256d b_vals = _mm256_load_pd(b);
+    __m256d c_vals = _mm256_mul_pd(a_vals,b_vals);
+    c_vals = _mm256_xor_pd(c_vals,_mm256_setr_pd(0.0,-0.0,0.0,-0.0));
+    b_vals = _mm256_permute_pd(b_vals,0b0101);
+    a_vals = _mm256_mul_pd(a_vals,b_vals);
+    b_vals = _mm256_hadd_pd(c_vals,a_vals);                      // complex product
+    return b_vals;
+}
+
+inline __m256d complex_mul_256register(double *a,double *b) {
+    __m256d a_vals = _mm256_load_pd(a);                                  //  3   2   4  -1
+    __m256d b_vals = _mm256_load_pd(b);                                  //  7   5   6  -2
+    __m256d c_vals = _mm256_mul_pd(a_vals,b_vals);                       // 21  10  24   2
+    c_vals = _mm256_xor_pd(c_vals,_mm256_setr_pd(0.0,-0.0,0.0,-0.0));    // 21 -10  24  -2
+    b_vals = _mm256_permute_pd(b_vals,0b0101);                           //  5   7  -2   6
+    a_vals = _mm256_mul_pd(a_vals,b_vals);                               // 15  14  -8  -6
+    b_vals = _mm256_hadd_pd(c_vals,a_vals);                              // 11  29  22 -14
+    return b_vals;
+}
+
+inline __m256 complex_mul_256register(float a0r,float a0i,float a1r,float a1i,float a2r,float a2i,float a3r,float a3i,float *b) {
+    __m256 a_vals = _mm256_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i);
+    __m256 b_vals = _mm256_load_ps(b);
+    __m256 c_vals = _mm256_mul_ps(a_vals,b_vals);
+    c_vals = _mm256_xor_ps(c_vals,_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0));
+    b_vals = _mm256_permute_ps(b_vals,0b10110001);
+    a_vals = _mm256_mul_ps(a_vals,b_vals);
+    b_vals = _mm256_hadd_ps(c_vals,a_vals);
+    b_vals = _mm256_permute_ps(b_vals,0b11011000);
+    return b_vals;
+}
+
+inline __m256 complex_mul_256register(float *a,float *b) {
+    __m256 a_vals = _mm256_load_ps(a);
+    __m256 b_vals = _mm256_load_ps(b);
+    __m256 c_vals = _mm256_mul_ps(a_vals,b_vals);
+    c_vals = _mm256_xor_ps(c_vals,_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0));
+    b_vals = _mm256_permute_ps(b_vals,0b10110001);
+    a_vals = _mm256_mul_ps(a_vals,b_vals);
+    b_vals = _mm256_hadd_ps(c_vals,a_vals);
+    b_vals = _mm256_permute_ps(b_vals,0b11011000);
+    return b_vals;
+}
+
+
+
+
+
+
+
+
+
+
+

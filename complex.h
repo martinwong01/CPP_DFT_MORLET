@@ -1,4 +1,5 @@
 #include <cstring>
+#include <immintrin.h>
 using namespace std;
 
 template <class Type>

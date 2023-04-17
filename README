@@ -6,7 +6,7 @@ Programs to compute Discrete Fourier Transform and Morlet continuous wavelet tra
 * allocate.h:       allocate multidimensional array of any data type. contiguous memory. code brevity.   
 * complex.h:        complex numbers template class.
 * table.h:          required if using bit-reverse fft. generated from table.cpp 
-* dft.h:            discrete Fourier transform. Cooley Tukey/Rader algorithm.         
+* dft.h:            discrete Fourier transform. Cooley Tukey/Radix-2/Rader algorithms.         
 * morlet.h:         continuous wavelet transform with Morlet. 
 
 * table.cpp:        generate table.h, to bit-reverse the input array in fft

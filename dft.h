@@ -181,15 +181,15 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap().reverse();              //     values remaining in quadrant 
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnright();
-	    roots[i+(j<<1)] = roots[i].reverse();
-            roots[i+(j<<2)-j] = roots[i].turnleft();
+	    //roots[i+(j<<1)] = roots[i].reverse();
+            //roots[i+(j<<2)-j] = roots[i].turnleft();
         }
     } else {
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap();
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnleft();
-	    roots[i+(j<<1)] = roots[i].reverse();
-            roots[i+(j<<2)-j] = roots[i].turnright();
+	    //roots[i+(j<<1)] = roots[i].reverse();
+            //roots[i+(j<<2)-j] = roots[i].turnright();
         }
     }
     
@@ -286,15 +286,15 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap().reverse();           //     values remaining in quadrant
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnright();
-            roots[i+(j<<1)] = roots[i].reverse();
-            roots[i+(j<<2)-j] = roots[i].turnleft();
+            //roots[i+(j<<1)] = roots[i].reverse();
+            //roots[i+(j<<2)-j] = roots[i].turnleft();
         }
     } else {
         for(i=1;i<k;i++) roots[j-i] = roots[i].swap();
         for(i=0;i<j;i++) {
             roots[i+j] = roots[i].turnleft();
-            roots[i+(j<<1)] = roots[i].reverse();
-            roots[i+(j<<2)-j] = roots[i].turnright();
+            //roots[i+(j<<1)] = roots[i].reverse();
+            //roots[i+(j<<2)-j] = roots[i].turnright();
         }
     }
 

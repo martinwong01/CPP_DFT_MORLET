@@ -224,7 +224,7 @@ inline __m512 complex_mul_512register(float a0r,float a0i,float a1r,float a1i,fl
 
     mw01_mul512f_a = _mm512_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i,a4r,a4i,a5r,a5i,a6r,a6i,a7r,a7i);
     if(alignb == 0)
-        mw01_mul512f_b = _mm512_load_ps(b);                                      //  7   5   6  -2
+        mw01_mul512f_b = _mm512_load_ps(b);                                      
     else
         mw01_mul512f_b = _mm512_loadu_ps(b);
     return complex_mul_512register(mw01_mul512f_a,mw01_mul512f_b);

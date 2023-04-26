@@ -13,7 +13,7 @@ Programs to compute Discrete Fourier Transform and Morlet continuous wavelet tra
 * testdft.cpp:         tests of dft.h
 * testmorlet.cpp:      tests of morlet.h
 * wavelet2d.cpp:       sample 2D wavelet transform. OpenMP
-* wavelet2d_stat.cpp:  compute accuracy statistics of wavelet2d.cpp results
+* wavelet2d_stat.cpp:  compute accuracy statistics of wavelet2d.cpp results, using equations in wavelet2D.pdf
 * fft_bench.cpp:       for speed testing
 
 * compile.sh:          script to compile the test programs     

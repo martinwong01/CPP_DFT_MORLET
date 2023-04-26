@@ -15,4 +15,4 @@ export OMP_STACKSIZE=10000000
 
 
 ## some verifications
-./wavelet2d_test.exe
+./wavelet2d_stat.exe

@@ -142,13 +142,20 @@ inline __m512d complex_mul_512register(register __m512d mw01_mul512d_a,register 
     mw01_mul256_1_e = _mm512_castpd512_pd256(mw01_mul512_1_c);
     mw01_mul256_1_f = _mm512_castpd512_pd256(mw01_mul512_1_a);
     mw01_mul256_1_g = _mm256_hadd_pd(mw01_mul256_1_e,mw01_mul256_1_f);
+    mw01_mul256_1_e = _mm512_extractf64x4_pd(mw01_mul512_1_c,0b01);
+    mw01_mul256_1_f = _mm512_extractf64x4_pd(mw01_mul512_1_a,0b01);
     mw01_mul256_1_e = _mm512_castpd512_pd256(_mm512_shuffle_f64x2(mw01_mul512_1_c,mw01_mul512_1_c,_MM_SHUFFLE(1,0,3,2)));
     mw01_mul256_1_f = _mm512_castpd512_pd256(_mm512_shuffle_f64x2(mw01_mul512_1_a,mw01_mul512_1_a,_MM_SHUFFLE(1,0,3,2)));
     mw01_mul256_1_h = _mm256_hadd_pd(mw01_mul256_1_e,mw01_mul256_1_f);
     mw01_mul512_1_d = _mm512_insertf64x4(_mm512_castpd256_pd512(mw01_mul256_1_g),mw01_mul256_1_h,1);
     return mw01_mul512_1_d;
 */
-    return _mm512_insertf64x4(_mm512_castpd256_pd512(_mm256_hadd_pd(_mm512_castpd512_pd256(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castpd512_pd256(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101))))),_mm256_hadd_pd(_mm512_castpd512_pd256(_mm512_shuffle_f64x2(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_MM_SHUFFLE(1,0,3,2))),_mm512_castpd512_pd256(_mm512_shuffle_f64x2(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101)),_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101)),_MM_SHUFFLE(1,0,3,2)))),1);
+    return _mm512_insertf64x4(_mm512_castpd256_pd512(_mm256_hadd_pd(_mm512_castpd512_pd256(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castpd512_pd256(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101))))),_mm256_hadd_pd(_mm512_extractf64x4_pd(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),0b01),_mm512_extractf64x4_pd(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101)),0b01)),1);
+//    return _mm512_insertf64x4(_mm512_castpd256_pd512(_mm256_hadd_pd(_mm512_castpd512_pd256(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castpd512_pd256(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101))))),_mm256_hadd_pd(_mm512_castpd512_pd256(_mm512_shuffle_f64x2(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_MM_SHUFFLE(1,0,3,2))),_mm512_castpd512_pd256(_mm512_shuffle_f64x2(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101)),_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101)),_MM_SHUFFLE(1,0,3,2)))),1);
+
+	
+	
+
 }
 
 inline __m512d complex_mul_512register(double *a,double *b,int aligna,int alignb) {
@@ -193,6 +200,10 @@ inline __m512 complex_mul_512register(register __m512 mw01_mul512f_a,register __
     mw01_mul256f_g = _mm512_castps512_ps256(mw01_mul512f_c);
     mw01_mul256f_h = _mm512_castps512_ps256(mw01_mul512f_e); 
     mw01_mul256f_i = _mm256_hadd_ps(mw01_mul256f_g,mw01_mul256f_h);
+    
+    mw01_mul256f_g = _mm512_extractf32x8_ps(mw01_mul512f_c,0b01);
+    mw01_mul256f_h = _mm512_extractf32x8_ps(mw01_mul512f_e,0b01);
+        
     mw01_mul256f_g = _mm512_castps512_ps256(_mm512_shuffle_f32x4(mw01_mul512f_c,mw01_mul512f_c,_MM_SHUFFLE(1,0,3,2)));
     mw01_mul256f_h = _mm512_castps512_ps256(_mm512_shuffle_f32x4(mw01_mul512f_e,mw01_mul512f_e,_MM_SHUFFLE(1,0,3,2))); 
     mw01_mul256f_j = _mm256_hadd_ps(mw01_mul256f_g,mw01_mul256f_h);
@@ -200,7 +211,8 @@ inline __m512 complex_mul_512register(register __m512 mw01_mul512f_a,register __
     mw01_mul512f_m = _mm512_permute_ps(mw01_mul512f_m,0b11011000); 
     return mw01_mul512f_m;
 */
-    return _mm512_permute_ps(_mm512_insertf32x8(_mm512_castps256_ps512(_mm256_hadd_ps(_mm512_castps512_ps256(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castps512_ps256(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001))))),_mm256_hadd_ps(_mm512_castps512_ps256(_mm512_shuffle_f32x4(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_MM_SHUFFLE(1,0,3,2))),_mm512_castps512_ps256(_mm512_shuffle_f32x4(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001)),_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001)),_MM_SHUFFLE(1,0,3,2)))),1),0b11011000);
+    return _mm512_permute_ps(_mm512_insertf32x8(_mm512_castps256_ps512(_mm256_hadd_ps(_mm512_castps512_ps256(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castps512_ps256(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001))))),_mm256_hadd_ps(_mm512_extractf32x8_ps(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),0b01),_mm512_extractf32x8_ps(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001)),0b01)),1),0b11011000);
+//    return _mm512_permute_ps(_mm512_insertf32x8(_mm512_castps256_ps512(_mm256_hadd_ps(_mm512_castps512_ps256(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castps512_ps256(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001))))),_mm256_hadd_ps(_mm512_castps512_ps256(_mm512_shuffle_f32x4(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_MM_SHUFFLE(1,0,3,2))),_mm512_castps512_ps256(_mm512_shuffle_f32x4(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001)),_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001)),_MM_SHUFFLE(1,0,3,2)))),1),0b11011000);
 }
 
 inline __m512 complex_mul_512register(float *a,float *b,int aligna,int alignb) {

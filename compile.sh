@@ -10,14 +10,15 @@ maxs=64                        # maximum number of wavelet scales
 
 
 
+avx=0
+avx512=0
+fma=0
 if [ $tryvector -eq 1 ]; then
-    avx=$(grep " avx " /proc/cpuinfo|wc -l)
-    avx512=$(grep " avx512f " /proc/cpuinfo|wc -l)
     fma=$(grep " fma " /proc/cpuinfo|wc -l)
-else
-    avx=0
-    avx512=0
-    fma=0
+    if [ $fma -gt 0 ]; then
+        avx=$(grep " avx " /proc/cpuinfo|wc -l)
+        avx512=$(grep " avx512f " /proc/cpuinfo|wc -l)
+    fi
 fi
 macros="-D AVX512=${avx512} -D AVX=${avx} -D FMA=${fma} -D MAXN=${maxn} -D MAXS=${maxs}"
 flags=""

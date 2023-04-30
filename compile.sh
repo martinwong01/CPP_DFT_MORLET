@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-tryavx=1                       # 1: use avx/avx512, 0: not used
+tryvector=1                    # 1: use avx/avx512/fma, 0: not used
 compiler="intel"               # "gnu" or "intel"
 maxn=131072                    # set to 2^
 maxs=64                        # maximum number of wavelet scales
@@ -10,23 +10,26 @@ maxs=64                        # maximum number of wavelet scales
 
 
 
-if [ $tryavx -eq 1 ]; then
+if [ $tryvector -eq 1 ]; then
     avx=$(grep " avx " /proc/cpuinfo|wc -l)
-    avx512=$(grep " avx512f " /proc/cpuinfo|wc -l) 
+    avx512=$(grep " avx512f " /proc/cpuinfo|wc -l)
+    fma=$(grep " fma " /proc/cpuinfo|wc -l)
 else
     avx=0
     avx512=0
+    fma=0
 fi
-macros="-D AVX512=${avx512} -D AVX=${avx} -D MAXN=${maxn} -D MAXS=${maxs}"
-avxflags=""
-if [ $avx512 -gt 0 ]; then avxflags="-mavx512f"; fi 
-if [ $avx -gt 0 ]; then avxflags="$avxflags -mavx"; fi
+macros="-D AVX512=${avx512} -D AVX=${avx} -D FMA=${fma} -D MAXN=${maxn} -D MAXS=${maxs}"
+flags=""
+if [ $avx512 -gt 0 ]; then flags="-mavx512f"; fi 
+if [ $avx -gt 0 ]; then flags="$flags -mavx"; fi
+if [ $fma -gt 0 ]; then flags="$flags -mfma"; fi
 
 if [ $compiler == "gnu" ]; then
-    #command="g++ $avxflags -fopenmp -Ofast -march=skylake-avx512 $macros"
-    command="g++ $avxflags -fopenmp -Ofast $macros"
+    #command="g++ $flags -fopenmp -Ofast -march=skylake-avx512 $macros"
+    command="g++ $flags -fopenmp -Ofast $macros"
 elif [ $compiler == "intel" ]; then
-    command="icc $avxflags -diag-disable=10441 -qopenmp -Ofast $macros"
+    command="icc $flags -diag-disable=10441 -qopenmp -Ofast $macros"
 fi
 
 

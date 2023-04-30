@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#if AVX > 0 || AVX512 > 0
+#if AVX > 0 || AVX512 > 0 || FMA > 0
     #include <immintrin.h>
 #endif
 using namespace std;
@@ -147,8 +147,14 @@ inline __m512d complex_mul_512register(register __m512d mw01_mul512d_a,register 
     mw01_mul256_1_h = _mm256_hadd_pd(mw01_mul256_1_e,mw01_mul256_1_f);
     mw01_mul512_1_d = _mm512_insertf64x4(_mm512_castpd256_pd512(mw01_mul256_1_g),mw01_mul256_1_h,1);
     return mw01_mul512_1_d;
-*/
     return _mm512_insertf64x4(_mm512_castpd256_pd512(_mm256_hadd_pd(_mm512_castpd512_pd256(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castpd512_pd256(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101))))),_mm256_hadd_pd(_mm512_extractf64x4_pd(_mm512_xor_pd(_mm512_mul_pd(mw01_mul512d_a,mw01_mul512d_b),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),0b01),_mm512_extractf64x4_pd(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b01010101)),0b01)),1);
+*/
+
+#if FMA > 0
+    return _mm512_fmaddsub_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b00000000),_mm512_mul_pd(_mm512_permute_pd(mw01_mul512d_a,0b01010101),_mm512_permute_pd(mw01_mul512d_b,0b11111111)));
+#else
+    return _mm512_addsub_pd(_mm512_mul_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b00000000)),_mm512_mul_pd(_mm512_permute_pd(mw01_mul512d_a,0b01010101),_mm512_permute_pd(mw01_mul512d_b,0b11111111)));
+#endif
 }
 
 inline __m512d complex_mul_512register(double *a,double *b,int aligna,int alignb) {
@@ -199,8 +205,14 @@ inline __m512 complex_mul_512register(register __m512 mw01_mul512f_a,register __
     mw01_mul512f_m = _mm512_insertf32x8(_mm512_castps256_ps512(mw01_mul256f_i),mw01_mul256f_j,1);
     mw01_mul512f_m = _mm512_permute_ps(mw01_mul512f_m,0b11011000); 
     return mw01_mul512f_m;
-*/
     return _mm512_permute_ps(_mm512_insertf32x8(_mm512_castps256_ps512(_mm256_hadd_ps(_mm512_castps512_ps256(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))),_mm512_castps512_ps256(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001))))),_mm256_hadd_ps(_mm512_extractf32x8_ps(_mm512_xor_ps(_mm512_mul_ps(mw01_mul512f_a,mw01_mul512f_b),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),0b01),_mm512_extractf32x8_ps(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10110001)),0b01)),1),0b11011000);
+*/
+	
+#if FMA > 0
+    return _mm512_fmaddsub_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10100000),_mm512_mul_ps(_mm512_permute_ps(mw01_mul512f_a,0b10110001),_mm512_permute_ps(mw01_mul512f_b,0b11110101)));
+#else
+    return _mm512_addsub_ps(_mm512_mul_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10100000)),_mm512_mul_ps(_mm512_permute_ps(mw01_mul512f_a,0b10110001),_mm512_permute_ps(mw01_mul512f_b,0b11110101)));
+#endif
 }
 
 inline __m512 complex_mul_512register(float *a,float *b,int aligna,int alignb) {
@@ -246,8 +258,14 @@ inline __m256d complex_mul_256register(register __m256d mw01_mul256d_a,register 
     a_256_2 = _mm256_mul_pd(a_256_2,b_256_2);                                  15  14  -8  -6
     d_256_2 = _mm256_hadd_pd(c_256_2,a_256_2);                                 11  29  22 -14
     return d_256_2;
-*/
     return _mm256_hadd_pd(_mm256_xor_pd(_mm256_mul_pd(mw01_mul256d_a,mw01_mul256d_b),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)),_mm256_mul_pd(mw01_mul256d_a,_mm256_permute_pd(mw01_mul256d_b,0b0101)));
+*/
+	
+#if FMA > 0
+    return _mm256_fmaddsub_pd(mw01_mul256d_a,_mm256_permute_pd(mw01_mul256d_b,0b0000),_mm256_mul_pd(_mm256_permute_pd(mw01_mul256d_a,0b0101),_mm256_permute_pd(mw01_mul256d_b,0b1111)));
+#else
+    return _mm256_addsub_pd(_mm256_mul_pd(mw01_mul256d_a,_mm256_permute_pd(mw01_mul256d_b,0b0000)),_mm256_mul_pd(_mm256_permute_pd(mw01_mul256d_a,0b0101),_mm256_permute_pd(mw01_mul256d_b,0b1111)));
+#endif
 }
 
 inline __m256d complex_mul_256register(double a0r,double a0i,double a1r,double a1i,double *b,int alignb) {
@@ -289,11 +307,22 @@ inline __m256 complex_mul_256register(register __m256 mw01_mul256f_a,register __
     c_vals = _mm256_xor_ps(c_vals,_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0));
     b_vals = _mm256_permute_ps(b_vals,0b10110001);
     a_vals = _mm256_mul_ps(a_vals,b_vals);
-    b_vals = _mm256_hadd_ps(c_vals,a_vals);
+    b_vals = _mm256_hadd_ps(c_vals,a_vals);#if FMA > 0
+    return _mm256_fmaddsub_ps(mw01_mul256f_a,_mm256_permute_ps(mw01_mul256f_b,0b10100000),_mm256_mul_ps(_mm256_permute_ps(mw01_mul256f_a,0b10110001),_mm256_permute_ps(mw01_mul256f_b,0b11110101)));
+#else
+    return _mm256_addsub_ps(_mm256_mul_ps(mw01_mul256f_a,_mm256_permute_ps(mw01_mul256f_b,0b10100000)),_mm256_mul_ps(_mm256_permute_ps(mw01_mul256f_a,0b10110001),_mm256_permute_ps(mw01_mul256f_b,0b11110101)));
+#endif
+
     b_vals = _mm256_permute_ps(b_vals,0b11011000);
     return b_vals;
-*/
     return _mm256_permute_ps(_mm256_hadd_ps(_mm256_xor_ps(_mm256_mul_ps(mw01_mul256f_a,mw01_mul256f_b),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),_mm256_mul_ps(mw01_mul256f_a,_mm256_permute_ps(mw01_mul256f_b,0b10110001))),0b11011000);
+*/
+
+#if FMA > 0
+    return _mm256_fmaddsub_ps(mw01_mul256f_a,_mm256_permute_ps(mw01_mul256f_b,0b10100000),_mm256_mul_ps(_mm256_permute_ps(mw01_mul256f_a,0b10110001),_mm256_permute_ps(mw01_mul256f_b,0b11110101)));
+#else
+    return _mm256_addsub_ps(_mm256_mul_ps(mw01_mul256f_a,_mm256_permute_ps(mw01_mul256f_b,0b10100000)),_mm256_mul_ps(_mm256_permute_ps(mw01_mul256f_a,0b10110001),_mm256_permute_ps(mw01_mul256f_b,0b11110101)));
+#endif
 }
 
 inline __m256 complex_mul_256register(float *a,float *b,int aligna,int alignb) {

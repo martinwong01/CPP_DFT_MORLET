@@ -338,27 +338,28 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                             for(m=1;m<(Factor[j]+1)/2;m++) {
                                 datasub1[m] = roots[n*m*mleft%N];
                                 for(r=0;r<2;r++) {
-                                    datasub3[m] = datasub2[t+r]*datasub1[m].getreal();
-                                    datasub4[m] = datasub2[t+r].turnleft()*datasub1[m].getimga();
-                                    outptr[kkleft+m*mleft+t+r] += datasub3[m]+datasub4[m];
-                                    outptr[kkleft+(Factor[j]-m)*mleft+t+r] += datasub3[m]-datasub4[m];
+                                    datasub3[m] = datasub2[t+r]*datasub1[m].getreal();                        (1)
+                                    datasub4[m] = datasub2[t+r].turnleft()*datasub1[m].getimga();             (2)
+                                    outptr[kkleft+m*mleft+t+r] += datasub3[m]+datasub4[m];                    (3)     
+                                    outptr[kkleft+(Factor[j]-m)*mleft+t+r] += datasub3[m]-datasub4[m];        (4)
                                 }
 /*
+				mw01_dft_c = _mm256_set1_pd(datasub1[m].getreal());
+                                mw01_dft_d = _mm256_set1_pd(datasub1[m].getimga());
+          datasub2[t]           mw01_dft_e = _mm256_load_pd((double *)&datasub2[t]);
+          datasub2[t].left      mw01_dft_f = _mm256_xor_pd(_mm256_permute_pd(mw01_dft_e,0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0));
+				
                                 if((kkleft+m*mleft)%2 == 0)
-                                    mw01_dft_a = _mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]);
+          left of (3)               mw01_dft_a = _mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]);
 				else
                                     mw01_dft_a = _mm256_loadu_pd((double *)&outptr[kkleft+m*mleft+t]);
                                 if((kkleft+(Factor[j]-m)*mleft)%2 == 0)
-				    mw01_dft_b = _mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]);
+	  left of (4)		    mw01_dft_b = _mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]);
 				else
 				    mw01_dft_b = _mm256_loadu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]);
-				mw01_dft_c = _mm256_set1_pd(datasub1[m].getreal());
-                                mw01_dft_d = _mm256_set1_pd(datasub1[m].getimga());
-				mw01_dft_e = _mm256_load_pd((double *)&datasub2[t]);
-                                mw01_dft_f = _mm256_xor_pd(_mm256_permute_pd(mw01_dft_c,0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0));
 								
-				mw01_dft_g = _mm_fmadd_pd(e,c,a);
-				mw01_dft_h = _mm_fmadd_pd(f,d,g);
+				mw01_dft_g = _mm_fmadd_pd(e,c,a);              e*c is (1) RHS
+				mw01_dft_h = _mm_fmadd_pd(f,d,g);              f*d is (2) RHS
 				if((kkleft+m*mleft)%2 == 0)
     				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],h);
 				else
@@ -366,14 +367,32 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 				    
 
                                 mw01_dft_g = _mm_fmadd_pd(e,c,b);
-				mw01_dft_h = _mm_fmsub_pd(f,d,g);
+				mw01_dft_h = _mm_fnmadd_pd(f,d,g);
 				if((kkleft+(Factor[j]-m)*mleft)%2 == 0)
 				    _mm256_store_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],h);
 				else
 				    _mm256_storeu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],h);
 		    
 */				
-                                
+                                mw01_dft_a = _mm256_set1_pd(datasub1[m].getreal());
+                                mw01_dft_b = _mm256_set1_pd(datasub1[m].getimga());
+				mw01_dft_c = _mm256_load_pd((double *)&datasub2[t]);
+                                mw01_dft_d = _mm256_xor_pd(_mm256_permute_pd(mw01_dft_c,0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0));
+				
+                                if((kkleft+m*mleft)%2 == 0)
+/*				    mw01_dft_e = _mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]);
+				    mw01_dft_f = _mm_fmadd_pd(c,a,e);
+				    mw01_dft_g = _mm_fmadd_pd(d,b,f);
+				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],g);                 */
+				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]))));
+				else    
+    				    _mm256_storeu_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_loadu_pd((double *)&outptr[kkleft+m*mleft+t]))));
+                          
+			        if((kkleft+(Factor[j]-m)*mleft)%2 == 0)
+				    _mm256_store_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
+				else
+				    _mm256_storeu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_loadu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
+			  
                             }
                         }
                     } else if(sizeof(Type) == 4) {

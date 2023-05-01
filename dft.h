@@ -329,12 +329,17 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                         q = (kkright+nnright)%2;   // kkright = k*N/P    nnright = n*NoverPF
                         p = kkleft%2;              // kkleft = k*NoverPF 
                         for(t=0;t<tail-1;t+=2) {   // tail = NoverPF, must be odd
-                            mw01_dft_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
-                            _mm256_store_pd((double *)&datasub2[t],mw01_dft_b);
+                            mw01_dft_c = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
+                            _mm256_store_pd((double *)&datasub2[t],mw01_dft_c);
                             if(p == 0)
-                                _mm256_store_pd((double *)&outptr[kkleft+t],_mm256_add_pd(_mm256_load_pd((double *)&outptr[kkleft+t]),mw01_dft_b));  
+                                _mm256_store_pd((double *)&outptr[kkleft+t],_mm256_add_pd(_mm256_load_pd((double *)&outptr[kkleft+t]),mw01_dft_c));  
                             else
-                                _mm256_storeu_pd((double *)&outptr[kkleft+t],_mm256_add_pd(_mm256_loadu_pd((double *)&outptr[kkleft+t]),mw01_dft_b));
+                                _mm256_storeu_pd((double *)&outptr[kkleft+t],_mm256_add_pd(_mm256_loadu_pd((double *)&outptr[kkleft+t]),mw01_dft_c));
+
+    		            //mw01_dft_c = _mm256_load_pd((double *)&datasub2[t]);
+                            mw01_dft_d = _mm256_xor_pd(_mm256_permute_pd(mw01_dft_c,0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0));
+
+				
                             for(m=1;m<(Factor[j]+1)/2;m++) {
                                 datasub1[m] = roots[n*m*mleft%N];
                                 for(r=0;r<2;r++) {
@@ -346,22 +351,22 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 /*				
                                 mw01_dft_a = _mm256_set1_pd(datasub1[m].getreal());
                                 mw01_dft_b = _mm256_set1_pd(datasub1[m].getimga());
-				mw01_dft_c = _mm256_load_pd((double *)&datasub2[t]);
-                                mw01_dft_d = _mm256_xor_pd(_mm256_permute_pd(mw01_dft_c,0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0));
+				//mw01_dft_c = _mm256_load_pd((double *)&datasub2[t]);
+                                //mw01_dft_d = _mm256_xor_pd(_mm256_permute_pd(mw01_dft_c,0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0));
 				
                                 if((kkleft+m*mleft)%2 == 0)
 				    //mw01_dft_e = _mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]);
 				    //mw01_dft_f = _mm_fmadd_pd(c,a,e);
 				    //mw01_dft_g = _mm_fmadd_pd(d,b,f);
 				    //_mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],g);                
-				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]))));
+				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],_mm256_fmadd_pd(mw01_dft_d,mw01_dft_b,_mm256_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]))));
 				else    
-    				    _mm256_storeu_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_loadu_pd((double *)&outptr[kkleft+m*mleft+t]))));
+    				    _mm256_storeu_pd((double *)&outptr[kkleft+m*mleft+t],_mm256_fmadd_pd(mw01_dft_d,mw01_dft_b,_mm256_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_loadu_pd((double *)&outptr[kkleft+m*mleft+t]))));
                           
 			        if((kkleft+(Factor[j]-m)*mleft)%2 == 0)
-				    _mm256_store_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
+				    _mm256_store_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm256_fnmadd_pd(mw01_dft_d,mw01_dft_b,_mm256_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
 				else
-				    _mm256_storeu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_loadu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
+				    _mm256_storeu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm256_fnmadd_pd(mw01_dft_d,mw01_dft_b,_mm256_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_loadu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
 */			  
                             }
                         }

@@ -374,12 +374,12 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                         q = (kkright+nnright)%4;
                         p = kkleft%4;
                         for(t=0;t<tail-3;t+=4) { 
-                            mw01_dft_bf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
-                            _mm256_store_ps((float *)&datasub2[t],mw01_dft_bf);
+                            mw01_dft_cf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
+                            _mm256_store_ps((float *)&datasub2[t],mw01_dft_cf);
                             if(p == 0)
-                                _mm256_store_ps((float *)&outptr[kkleft+t],_mm256_add_ps(_mm256_load_ps((float *)&outptr[kkleft+t]),mw01_dft_bf));  
+                                _mm256_store_ps((float *)&outptr[kkleft+t],_mm256_add_ps(_mm256_load_ps((float *)&outptr[kkleft+t]),mw01_dft_cf));  
                             else
-                                _mm256_storeu_ps((float *)&outptr[kkleft+t],_mm256_add_ps(_mm256_loadu_ps((float *)&outptr[kkleft+t]),mw01_dft_bf));
+                                _mm256_storeu_ps((float *)&outptr[kkleft+t],_mm256_add_ps(_mm256_loadu_ps((float *)&outptr[kkleft+t]),mw01_dft_cf));
                             for(m=1;m<(Factor[j]+1)/2;m++) {
                                 datasub1[m] = roots[n*m*mleft%N];
                                 for(r=0;r<4;r++) {
@@ -396,12 +396,12 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                         q = (kkright+nnright)%4;   // kkright = k*N/P    nnright = n*NoverPF
                         p = kkleft%4;              // kkleft = k*NoverPF 
                         for(t=0;t<tail-3;t+=4) {   // tail = NoverPF, must be odd
-                            mw01_dft_b = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
-                            _mm512_store_pd((double *)&datasub2[t],mw01_dft_b);
+                            mw01_dft_c = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
+                            _mm512_store_pd((double *)&datasub2[t],mw01_dft_c);
                             if(p == 0)
-                                _mm512_store_pd((double *)&outptr[kkleft+t],_mm512_add_pd(_mm512_load_pd((double *)&outptr[kkleft+t]),mw01_dft_b));  
+                                _mm512_store_pd((double *)&outptr[kkleft+t],_mm512_add_pd(_mm512_load_pd((double *)&outptr[kkleft+t]),mw01_dft_c));  
                             else
-                                _mm512_storeu_pd((double *)&outptr[kkleft+t],_mm512_add_pd(_mm512_loadu_pd((double *)&outptr[kkleft+t]),mw01_dft_b));
+                                _mm512_storeu_pd((double *)&outptr[kkleft+t],_mm512_add_pd(_mm512_loadu_pd((double *)&outptr[kkleft+t]),mw01_dft_c));
                             for(m=1;m<(Factor[j]+1)/2;m++) {
                                 datasub1[m] = roots[n*m*mleft%N];
                                 for(r=0;r<4;r++) {
@@ -416,12 +416,12 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                         q = (kkright+nnright)%8;
                         p = kkleft%8;
                         for(t=0;t<tail-7;t+=8) { 
-                            mw01_dft_bf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
-                            _mm512_store_ps((float *)&datasub2[t],mw01_dft_bf);
+                            mw01_dft_cf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
+                            _mm512_store_ps((float *)&datasub2[t],mw01_dft_cf);
                             if(p == 0)
-                                _mm512_store_ps((float *)&outptr[kkleft+t],_mm512_add_ps(_mm512_load_ps((float *)&outptr[kkleft+t]),mw01_dft_bf));  
+                                _mm512_store_ps((float *)&outptr[kkleft+t],_mm512_add_ps(_mm512_load_ps((float *)&outptr[kkleft+t]),mw01_dft_cf));  
                             else
-                                _mm512_storeu_ps((float *)&outptr[kkleft+t],_mm512_add_ps(_mm512_loadu_ps((float *)&outptr[kkleft+t]),mw01_dft_bf));
+                                _mm512_storeu_ps((float *)&outptr[kkleft+t],_mm512_add_ps(_mm512_loadu_ps((float *)&outptr[kkleft+t]),mw01_dft_cf));
                             for(m=1;m<(Factor[j]+1)/2;m++) {
                                 datasub1[m] = roots[n*m*mleft%N];
                                 for(r=0;r<8;r++) {

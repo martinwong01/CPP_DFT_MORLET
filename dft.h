@@ -39,13 +39,21 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #if AVX512 > 0
     register __m512d mw01_dft_a asm("zmm11");
     register __m512d mw01_dft_b asm("zmm10");
+    register __m512d mw01_dft_c asm("zmm9");
+    register __m512d mw01_dft_d asm("zmm8");
     register __m512 mw01_dft_af asm("zmm11");
     register __m512 mw01_dft_bf asm("zmm10");
+    register __m512 mw01_dft_cf asm("zmm9");
+    register __m512 mw01_dft_df asm("zmm8");
 #elif AVX > 0
     register __m256d mw01_dft_a asm("ymm11");
     register __m256d mw01_dft_b asm("ymm10");
+    register __m256d mw01_dft_c asm("ymm9");
+    register __m256d mw01_dft_d asm("ymm8");
     register __m256 mw01_dft_af asm("ymm11");
     register __m256 mw01_dft_bf asm("ymm10");
+    register __m256 mw01_dft_cf asm("ymm9");
+    register __m256 mw01_dft_df asm("ymm8");
 #endif
     
     i = N & (N - 1);                                                               //  if 2^, use fft
@@ -535,15 +543,15 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512 > 0
-    register __m512d mw01_fft0_a asm("zmm9");
-    register __m512d mw01_fft0_b asm("zmm8");
-    register __m512 mw01_fft0_af asm("zmm9");
-    register __m512 mw01_fft0_bf asm("zmm8");
+    register __m512d mw01_fft0_a asm("zmm7");
+    register __m512d mw01_fft0_b asm("zmm6");
+    register __m512 mw01_fft0_af asm("zmm7");
+    register __m512 mw01_fft0_bf asm("zmm6");
 #elif AVX > 0
-    register __m256d mw01_fft0_a asm("ymm9");
-    register __m256d mw01_fft0_b asm("ymm8");
-    register __m256 mw01_fft0_af asm("ymm9");
-    register __m256 mw01_fft0_bf asm("ymm8");
+    register __m256d mw01_fft0_a asm("ymm7");
+    register __m256d mw01_fft0_b asm("ymm6");
+    register __m256 mw01_fft0_af asm("ymm7");
+    register __m256 mw01_fft0_bf asm("ymm6");
 #endif
 
 
@@ -722,15 +730,15 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local head,hhead;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
 #if AVX512 > 0
-    register __m512d mw01_fft1_a asm("zmm9");
-    register __m512d mw01_fft1_b asm("zmm8");
-    register __m512 mw01_fft1_af asm("zmm9");
-    register __m512 mw01_fft1_bf asm("zmm8");
+    register __m512d mw01_fft1_a asm("zmm7");
+    register __m512d mw01_fft1_b asm("zmm6");
+    register __m512 mw01_fft1_af asm("zmm7");
+    register __m512 mw01_fft1_bf asm("zmm6");
 #elif AVX > 0
-    register __m256d mw01_fft1_a asm("ymm9");
-    register __m256d mw01_fft1_b asm("ymm8");
-    register __m256 mw01_fft1_af asm("ymm9");
-    register __m256 mw01_fft1_bf asm("ymm8");
+    register __m256d mw01_fft1_a asm("ymm7");
+    register __m256d mw01_fft1_b asm("ymm6");
+    register __m256 mw01_fft1_af asm("ymm7");
+    register __m256 mw01_fft1_bf asm("ymm6");
 #endif
 
 
@@ -991,11 +999,11 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];
 #if AVX512 > 0
-    register __m512d mw01_rader_a asm("zmm7");
-    register __m512 mw01_rader_af asm("zmm7");
+    register __m512d mw01_rader_a asm("zmm5");
+    register __m512 mw01_rader_af asm("zmm5");
 #elif AVX > 0
-    register __m256d mw01_rader_a asm("ymm7");
-    register __m256 mw01_rader_af asm("ymm7");
+    register __m256d mw01_rader_a asm("ymm5");
+    register __m256 mw01_rader_af asm("ymm5");
 #endif
 
 

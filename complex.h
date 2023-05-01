@@ -137,32 +137,21 @@ inline __m512d complex_mul_512register(register __m512d mw01_mul512d_a,register 
 }
 
 inline __m512d complex_mul_512register(double *a,double *b,int aligna,int alignb) {
-    register __m512d mw01_mul512d_a; //asm("ymm13");
-    register __m512d mw01_mul512d_b; //asm("ymm12");
-
-    if(aligna == 0)
-        mw01_mul512d_a = _mm512_load_pd(a);                                      
+    if(aligna == 0 && alignb == 0)	
+        return complex_mul_512register(_mm512_load_pd(a),_mm512_load_pd(b));
+    else if(aligna == 0 && alignb != 0)
+        return complex_mul_512register(_mm512_load_pd(a),_mm512_loadu_pd(b));
+    else if(aligna != 0 && alignb == 0)
+        return complex_mul_512register(_mm512_loadu_pd(a),_mm512_load_pd(b));
     else
-        mw01_mul512d_a = _mm512_loadu_pd(a);
-    if(alignb == 0)
-        mw01_mul512d_b = _mm512_load_pd(b);                                      
-    else
-        mw01_mul512d_b = _mm512_loadu_pd(b);
-
-    return complex_mul_512register(mw01_mul512d_a,mw01_mul512d_b);
+        return complex_mul_512register(_mm512_loadu_pd(a),_mm512_loadu_pd(b));
 }
 
 inline __m512d complex_mul_512register(double a0r,double a0i,double a1r,double a1i,double a2r,double a2i,double a3r,double a3i,double *b,int alignb) {
-    register __m512d mw01_mul512d_a; //asm("ymm13");
-    register __m512d mw01_mul512d_b; //asm("ymm12");
-
-    mw01_mul512d_a = _mm512_setr_pd(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i);
     if(alignb == 0)
-        mw01_mul512d_b = _mm512_load_pd(b);                                      
+        return complex_mul_512register(_mm512_setr_pd(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i),_mm512_load_pd(b));	    
     else
-        mw01_mul512d_b = _mm512_loadu_pd(b);
-
-    return complex_mul_512register(mw01_mul512d_a,mw01_mul512d_b);
+        return complex_mul_512register(_mm512_setr_pd(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i),_mm512_loadu_pd(b));
 }
 
 
@@ -173,30 +162,21 @@ inline __m512 complex_mul_512register(register __m512 mw01_mul512f_a,register __
 }
 
 inline __m512 complex_mul_512register(float *a,float *b,int aligna,int alignb) {
-    register __m512 mw01_mul512f_a; //asm("ymm13");
-    register __m512 mw01_mul512f_b; //asm("ymm12");
-
-    if(aligna == 0)
-        mw01_mul512f_a = _mm512_load_ps(a);                                      
+    if(aligna == 0 && alignb == 0)
+        return complex_mul_512register(_mm512_load_ps(a),_mm512_load_ps(b));
+    else if(aligna == 0 && alignb != 0)
+        return complex_mul_512register(_mm512_load_ps(a),_mm512_loadu_ps(b));
+    else if(aligna != 0 && alignb == 0)
+        return complex_mul_512register(_mm512_loadu_ps(a),_mm512_load_ps(b));
     else
-        mw01_mul512f_a = _mm512_loadu_ps(a);
-    if(alignb == 0)
-        mw01_mul512f_b = _mm512_load_ps(b);                                      
-    else
-        mw01_mul512f_b = _mm512_loadu_ps(b);
-    return complex_mul_512register(mw01_mul512f_a,mw01_mul512f_b);
+        return complex_mul_512register(_mm512_loadu_ps(a),_mm512_loadu_ps(b));
 }
 
 inline __m512 complex_mul_512register(float a0r,float a0i,float a1r,float a1i,float a2r,float a2i,float a3r,float a3i,float a4r,float a4i,float a5r,float a5i,float a6r,float a6i,float a7r,float a7i,float *b,int alignb) {
-    register __m512 mw01_mul512f_a; //asm("ymm13");
-    register __m512 mw01_mul512f_b; //asm("ymm12");
-
-    mw01_mul512f_a = _mm512_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i,a4r,a4i,a5r,a5i,a6r,a6i,a7r,a7i);
     if(alignb == 0)
-        mw01_mul512f_b = _mm512_load_ps(b);                                      
+        return complex_mul_512register(_mm512_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i,a4r,a4i,a5r,a5i,a6r,a6i,a7r,a7i),_mm512_load_ps(b));
     else
-        mw01_mul512f_b = _mm512_loadu_ps(b);
-    return complex_mul_512register(mw01_mul512f_a,mw01_mul512f_b);
+        return complex_mul_512register(_mm512_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i,a4r,a4i,a5r,a5i,a6r,a6i,a7r,a7i),_mm512_loadu_ps(b));
 }
 #endif
 
@@ -206,48 +186,25 @@ inline __m512 complex_mul_512register(float a0r,float a0i,float a1r,float a1i,fl
 #if AVX > 0
 // 256 bit double multiply
 inline __m256d complex_mul_256register(register __m256d mw01_mul256d_a,register __m256d mw01_mul256d_b) {
-/*
-                                                                          a:    3   2   4  -1
-                                                                          b:    7   5   6  -2
-    c_256_2 = _mm256_mul_pd(a_256_2,b_256_2);                                  21  10  24   2
-    c_256_2 = _mm256_xor_pd(c_256_2,_mm256_setr_pd(0.0,-0.0,0.0,-0.0));        21 -10  24  -2
-    b_256_2 = _mm256_permute_pd(b_256_2,0b0101);                                5   7  -2   6
-    a_256_2 = _mm256_mul_pd(a_256_2,b_256_2);                                  15  14  -8  -6
-    d_256_2 = _mm256_hadd_pd(c_256_2,a_256_2);                                 11  29  22 -14
-    return d_256_2;
-    return _mm256_hadd_pd(_mm256_xor_pd(_mm256_mul_pd(mw01_mul256d_a,mw01_mul256d_b),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)),_mm256_mul_pd(mw01_mul256d_a,_mm256_permute_pd(mw01_mul256d_b,0b0101)));
-*/
-	
     return _mm256_fmaddsub_pd(mw01_mul256d_a,_mm256_permute_pd(mw01_mul256d_b,0b0000),_mm256_mul_pd(_mm256_permute_pd(mw01_mul256d_a,0b0101),_mm256_permute_pd(mw01_mul256d_b,0b1111)));
 }
 
 inline __m256d complex_mul_256register(double a0r,double a0i,double a1r,double a1i,double *b,int alignb) {
-    register __m256d mw01_mul256d_a asm("ymm15");
-    register __m256d mw01_mul256d_b asm("ymm14");
-
-    mw01_mul256d_a = _mm256_setr_pd(a0r,a0i,a1r,a1i);
     if(alignb == 0)
-        mw01_mul256d_b = _mm256_load_pd(b);
+        return complex_mul_256register(_mm256_setr_pd(a0r,a0i,a1r,a1i),_mm256_load_pd(b));
     else
-        mw01_mul256d_b = _mm256_loadu_pd(b);
-
-    return complex_mul_256register(mw01_mul256d_a,mw01_mul256d_b);
+	return complex_mul_256register(_mm256_setr_pd(a0r,a0i,a1r,a1i),_mm256_loadu_pd(b));
 }
 
 inline __m256d complex_mul_256register(double *a,double *b,int aligna,int alignb) {
-    register __m256d mw01_mul256d_a asm("ymm13");
-    register __m256d mw01_mul256d_b asm("ymm12");
-
-    if(aligna == 0)
-        mw01_mul256d_a = _mm256_load_pd(a);                                      
+    if(aligna == 0 && alignb == 0)
+        return complex_mul_256register(_mm256_load_pd(a),_mm256_load_pd(b));
+    else if(aligna == 0 && alignb != 0)
+        return complex_mul_256register(_mm256_load_pd(a),_mm256_loadu_pd(b));
+    else if(aligna != 0 && alignb == 0)
+        return complex_mul_256register(_mm256_loadu_pd(a),_mm256_load_pd(b));
     else
-        mw01_mul256d_a = _mm256_loadu_pd(a);
-    if(alignb == 0)
-        mw01_mul256d_b = _mm256_load_pd(b);                                      
-    else
-        mw01_mul256d_b = _mm256_loadu_pd(b);
-
-    return complex_mul_256register(mw01_mul256d_a,mw01_mul256d_b);
+        return complex_mul_256register(_mm256_loadu_pd(a),_mm256_loadu_pd(b));
 }
 
 
@@ -259,30 +216,21 @@ inline __m256 complex_mul_256register(register __m256 mw01_mul256f_a,register __
 }
 
 inline __m256 complex_mul_256register(float *a,float *b,int aligna,int alignb) {
-    register __m256 mw01_mul256f_a; //asm("ymm13");
-    register __m256 mw01_mul256f_b; //asm("ymm12");
-
-    if(aligna == 0)
-        mw01_mul256f_a = _mm256_load_ps(a);
+    if(aligna == 0 && alignb == 0)
+        return complex_mul_256register(_mm256_load_ps(a),_mm256_load_ps(b));
+    else if(aligna == 0 && alignb != 0)
+        return complex_mul_256register(_mm256_load_ps(a),_mm256_loadu_ps(b));
+    else if(aligna != 0 && alignb == 0)
+        return complex_mul_256register(_mm256_loadu_ps(a),_mm256_load_ps(b));
     else
-        mw01_mul256f_a = _mm256_loadu_ps(a);
-    if(alignb == 0)
-        mw01_mul256f_b = _mm256_load_ps(b);
-    else
-        mw01_mul256f_b = _mm256_loadu_ps(b);
-    return complex_mul_256register(mw01_mul256f_a,mw01_mul256f_b);
+        return complex_mul_256register(_mm256_loadu_ps(a),_mm256_loadu_ps(b));
 }
 
 inline __m256 complex_mul_256register(float a0r,float a0i,float a1r,float a1i,float a2r,float a2i,float a3r,float a3i,float *b,int alignb) {
-    register __m256 mw01_mul256f_a asm("ymm15");
-    register __m256 mw01_mul256f_b asm("ymm14");
-
-    mw01_mul256f_a = _mm256_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i);
     if(alignb == 0)
-        mw01_mul256f_b = _mm256_load_ps(b);
+        return complex_mul_256register(_mm256_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i),_mm256_load_ps(b));
     else
-        mw01_mul256f_b = _mm256_loadu_ps(b);
-    return complex_mul_256register(mw01_mul256f_a,mw01_mul256f_b);
+        return complex_mul_256register(_mm256_setr_ps(a0r,a0i,a1r,a1i,a2r,a2i,a3r,a3i),_mm256_loadu_ps(b));
 }
 #endif
 

@@ -14,6 +14,7 @@
 #endif
 
 int primeFactors(int,int *);
+int aligned_int(int,int);
 
 template <class Type>
 void Rader(complex<Type> *,complex<Type> *,complex<Type> *,int,Type,int);

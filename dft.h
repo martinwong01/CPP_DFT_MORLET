@@ -353,15 +353,15 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 				    //mw01_dft_e = _mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]);
 				    //mw01_dft_f = _mm_fmadd_pd(c,a,e);
 				    //mw01_dft_g = _mm_fmadd_pd(d,b,f);
-				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],g);                
-				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]))));
+				    //_mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],g);                
+				    _mm256_store_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_load_pd((double *)&outptr[kkleft+m*mleft+t]))));
 				else    
-    				    _mm256_storeu_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_loadu_pd((double *)&outptr[kkleft+m*mleft+t]))));
+    				    _mm256_storeu_pd((double *)&outptr[kkleft+m*mleft+t],_mm_fmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_loadu_pd((double *)&outptr[kkleft+m*mleft+t]))));
                           
 			        if((kkleft+(Factor[j]-m)*mleft)%2 == 0)
-				    _mm256_store_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
+				    _mm256_store_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_load_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
 				else
-				    _mm256_storeu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(d,b,_mm_fmadd_pd(c,a,_mm256_loadu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
+				    _mm256_storeu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t],_mm_fnmadd_pd(mw01_dft_d,mw01_dft_b,_mm_fmadd_pd(mw01_dft_c,mw01_dft_a,_mm256_loadu_pd((double *)&outptr[kkleft+(Factor[j]-m)*mleft+t]))));
 */			  
                             }
                         }

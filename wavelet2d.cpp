@@ -132,8 +132,8 @@ int main(int argc, char *argv[]) {
         }
         fwrite(cwt1[0][0],Nx*Sy*aligned_dim<complex<float>>(Ny)*sizeof(complex<float>),1,fp1);
         fwrite(cwt2[0][0],Nx*Sy*aligned_dim<complex<float>>(Ny)*sizeof(complex<float>),1,fp2);
-        // Note the aligned_dim(Ny). These 1 line fwrite may save time than fwriting Nx*Sy times.
-        // When reading these files, have to use same structure. See waveletcov.cpp as an example.
+        // Note the aligned_dim(Ny). These 1 line fwrite could save time than fwriting Nx*Sy times.
+        // When reading these files, have to use same structure. See waveletcov_stat.cpp as an example.
     }
 
     fclose(fp1);

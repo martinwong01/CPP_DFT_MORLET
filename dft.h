@@ -337,12 +337,14 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                                 _mm256_storeu_pd((double *)&outptr[kkleft+t],_mm256_add_pd(_mm256_loadu_pd((double *)&outptr[kkleft+t]),mw01_dft_b));
                             for(m=1;m<(Factor[j]+1)/2;m++) {
                                 datasub1[m] = roots[n*m*mleft%N];
+/*				
                                 for(r=0;r<2;r++) {
                                     datasub3[m] = datasub2[t+r]*datasub1[m].getreal();
                                     datasub4[m] = datasub2[t+r].turnleft()*datasub1[m].getimga();
                                     outptr[kkleft+m*mleft+t+r] += datasub3[m]+datasub4[m];
                                     outptr[kkleft+(Factor[j]-m)*mleft+t+r] += datasub3[m]-datasub4[m];
                                 }
+*/
                             }
                         }
                     } else if(sizeof(Type) == 4) {

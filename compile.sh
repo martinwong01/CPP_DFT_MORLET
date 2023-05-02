@@ -32,6 +32,7 @@ if [ $compiler == "gnu" ]; then
 elif [ $compiler == "intel" ]; then
     command="icc $flags -diag-disable=10441 -qopenmp -Ofast $macros"
 elif [ $compiler == "clang" ]; then
+    #command="clang++ $flags -fopenmp=libomp -Ofast -march=skylake-avx512 $macros"
     command="clang++ $flags -fopenmp=libomp -Ofast $macros"
 fi
 

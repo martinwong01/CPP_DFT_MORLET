@@ -690,18 +690,18 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
-	        for(i=j;i<aligned_int(j,2);i++) roots[i-j].turnleft();
+	        for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnleft();
 		for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0)));
             } else if(sizeof(Type) == 4) {
-	        for(i=j;i<aligned_int(j,4);i++) roots[i-j].turnleft();
+	        for(i=j;i<aligned_int(j,4);i++) roots[i] = roots[i-j].turnleft();
 		for(i=aligned_int(j,4);i<N/2;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0))); 
             }
 #else
             if(sizeof(Type) == 8) {
-	        for(i=j;i<aligned_int(j,4);i++) roots[i-j].turnleft();
+	        for(i=j;i<aligned_int(j,4);i++) roots[i] = roots[i-j].turnleft();
 		for(i=aligned_int(j,4);i<N/2;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
             } else if(sizeof(Type) == 4) {
-	        for(i=j;i<aligned_int(j,8);i++) roots[i-j].turnleft();
+	        for(i=j;i<aligned_int(j,8);i++) roots[i] = roots[i-j].turnleft();
 		for(i=aligned_int(j,8);i<N/2;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_permute_ps(_mm512_load_ps((float *)&roots[i-j]),0b10110001),_mm512_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0))); 
             }
 #endif

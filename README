@@ -1,4 +1,4 @@
-Programs to compute Discrete Fourier Transform and Morlet continuous wavelet transform. Tested on Debian x86_64 with icc/g++ compilers.
+Programs to compute Discrete Fourier Transform and Morlet continuous wavelet transform. Tested on Debian x86_64 with clang/icc/g++ compilers.
 
 
 5 header files, 6 test cpp files, 2 bash scripts:

@@ -71,7 +71,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             for(i=0;i<=k;i++) roots[i].setangle(a*i);                          //     1/8 values
             if(sign > 0) {
                 for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();     //     values remaining in quadrant
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnright();          //     copy to next quadrant
 #elif AVX512 == 0
                 if(sizeof(Type) == 8) {
@@ -92,7 +92,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #endif
             } else {
                 for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap();
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
 #elif AVX512 == 0
                 if(sizeof(Type) == 8) {
@@ -112,7 +112,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 }
 #endif
             }
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=N/2;i<N;i++) roots[i] = roots[i-N/2].reverse();                   // copy to whole circle
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -134,7 +134,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    j = N>>2;
             for(i=0;i<=j;i++) roots[i].setangle(a*i);                                   // quadrant values
 	    for(i=j+1;i<N/2;i++) roots[i] = roots[N/2-i].realconjugate();               // copy to next quadrant
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=N/2;i<N;i++) roots[i] = roots[i-N/2].reverse();                       
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {    // N/2 must be odd
@@ -159,7 +159,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         }
     } else {
         if((sign > 0 && roots[1].getimga() > 0.) || (sign < 0 && roots[1].getimga() < 0.))
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = roots[i].conjugate();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -209,7 +209,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	        kkleft += kleft;
 	        kkright += kright;
                 c[0] = roots[p];
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
                 for(t=0;t<tail;t++) {
                     datasub2[t] = c[0]*dataptr[kkright+nright+t];
                     outptr[kkleft+t] = dataptr[kkright+t] + datasub2[t];
@@ -314,7 +314,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	            nnright += nright;
 		    i = n*k*NoverPF;
                     c[0] = roots[i];
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
                     for(t=0;t<tail;t++) {
 		        datasub2[t] = c[0]*dataptr[kkright+nnright+t];
 		        outptr[kkleft+0*mleft+t] += datasub2[t];                            // m = 0
@@ -517,7 +517,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    p = n*k*NoverPF;
 		    nnright += nright;
                     c[0] = roots[p];
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
                     for(t=0;t<tail;t++) 
 		        outptr[kkleft+0*mleft+t] += c[0]*dataptr[kkright+nnright+t];
 #elif AVX512 == 0
@@ -645,7 +645,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(i=0;i<=k;i++) roots[i].setangle(a*i);                               //     1/8 values
         if(sign > 0) {
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();          //     values remaining in quadrant
-#if AVX == 0 
+#if !defined(AVX) || AVX == 0 
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnright();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -666,7 +666,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #endif
         } else {
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap();
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -688,7 +688,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         }
     } else {
         if((sign > 0 && roots[1].getimga() > 0.) || (sign < 0 && roots[1].getimga() < 0.))
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = roots[i].conjugate();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -741,7 +741,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    kkright = kkleft<<1;
             p += NoverPF;
             c[0] = roots[p];
-#if AVX == 0 
+#if !defined(AVX) || AVX == 0 
             for(t=0;t<tail;t++) {
                 c[1] = c[0]*dataptr[kkright+nright+t];
                 outptr[kkleft+t] = dataptr[kkright+t] + c[1];
@@ -832,7 +832,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         for(i=0;i<=k;i++) roots[i].setangle(a*i);                                //     1/8 values
         if(sign > 0) {
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();           //     values remaining in quadrant
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnright();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -853,7 +853,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #endif
         } else {
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap();
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -875,7 +875,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         }
     } else {
         if((sign > 0 && roots[1].getimga() > 0.) || (sign < 0 && roots[1].getimga() < 0.))
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = roots[i].conjugate();
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {
@@ -914,7 +914,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 out[hhead] = c[0] + c[1];
                 out[hhead+Product] = c[0] - c[1];
             } else {
-#if AVX == 0
+#if !defined(AVX) || AVX == 0
                 for(k=0;k<Product;k++) {
                     p += NoverPF;
                     c[0] = out[hhead+k];
@@ -1116,7 +1116,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     memcpy(&padded[newN-N+2],&padded[1],(N-2)*sizeof(complex<Type>));
     fft_func<Type>(padded,result2,newN,1,pi,1,0);
     newN2 = 1.*newN;
-#if AVX == 0 
+#if !defined(AVX) || AVX == 0 
     for(int q=0;q<newN;q++) result1[q] *= result2[q]*newN2;
 #elif AVX512 == 0
     if(sizeof(Type) == 8) {

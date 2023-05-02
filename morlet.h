@@ -31,6 +31,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
                 freq[k] = a*k;
 	    else
                 freq[k] = a*(k-N); 
+/*
         for(s=0;s<S;s++)
         for(k=0;k<N;k++)
             if(freq[k] > 0.)
@@ -38,7 +39,13 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	    else
 	        wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
 	        //wavefunc[s][k] = 0.;
+*/
+        for(s=0;s<S;s++)
+	for(k=0;k<=N/2;k++)
+            wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
     }
+    
+//    _mm256_exp_pd
     
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);
     

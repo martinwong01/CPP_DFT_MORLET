@@ -131,9 +131,11 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             }
 #endif
         } else if(N%2 == 0) {
-            for(i=0;i<N/2;i++) roots[i].setangle(a*i);
+	    j = N>>2;
+            for(i=0;i<=j;i++) roots[i].setangle(a*i);                                   // quadrant values
+	    for(i=j+1;i<N/2;i++) roots[i] = roots[N/2-i].realconjugate();               // copy to next quadrant
 #if AVX == 0
-            for(i=N/2;i<N;i++) roots[i] = roots[i-N/2].reverse();
+            for(i=N/2;i<N;i++) roots[i] = roots[i-N/2].reverse();                       
 #elif AVX512 == 0
             if(sizeof(Type) == 8) {    // N/2 must be odd
 	        for(i=N/2;i<aligned_int(N/2,2);i++) roots[i] = roots[i-N/2].reverse();

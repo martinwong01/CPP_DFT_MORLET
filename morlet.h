@@ -41,10 +41,16 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
         for(k=0;k<N;k++) dft_product[s][k] = dft[k]*wavefunc[s][k];
 #elif AVX512 == 0
         if(sizeof(Type) == 8) {
-	    for(k=0;k<N;k+=2)_mm256_store_pd((double *)&dft_product[s][k],_mm256_mul_pd(_mm256_load_pd((double *)&dft[k]),);
+	    for(k=0;k<N;k+=2)_mm256_store_pd((double *)&dft_product[s][k],_mm256_mul_pd(_mm256_load_pd((double *)&dft[k]),_mm256_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1]));
 	else if(sizeof(Type) == 4) {
+	    for(k=0;k<N;k+=4)_mm256_store_ps((float *)&dft_product[s][k],_mm256_mul_ps(_mm256_load_ps((float *)&dft[k]),_mm256_setr_ps(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3]));
         }
 #else
+        if(sizeof(Type) == 8) {
+	    for(k=0;k<N;k+=4)_mm512_store_pd((double *)&dft_product[s][k],_mm512_mul_pd(_mm512_load_pd((double *)&dft[k]),_mm512_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3]));
+	else if(sizeof(Type) == 4) {
+	    for(k=0;k<N;k+=8)_mm256_store_ps((float *)&dft_product[s][k],_mm512_mul_ps(_mm512_load_ps((float *)&dft[k]),_mm512_setr_ps(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3],wavefunc[s][k+4],wavefunc[s][k+4],wavefunc[s][k+5],wavefunc[s][k+5],wavefunc[s][k+6],wavefunc[s][k+6],wavefunc[s][k+7],wavefunc[s][k+7]));
+        }
 #endif
     
     for(s=0;s<S;s++) dftinv_func<Type>(dft_product[s],transform[s],N,pi,0);

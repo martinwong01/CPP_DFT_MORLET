@@ -810,7 +810,25 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         } else {
 	    if(sign > 0) {
                 a = 1./N;
+#if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
+#elif AVX512 == 0
+                if(sizeof(Type) == 8) {
+		    mw01_dft_a = _mm256_set1_pd(a);
+		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_dft_a));
+		} else if(sizeof(Type) == 4) {
+		    mw01_dft_af = _mm256_set1_ps(a);
+    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_dft_af));
+		}
+#else
+                if(sizeof(Type) == 8) {
+		    mw01_dft_a = _mm512_set1_pd(a);
+    		    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_dft_a));
+		} else if(sizeof(Type) == 4) {
+		    mw01_dft_af = _mm512_set1_ps(a);
+       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_dft_af));
+		}
+#endif
 	    }
             break;	
         }
@@ -991,7 +1009,25 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         if(PF == N) {
             if(sign > 0) {
                 a = 1./N;
+#if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
+#elif AVX512 == 0
+                if(sizeof(Type) == 8) {
+		    mw01_dft_a = _mm256_set1_pd(a);
+		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_dft_a));
+		} else if(sizeof(Type) == 4) {
+		    mw01_dft_af = _mm256_set1_ps(a);
+    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_dft_af));
+		}
+#else
+                if(sizeof(Type) == 8) {
+		    mw01_dft_a = _mm512_set1_pd(a);
+    		    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_dft_a));
+		} else if(sizeof(Type) == 4) {
+		    mw01_dft_af = _mm512_set1_ps(a);
+       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_dft_af));
+		}
+#endif
             }
             break;
         }

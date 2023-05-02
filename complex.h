@@ -78,6 +78,12 @@ class complex {
 	cc.imga = -1.*imga;
 	return cc;
     }
+    complex<Type> realconjugate() {
+        complex<Type> cc;
+        cc.real = -real;
+	cc.imga = imga;
+	return cc;
+    }
     void operator+=(complex<Type> c) {
 	real += c.real;
 	imga += c.imga;

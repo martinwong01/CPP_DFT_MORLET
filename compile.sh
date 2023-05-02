@@ -2,7 +2,7 @@
 
 
 tryvector=1                    # 1: use avx/avx512/fma, 0: not used
-compiler="intel"               # "clang" or "intel" or "gnu"
+compiler="clang"               # "clang" or "intel" or "gnu"
 maxn=131072                    # set to 2^
 maxs=64                        # maximum number of wavelet scales
 

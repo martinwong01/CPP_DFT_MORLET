@@ -14,11 +14,11 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) complex<Type> thread_local dft_product[MAXS][MAXN];
     alignas(ALIGN) complex<Type> thread_local datacomplex[MAXN];
 #if AVX512 > 0
-    __m512d mw01_morlet_a asm("zmm0");
-    __m512 mw01_morlet_af asm("zmm0");
+    __m512d mw01_morlet_a;
+    __m512 mw01_morlet_af;
 #elif AVX > 0
-    __m256d mw01_morlet_a asm("ymm0");
-    __m256 mw01_morlet_af asm("ymm0");
+    __m256d mw01_morlet_a;
+    __m256 mw01_morlet_af;
 #endif
 
 

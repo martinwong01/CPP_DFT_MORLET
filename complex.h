@@ -138,7 +138,7 @@ class complex {
 
 #if AVX512 > 0
 // 512 bit double multiply
-inline __m512d complex_mul_512register(register __m512d mw01_mul512d_a,register __m512d mw01_mul512d_b) {
+inline __m512d complex_mul_512register(__m512d mw01_mul512d_a,__m512d mw01_mul512d_b) {
     return _mm512_fmaddsub_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b00000000),_mm512_mul_pd(_mm512_permute_pd(mw01_mul512d_a,0b01010101),_mm512_permute_pd(mw01_mul512d_b,0b11111111)));
 }
 
@@ -163,7 +163,7 @@ inline __m512d complex_mul_512register(double a0r,double a0i,double a1r,double a
 
 
 // 512 bit float multiply
-inline __m512 complex_mul_512register(register __m512 mw01_mul512f_a,register __m512 mw01_mul512f_b) {
+inline __m512 complex_mul_512register(__m512 mw01_mul512f_a,__m512 mw01_mul512f_b) {
     return _mm512_fmaddsub_ps(mw01_mul512f_a,_mm512_permute_ps(mw01_mul512f_b,0b10100000),_mm512_mul_ps(_mm512_permute_ps(mw01_mul512f_a,0b10110001),_mm512_permute_ps(mw01_mul512f_b,0b11110101)));
 }
 
@@ -191,7 +191,7 @@ inline __m512 complex_mul_512register(float a0r,float a0i,float a1r,float a1i,fl
 
 #if AVX > 0
 // 256 bit double multiply
-inline __m256d complex_mul_256register(register __m256d mw01_mul256d_a,register __m256d mw01_mul256d_b) {
+inline __m256d complex_mul_256register(__m256d mw01_mul256d_a,__m256d mw01_mul256d_b) {
     return _mm256_fmaddsub_pd(mw01_mul256d_a,_mm256_permute_pd(mw01_mul256d_b,0b0000),_mm256_mul_pd(_mm256_permute_pd(mw01_mul256d_a,0b0101),_mm256_permute_pd(mw01_mul256d_b,0b1111)));
 }
 
@@ -217,7 +217,7 @@ inline __m256d complex_mul_256register(double *a,double *b,int aligna,int alignb
 
 
 // 256 bit float multiply
-inline __m256 complex_mul_256register(register __m256 mw01_mul256f_a,register __m256 mw01_mul256f_b) {
+inline __m256 complex_mul_256register(__m256 mw01_mul256f_a,__m256 mw01_mul256f_b) {
     return _mm256_fmaddsub_ps(mw01_mul256f_a,_mm256_permute_ps(mw01_mul256f_b,0b10100000),_mm256_mul_ps(_mm256_permute_ps(mw01_mul256f_a,0b10110001),_mm256_permute_ps(mw01_mul256f_b,0b11110101)));
 }
 

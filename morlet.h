@@ -14,11 +14,11 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) complex<Type> thread_local dft_product[MAXS][MAXN];
     alignas(ALIGN) complex<Type> thread_local datacomplex[MAXN];
 #if AVX512 > 0
-    register __m512d mw01_morlet_a asm("zmm0");
-    register __m512 mw01_morlet_af asm("zmm0");
+    __m512d mw01_morlet_a asm("zmm0");
+    __m512 mw01_morlet_af asm("zmm0");
 #elif AVX > 0
-    register __m256d mw01_morlet_a asm("ymm0");
-    register __m256 mw01_morlet_af asm("ymm0");
+    __m256d mw01_morlet_a asm("ymm0");
+    __m256 mw01_morlet_af asm("ymm0");
 #endif
 
 
@@ -55,15 +55,15 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 #if !defined(AVX) || AVX == 0    
         for(k=0;k<N;k++) dft_product[s][k] = dft[k]*wavefunc[s][k];
 #elif AVX512 == 0
-        if(sizeof(Type) == 8) {
+        if constexpr(sizeof(Type) == 8) {
 	    for(k=0;k<N;k+=2) _mm256_store_pd((double *)&dft_product[s][k],_mm256_mul_pd(_mm256_load_pd((double *)&dft[k]),_mm256_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1])));
-	} else if(sizeof(Type) == 4) {
+	} else if constexpr(sizeof(Type) == 4) {
 	    for(k=0;k<N;k+=4) _mm256_store_ps((float *)&dft_product[s][k],_mm256_mul_ps(_mm256_load_ps((float *)&dft[k]),_mm256_setr_ps(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3])));
         }
 #else
-        if(sizeof(Type) == 8) {
+        if constexpr(sizeof(Type) == 8) {
 	    for(k=0;k<N;k+=4) _mm512_store_pd((double *)&dft_product[s][k],_mm512_mul_pd(_mm512_load_pd((double *)&dft[k]),_mm512_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3])));
-	} else if(sizeof(Type) == 4) {
+	} else if constexpr(sizeof(Type) == 4) {
 	    for(k=0;k<N;k+=8) _mm512_store_ps((float *)&dft_product[s][k],_mm512_mul_ps(_mm512_load_ps((float *)&dft[k]),_mm512_setr_ps(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3],wavefunc[s][k+4],wavefunc[s][k+4],wavefunc[s][k+5],wavefunc[s][k+5],wavefunc[s][k+6],wavefunc[s][k+6],wavefunc[s][k+7],wavefunc[s][k+7])));
         }
 #endif
@@ -75,18 +75,18 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 #if !defined(AVX) || AVX == 0
         for(n=0;n<N;n++) transform[s][n] *= a;
 #elif AVX512 == 0
-        if(sizeof(Type) == 8) {
+        if constexpr(sizeof(Type) == 8) {
     	    mw01_morlet_a = _mm256_set1_pd(a);
 	    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&transform[s][n],_mm256_mul_pd(_mm256_load_pd((double *)&transform[s][n]),mw01_morlet_a));
-	} else if(sizeof(Type) == 4) {
+	} else if constexpr(sizeof(Type) == 4) {
        	    mw01_morlet_af = _mm256_set1_ps(a);
 	    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&transform[s][n],_mm256_mul_ps(_mm256_load_ps((float *)&transform[s][n]),mw01_morlet_af));
 	}
 #else
-        if(sizeof(Type) == 8) {
+        if constexpr(sizeof(Type) == 8) {
     	    mw01_morlet_a = _mm512_set1_pd(a);
 	    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&transform[s][n],_mm512_mul_pd(_mm512_load_pd((double *)&transform[s][n]),mw01_morlet_a));
-	} else if(sizeof(Type) == 4) {
+	} else if constexpr(sizeof(Type) == 4) {
        	    mw01_morlet_af = _mm512_set1_ps(a);
 	    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&transform[s][n],_mm512_mul_ps(_mm512_load_ps((float *)&transform[s][n]),mw01_morlet_af));
 	}

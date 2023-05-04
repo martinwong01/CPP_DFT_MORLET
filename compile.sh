@@ -2,7 +2,7 @@
 
 
 vector=1                       # 1: use avx/avx512/fma, 0: not used
-compiler="apple"               # "apple" or "intel" or "gnu" or "nvidia"
+compiler="clang"               # "clang" or "intel" or "gnu" or "nvidia"
 maxn=131072                    # set to 2^
 maxs=64                        # maximum number of wavelet scales
 
@@ -31,7 +31,7 @@ if [ $compiler == "gnu" ]; then
     command="g++ $vector_flags -std=c++17 -fopenmp -Ofast $macros"
 elif [ $compiler == "intel" ]; then
     command="icc $vector_flags -std=c++17 -diag-disable=10441 -qopenmp -Ofast $macros"
-elif [ $compiler == "apple" ]; then
+elif [ $compiler == "clang" ]; then
     #command="clang++ $vector_flags -std=c++17 -fopenmp=libomp -Ofast -march=skylake-avx512 $macros"
     command="clang++ $vector_flags -std=c++17 -fopenmp=libomp -Ofast $macros"
 elif [ $compiler == "nvidia" ]; then

@@ -1167,10 +1167,54 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         }
     }
     
+#if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
+#elif AVX512 == 0
+    if constexpr(sizeof(Type) == 8) {
+        mw01_rader_a = _mm256_setzero_pd();
+        for(i=0;i<newN;i+=2)
+            _mm256_store_pd((double *)&padded[i],mw01_rader_a);
+    } else if constexpr(sizeof(Type) == 4) {
+        mw01_rader_af = _mm256_setzero_ps();
+        for(i=0;i<newN;i+=4)
+            _mm256_store_ps((float *)&padded[i],mw01_rader_af);
+    }
+#else
+    if constexpr(sizeof(Type) == 8) {
+        mw01_rader_a = _mm512_setzero_pd();
+        for(i=0;i<newN;i+=4)
+            _mm512_store_pd((double *)&padded[i],mw01_rader_a);
+    } else if constexpr(sizeof(Type) == 4) {
+        mw01_rader_af = _mm512_setzero_ps();
+        for(i=0;i<newN;i+=8)
+            _mm512_store_ps((float *)&padded[i],mw01_rader_af);
+    }
+#endif
     for(int q=0;q<N-1;q++) padded[q] = datasub1[mapg[q]];
     fft_func<Type>(padded,result1,newN,1,pi,1,init);
+#if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
+#elif AVX512 == 0
+    if constexpr(sizeof(Type) == 8) {
+        mw01_rader_a = _mm256_setzero_pd();
+        for(i=0;i<newN;i+=2)
+            _mm256_store_pd((double *)&padded[i],mw01_rader_a);
+    } else if constexpr(sizeof(Type) == 4) {
+        mw01_rader_af = _mm256_setzero_ps();
+        for(i=0;i<newN;i+=4)
+            _mm256_store_ps((float *)&padded[i],mw01_rader_af);
+    }
+#else
+    if constexpr(sizeof(Type) == 8) {
+        mw01_rader_a = _mm512_setzero_pd();
+        for(i=0;i<newN;i+=4)
+            _mm512_store_pd((double *)&padded[i],mw01_rader_a);
+    } else if constexpr(sizeof(Type) == 4) {
+        mw01_rader_af = _mm512_setzero_ps();
+        for(i=0;i<newN;i+=8)
+            _mm512_store_ps((float *)&padded[i],mw01_rader_af);
+    }
+#endif
     for(int q=0;q<N-1;q++) padded[q] = datasub2[mapginv[q]];
     memcpy(&padded[newN-N+2],&padded[1],(N-2)*sizeof(complex<Type>));
     fft_func<Type>(padded,result2,newN,1,pi,1,0);

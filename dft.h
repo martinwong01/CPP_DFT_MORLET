@@ -218,9 +218,9 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 }
 #elif AVX512 == 0
                 if constexpr(sizeof(Type) == 8) {
-                    i = (kkright+nright)&1;
-                    n = kkleft&1;
-                    q = (kkleft+mleft)&1;
+                    i = (kkright+nright)%2;
+                    n = kkleft%2;
+                    q = (kkleft+mleft)%2;
                     for(t=0;t<tail-1;t+=2) {     // if tail=6,t=0,2,4,exit at 6; if tail=7,t=0,2,4,exit at 6
                         mw01_dft_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],i);              // nright=NoverPF
                         mw01_dft_a = _mm256_load_pd((double *)&dataptr[kkright+t]);  // kkright = k*N/P = even
@@ -234,10 +234,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                             _mm256_storeu_pd((double *)&outptr[kkleft+mleft+t],_mm256_sub_pd(mw01_dft_a,mw01_dft_b));
                     }
                 } else if constexpr(sizeof(Type) == 4) {
-                    i = (kkright+nright)&3;
-                    m = kkright&3;                 
-                    n = kkleft&3;
-                    q = (kkleft+mleft)&3;
+                    i = (kkright+nright)%4;
+                    m = kkright%4;                 
+                    n = kkleft%4;
+                    q = (kkleft+mleft)%4;
                     for(t=0;t<tail-3;t+=4) {       // tail=1,2,3,exit at 0;  tail=4,5,6,7,exit at 4
                         mw01_dft_bf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],i);
                         if(m == 0)
@@ -256,10 +256,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 }
 #else
                 if constexpr(sizeof(Type) == 8) {
-                    i = (kkright+nright)&3;
-                    m = kkright&3;
-                    n = kkleft&3;
-                    q = (kkleft+mleft)&3;
+                    i = (kkright+nright)%4;
+                    m = kkright%4;
+                    n = kkleft%4;
+                    q = (kkleft+mleft)%4;
                     for(t=0;t<tail-3;t+=4) {     
                         mw01_dft_b = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],i);   
                         if(m == 0)
@@ -276,10 +276,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                             _mm512_storeu_pd((double *)&outptr[kkleft+mleft+t],_mm512_sub_pd(mw01_dft_a,mw01_dft_b));
                     }
                 } else if constexpr(sizeof(Type) == 4) {
-                    i = (kkright+nright)&7;
-                    m = kkright&7;                 
-                    n = kkleft&7;
-                    q = (kkleft+mleft)&7;
+                    i = (kkright+nright)%8;
+                    m = kkright%8;                 
+                    n = kkleft%8;
+                    q = (kkleft+mleft)%8;
                     for(t=0;t<tail-7;t+=8) {       
                         mw01_dft_bf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],i);
                         if(m == 0)
@@ -329,8 +329,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    }
 #elif AVX512 == 0
                     if constexpr(sizeof(Type) == 8) {
-                        q = (kkright+nnright)&1;   // kkright = k*N/P    nnright = n*NoverPF
-                        p = kkleft&1;              // kkleft = k*NoverPF 
+                        q = (kkright+nnright)%2;   // kkright = k*N/P    nnright = n*NoverPF
+                        p = kkleft%2;              // kkleft = k*NoverPF 
                         for(t=0;t<tail-1;t+=2) {   // tail = NoverPF, must be odd
                             mw01_dft_c = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
                             _mm256_store_pd((double *)&datasub2[t],mw01_dft_c);
@@ -374,8 +374,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                             }
                         }
                     } else if constexpr(sizeof(Type) == 4) {
-                        q = (kkright+nnright)&3;
-                        p = kkleft&3;
+                        q = (kkright+nnright)%4;
+                        p = kkleft%4;
                         for(t=0;t<tail-3;t+=4) { 
                             mw01_dft_cf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
                             _mm256_store_ps((float *)&datasub2[t],mw01_dft_cf);
@@ -415,8 +415,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     }
 #else
                     if constexpr(sizeof(Type) == 8) {
-                        q = (kkright+nnright)&3;   // kkright = k*N/P    nnright = n*NoverPF
-                        p = kkleft&3;              // kkleft = k*NoverPF 
+                        q = (kkright+nnright)%4;   // kkright = k*N/P    nnright = n*NoverPF
+                        p = kkleft%4;              // kkleft = k*NoverPF 
                         for(t=0;t<tail-3;t+=4) {   // tail = NoverPF, must be odd
                             mw01_dft_c = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
                             _mm512_store_pd((double *)&datasub2[t],mw01_dft_c);
@@ -454,8 +454,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                             }
                         }
                     } else if constexpr(sizeof(Type) == 4) {
-                        q = (kkright+nnright)&7;
-                        p = kkleft&7;
+                        q = (kkright+nnright)%8;
+                        p = kkleft%8;
                         for(t=0;t<tail-7;t+=8) { 
                             mw01_dft_cf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
                             _mm512_store_ps((float *)&datasub2[t],mw01_dft_cf);
@@ -526,8 +526,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #elif AVX512 == 0
                     if constexpr(sizeof(Type) == 8) {
                         // tail is NoverPF, or product of the remaining factors. must be odd.
-                        i = (kkright+nnright)&1;   // kkright = k*N/P   nnright = n*NoverPF
-                        m = kkleft&1;              // kkleft = k*NoverPF
+                        i = (kkright+nnright)%2;   // kkright = k*N/P   nnright = n*NoverPF
+                        m = kkleft%2;              // kkleft = k*NoverPF
                         for(t=0;t<tail-1;t+=2) {
                             mw01_dft_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],i);
                             if(m == 0)
@@ -540,8 +540,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                                 _mm256_storeu_pd((double *)&outptr[kkleft+t],_mm256_add_pd(mw01_dft_a,mw01_dft_b));
                         }
                     } else if constexpr(sizeof(Type) == 4) {
-                        i = (kkright+nnright)&3;
-                        m = kkleft&3;
+                        i = (kkright+nnright)%4;
+                        m = kkleft%4;
                         for(t=0;t<tail-3;t+=4) {
                             mw01_dft_bf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],i);
                             if(m == 0)
@@ -556,8 +556,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     }
 #else
                     if constexpr(sizeof(Type) == 8) {
-                        i = (kkright+nnright)&3;   
-                        m = kkleft&3;              
+                        i = (kkright+nnright)%4;   
+                        m = kkleft%4;              
                         for(t=0;t<tail-3;t+=4) {
                             mw01_dft_b = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],i);
                             if(m == 0)
@@ -570,8 +570,8 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                                 _mm512_storeu_pd((double *)&outptr[kkleft+t],_mm512_add_pd(mw01_dft_a,mw01_dft_b));
                         }
                     } else if constexpr(sizeof(Type) == 4) {
-                        i = (kkright+nnright)&7;
-                        m = kkleft&7;
+                        i = (kkright+nnright)%8;
+                        m = kkleft%8;
                         for(t=0;t<tail-7;t+=8) {
                             mw01_dft_bf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],i);
                             if(m == 0)
@@ -730,7 +730,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     i = N;                                                       
     j = 0;
     while(i != 1) { i>>=1; j++; }                                             // N = 2^j
-    j = j&1;
+    j = j%2;
    
  
     NoverPF = N;

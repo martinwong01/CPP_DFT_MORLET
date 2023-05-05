@@ -304,7 +304,29 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 }
 	    }
         } else if(Factor[j] <= RaderMin) {
+#if !defined(AVX) || AVX == 0
             memset(outptr,0,N*sizeof(complex<Type>));
+#elif AVX512 == 0
+            if constexpr(sizeof(Type) == 8) {
+                mw01_dft_a = _mm256_setzero_pd();
+                for(i=0;i<N;i+=2)
+                    _mm256_store_pd((double *)&outptr[i],mw01_dft_a);
+            } else if constexpr(sizeof(Type) == 4) {
+                mw01_dft_af = _mm256_setzero_ps();
+                for(i=0;i<N;i+=4)
+                    _mm256_store_ps((float *)&outptr[i],mw01_dft_af);
+            }
+#else
+            if constexpr(sizeof(Type) == 8) {
+                mw01_dft_a = _mm512_setzero_pd();
+                for(i=0;i<N;i+=4)
+                    _mm512_store_pd((double *)&outptr[i],mw01_dft_a);
+            } else if constexpr(sizeof(Type) == 4) {
+                mw01_dft_af = _mm512_setzero_ps();
+                for(i=0;i<N;i+=8)
+                    _mm512_store_ps((float *)&outptr[i],mw01_dft_af);
+            }
+#endif
             kkleft = -kleft;
 	    kkright = -kright;
 	    for(k=0;k<Product;k++) {
@@ -509,7 +531,29 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	        } 
 	    }
         } else {                                            // Rader
+#if !defined(AVX) || AVX == 0
             memset(outptr,0,N*sizeof(complex<Type>));
+#elif AVX512 == 0
+            if constexpr(sizeof(Type) == 8) {
+                mw01_dft_a = _mm256_setzero_pd();
+                for(i=0;i<N;i+=2)
+                    _mm256_store_pd((double *)&outptr[i],mw01_dft_a);
+            } else if constexpr(sizeof(Type) == 4) {
+                mw01_dft_af = _mm256_setzero_ps();
+                for(i=0;i<N;i+=4)
+                    _mm256_store_ps((float *)&outptr[i],mw01_dft_af);
+            }
+#else
+            if constexpr(sizeof(Type) == 8) {
+                mw01_dft_a = _mm512_setzero_pd();
+                for(i=0;i<N;i+=4)
+                    _mm512_store_pd((double *)&outptr[i],mw01_dft_a);
+            } else if constexpr(sizeof(Type) == 4) {
+                mw01_dft_af = _mm512_setzero_ps();
+                for(i=0;i<N;i+=8)
+                    _mm512_store_ps((float *)&outptr[i],mw01_dft_af);
+            }
+#endif
             kkleft = -kleft;
 	    kkright = -kright;
             for(k=0;k<Product;k++) {

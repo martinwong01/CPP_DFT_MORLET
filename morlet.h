@@ -5,8 +5,8 @@
 
 template <class Type>
 void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,Type pi,int init) {
-    int thread_local k,n,s;
-    Type thread_local a,b;
+    alignas(ALIGN) int thread_local k,n,s;
+    alignas(ALIGN) Type thread_local a,b;
     alignas(ALIGN) Type thread_local freq[MAXN];
     alignas(ALIGN) Type thread_local scale[MAXS];
     alignas(ALIGN) Type thread_local wavefunc[MAXS][MAXN];
@@ -14,11 +14,11 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) complex<Type> thread_local dft_product[MAXS][MAXN];
     alignas(ALIGN) complex<Type> thread_local datacomplex[MAXN];
 #if AVX512 > 0
-    __m512d mw01_morlet_a;
-    __m512 mw01_morlet_af;
+    alignas(ALIGN) __m512d thread_local mw01_morlet_a;
+    alignas(ALIGN) __m512 thread_local mw01_morlet_af;
 #elif AVX > 0
-    __m256d mw01_morlet_a;
-    __m256 mw01_morlet_af;
+    alignas(ALIGN) __m256d thread_local mw01_morlet_a;
+    alignas(ALIGN) __m256 thread_local mw01_morlet_af;
 #endif
 
 

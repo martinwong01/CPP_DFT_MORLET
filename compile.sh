@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-vector=1                       # 1: use avx/avx512/fma, 0: not used
+vector=1                       # 1: use avx/avx512/fma/svml, 0: not used
 compiler="clang"               # "clang" or "intel" or "gnu" or "nvidia"
 maxn=131072                    # set to 2^
 maxs=64                        # maximum number of wavelet scales
@@ -13,14 +13,18 @@ maxs=64                        # maximum number of wavelet scales
 avx=0
 avx512=0
 fma=0
+svml=0
 if [ $vector -eq 1 ]; then
     fma=$(grep " fma " /proc/cpuinfo|wc -l)
     if [ $fma -gt 0 ]; then
         avx=$(grep " avx " /proc/cpuinfo|wc -l)
         avx512=$(grep " avx512f " /proc/cpuinfo|wc -l)
     fi
+    if [ $compiler == "intel" ]; then
+        svml=1
+    fi
 fi
-macros="-D AVX512=${avx512} -D AVX=${avx} -D FMA=${fma} -D MAXN=${maxn} -D MAXS=${maxs}"
+macros="-D AVX512=${avx512} -D AVX=${avx} -D FMA=${fma} -D SVML=${svml} -D MAXN=${maxn} -D MAXS=${maxs}"
 vector_flags=""
 if [ $avx512 -gt 0 ]; then vector_flags="-mavx512f"; fi 
 if [ $avx -gt 0 ]; then vector_flags="$vector_flags -mavx"; fi

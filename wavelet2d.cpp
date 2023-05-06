@@ -34,6 +34,15 @@ int main(int argc, char *argv[]) {
     __uint128_t filesize;               // linux gnu C++ has difficulty handling __uint128_t. not used 
 
     int Nthreads,thread; 
+	
+#if AVX512 > 0
+    alignas(ALIGN) __m512d thread_local mw01_wavelet2d_a;
+    alignas(ALIGN) __m512d thread_local mw01_wavelet2d_b;
+#elif AVX > 0
+    alignas(ALIGN) __m256d thread_local mw01_wavelet2d_a;
+    alignas(ALIGN) __m256d thread_local mw01_wavelet2d_b;
+#endif
+
 
 
     // set constants
@@ -118,16 +127,31 @@ int main(int argc, char *argv[]) {
                     morlet<double>(yseries1[thread],transform_real[x],Ny,Sy,param,dy,pi,0); 
                 morlet<double>(yseries2[thread],transform_imga[x],Ny,Sy,param,dy,pi,0);
 
+#if !defined(AVX) || AVX == 0
 	        for(i=0;i<Sy;i++)
 	        for(y=0;y<Ny;y++) {
                     cwt1[x][i][y].setreal((float)(transform_real[x][i][y].getreal() - transform_imga[x][i][y].getimga()));
                     cwt1[x][i][y].setimga((float)(transform_real[x][i][y].getimga() + transform_imga[x][i][y].getreal()));
-                }
-	        for(i=0;i<Sy;i++)
-	        for(y=0;y<Ny;y++) {
                     cwt2[x][i][y].setreal((float)(transform_real[x][i][y].getreal() + transform_imga[x][i][y].getimga()));
                     cwt2[x][i][y].setimga((float)(transform_imga[x][i][y].getreal() - transform_real[x][i][y].getimga()));
                 }
+#elif AVX512 == 0
+                for(i=0;i<Sy;i++)
+                for(y=0;y<Ny;y+=2) {
+                    mw01_wavelet2d_a = _mm256_load_pd((double *)&transform_real[x][i][y]);
+                    mw01_wavelet2d_b = _mm256_permute_pd(_mm256_load_pd((double *)&transform_imga[x][i][y]),0b0101);
+                    _mm_store_ps((float *)&cwt1[x][i][y],_mm256_cvtpd_ps(_mm256_addsub_pd(mw01_wavelet2d_b,mw01_wavelet2d_a)));
+                    _mm_store_ps((float *)&cwt2[x][i][y],_mm256_cvtpd_ps(_mm256_add_pd(_mm256_xor_pd(mw01_wavelet2d_a,_mm256_setr_pd(0.0,-0.0,0.0,-0.0)),mw01_wavelet2d_b)));
+                }
+#else
+                for(i=0;i<Sy;i++)
+                for(y=0;y<Ny;y+=4) {
+                    mw01_wavelet2d_a = _mm512_load_pd((double *)&transform_real[x][i][y]);
+                    mw01_wavelet2d_b = _mm512_permute_pd(_mm512_load_pd((double *)&transform_imga[x][i][y]),0b01010101);
+                    _mm256_store_ps((float *)&cwt1[x][i][y],_mm512_cvtpd_ps(_mm512_add_pd(mw01_wavelet2d_a,_mm512_xor_pd(mw01_wavelet2d_b,_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)))));
+                    _mm256_store_ps((float *)&cwt2[x][i][y],_mm512_cvtpd_ps(_mm512_add_pd(_mm512_xor_pd(mw01_wavelet2d_a,_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)),mw01_wavelet2d_b)));
+                }
+#endif
 	    }
         }
         fwrite(cwt1[0][0],Nx*Sy*aligned_dim<complex<float>>(Ny)*sizeof(complex<float>),1,fp1);

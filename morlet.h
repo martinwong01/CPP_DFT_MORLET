@@ -5,8 +5,8 @@
 
 template <class Type>
 void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,Type pi,int init) {
-    alignas(ALIGN) int thread_local k,n,s;
-    alignas(ALIGN) Type thread_local a,b;
+    int thread_local k,n,s;
+    Type thread_local a,b;
     alignas(ALIGN) Type thread_local freq[MAXN];
     alignas(ALIGN) Type thread_local scale[MAXS];
     alignas(ALIGN) Type thread_local wavefunc[MAXS][MAXN];

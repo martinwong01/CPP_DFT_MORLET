@@ -689,7 +689,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
     alignas(ALIGN) complex<Type> thread_local datatemp[MAXN];
     int thread_local kkleft,kkright,mmleft,nnright;
-    alignas(ALIGN) complex<Type> thread_local *dataptr,*outptr;
+    complex<Type> thread_local *dataptr,*outptr;
 #if AVX512 > 0
     alignas(ALIGN) __m512d thread_local mw01_fft0_a;
     alignas(ALIGN) __m512d thread_local mw01_fft0_b;

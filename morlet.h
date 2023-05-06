@@ -16,9 +16,29 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 #if AVX512 > 0
     alignas(ALIGN) __m512d thread_local mw01_morlet_a;
     alignas(ALIGN) __m512 thread_local mw01_morlet_af;
+#if SVML > 0
+    alignas(ALIGN) __m512d thread_local mw01_morlet_b;
+    alignas(ALIGN) __m512d thread_local mw01_morlet_c;
+    alignas(ALIGN) __m512d thread_local mw01_morlet_d;
+    alignas(ALIGN) __m512d thread_local mw01_morlet_e;
+    alignas(ALIGN) __m512 thread_local mw01_morlet_bf;
+    alignas(ALIGN) __m512 thread_local mw01_morlet_cf;
+    alignas(ALIGN) __m512 thread_local mw01_morlet_df;
+    alignas(ALIGN) __m512 thread_local mw01_morlet_ef;
+#endif
 #elif AVX > 0
     alignas(ALIGN) __m256d thread_local mw01_morlet_a;
     alignas(ALIGN) __m256 thread_local mw01_morlet_af;
+#if SVML > 0
+    alignas(ALIGN) __m256d thread_local mw01_morlet_b;
+    alignas(ALIGN) __m256d thread_local mw01_morlet_c;
+    alignas(ALIGN) __m256d thread_local mw01_morlet_d;
+    alignas(ALIGN) __m256d thread_local mw01_morlet_e;
+    alignas(ALIGN) __m256 thread_local mw01_morlet_bf;
+    alignas(ALIGN) __m256 thread_local mw01_morlet_cf;
+    alignas(ALIGN) __m256 thread_local mw01_morlet_df;
+    alignas(ALIGN) __m256 thread_local mw01_morlet_ef;
+#endif
 #endif
 
 
@@ -40,12 +60,75 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	        wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
 	        //wavefunc[s][k] = 0.;
 */
+
+#if !defined(AVX) || AVX == 0 || SVML == 0
         for(s=0;s<S;s++)
 	for(k=0;k<=N/2;k++)
             wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
+#elif AVX512 == 0
+        if constexpr(sizeof(Type) == 8) {
+            for(s=0;s<S;s++) {
+                mw01_morlet_a = _mm256_set1_pd(-0.5);
+                mw01_morlet_b = _mm256_set1_pd(scale[s]);
+                mw01_morlet_c = _mm256_set1_pd(param);
+                mw01_morlet_d = _mm256_set1_pd(b);
+                for(k=0;k<=N/2;k+=4) {
+/*
+                    mw01_morlet_f = _mm256_load_pd((double *)&freq[k]);
+                    mw01_morlet_e = _mm256_fmsub_pd(mw01_morlet_b,mw01_morlet_f,mw01_morlet_c);
+                    mw01_morlet_g = _mm256_mul_pd(mw01_morlet_e,mw01_morlet_e);
+                    mw01_morlet_h = _mm256_mul_pd(mw01_morlet_g,mw01_morlet_a);
+                    mw01_morlet_i = _mm256_exp_pd(mw01_morlet_h);
+                    mw01_morlet_j = _mm256_mul_pd(mw01_morlet_i,mw01_morlet_d);
+                    _mm256_store_pd((double *)&wavefunc[s][k],mw01_morlet_j);
+*/
+                    mw01_morlet_e = _mm256_fmsub_pd(mw01_morlet_b,_mm256_load_pd((double *)&freq[k]),mw01_morlet_c);
+                    _mm256_store_pd((double *)&wavefunc[s][k],_mm256_mul_pd(_mm256_exp_pd(_mm256_mul_pd(_mm256_mul_pd(mw01_morlet_e,mw01_morlet_e),mw01_morlet_a)),mw01_morlet_d));
+                }
+            }
+        } else if constexpr(sizeof(Type) == 4) {
+            for(s=0;s<S;s++) {
+                mw01_morlet_af = _mm256_set1_ps(-0.5);
+                mw01_morlet_bf = _mm256_set1_ps(scale[s]);
+                mw01_morlet_cf = _mm256_set1_ps(param);
+                mw01_morlet_df = _mm256_set1_ps(b);
+                for(k=0;k<=N/2;k+=8) {
+                    mw01_morlet_ef = _mm256_fmsub_ps(mw01_morlet_bf,_mm256_load_ps((float *)&freq[k]),mw01_morlet_cf);
+                    _mm256_store_ps((float *)&wavefunc[s][k],_mm256_mul_ps(_mm256_exp_ps(_mm256_mul_ps(_mm256_mul_ps(mw01_morlet_ef,mw01_morlet_ef),mw01_morlet_af)),mw01_morlet_df));
+                }
+            }
+        }
+#else
+        if constexpr(sizeof(Type) == 8) {
+            for(s=0;s<S;s++) {
+                mw01_morlet_a = _mm512_set1_pd(-0.5);
+                mw01_morlet_b = _mm512_set1_pd(scale[s]);
+                mw01_morlet_c = _mm512_set1_pd(param);
+                mw01_morlet_d = _mm512_set1_pd(b);
+                for(k=0;k<=N/2;k+=8) {
+                    mw01_morlet_e = _mm512_fmsub_pd(mw01_morlet_b,_mm512_load_pd((double *)&freq[k]),mw01_morlet_c);
+                    _mm512_store_pd((double *)&wavefunc[s][k],_mm512_mul_pd(_mm512_exp_pd(_mm512_mul_pd(_mm512_mul_pd(mw01_morlet_e,mw01_morlet_e),mw01_morlet_a)),mw01_morlet_d));
+                }
+            }
+        } else if constexpr(sizeof(Type) == 4) {
+            for(s=0;s<S;s++) {
+                mw01_morlet_af = _mm512_set1_ps(-0.5);
+                mw01_morlet_bf = _mm512_set1_ps(scale[s]);
+                mw01_morlet_cf = _mm512_set1_ps(param);
+                mw01_morlet_df = _mm512_set1_ps(b);
+                for(k=0;k<=N/2;k+=16) {
+                    mw01_morlet_ef = _mm512_fmsub_ps(mw01_morlet_bf,_mm512_load_ps((float *)&freq[k]),mw01_morlet_cf);
+                    _mm512_store_ps((float *)&wavefunc[s][k],_mm512_mul_ps(_mm512_exp_ps(_mm512_mul_ps(_mm512_mul_ps(mw01_morlet_ef,mw01_morlet_ef),mw01_morlet_af)),mw01_morlet_df));
+                }
+            }
+        }
+#endif
     }
-    
-//    _mm256_exp_pd
+
+
+
+
+
     
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);
     

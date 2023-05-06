@@ -21,20 +21,20 @@ void Rader(complex<Type> *,complex<Type> *,complex<Type> *,int,Type,int);
 
 template <class Type>
 void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign,int init) {      
-    alignas(ALIGN) int thread_local i,j,k,m,n,p,q,r,t;
+    int thread_local i,j,k,m,n,p,q,r,t;
     alignas(ALIGN) complex<Type> thread_local datasub1[MAXN];
     alignas(ALIGN) complex<Type> thread_local datasub2[MAXN];
     alignas(ALIGN) complex<Type> thread_local datasub3[MAXN];
     alignas(ALIGN) complex<Type> thread_local datasub4[MAXN];
-    alignas(ALIGN) Type thread_local a;
+    Type thread_local a;
     alignas(ALIGN) complex<Type> thread_local c[2];
-    alignas(ALIGN) int thread_local PF,NoverPF;
-    alignas(ALIGN) int thread_local kleft,kright,mleft,nright,tail;
+    int thread_local PF,NoverPF;
+    int thread_local kleft,kright,mleft,nright,tail;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
     alignas(ALIGN) int thread_local Factor[100];
-    alignas(ALIGN) int thread_local NFactor;
+    int thread_local NFactor;
     alignas(ALIGN) complex<Type> thread_local datatemp[MAXN];
-    alignas(ALIGN) int thread_local kkleft,kkright,mmleft,nnright;
+    int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512 > 0
     alignas(ALIGN) __m512d thread_local mw01_dft_a;
@@ -681,14 +681,14 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 // out-of-place fft, N>=4
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign,int init) {    
-    alignas(ALIGN) int thread_local i,j,k,m,n,p,q,t;
+    int thread_local i,j,k,m,n,p,q,t;
     alignas(ALIGN) complex<Type> thread_local c[8];
-    alignas(ALIGN) Type thread_local a;
-    alignas(ALIGN) int thread_local PF,NoverPF;
-    alignas(ALIGN) int thread_local kleft,kright,mleft,nright,tail;
+    Type thread_local a;
+    int thread_local PF,NoverPF;
+    int thread_local kleft,kright,mleft,nright,tail;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
     alignas(ALIGN) complex<Type> thread_local datatemp[MAXN];
-    alignas(ALIGN) int thread_local kkleft,kkright,mmleft,nnright;
+    int thread_local kkleft,kkright,mmleft,nnright;
     alignas(ALIGN) complex<Type> thread_local *dataptr,*outptr;
 #if AVX512 > 0
     alignas(ALIGN) __m512d thread_local mw01_fft0_a;
@@ -890,11 +890,11 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 // in-place fft, N>=4
 template <class Type>
 void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,int sign,int init) {      
-    alignas(ALIGN) int thread_local i,j,k,m,n,p,q,h;
+    int thread_local i,j,k,m,n,p,q,h;
     alignas(ALIGN) complex<Type> thread_local c[8];
-    alignas(ALIGN) Type thread_local a,b;
-    alignas(ALIGN) int thread_local PF,NoverPF;
-    alignas(ALIGN) int thread_local head,hhead;
+    Type thread_local a,b;
+    int thread_local PF,NoverPF;
+    int thread_local head,hhead;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
 #if AVX512 > 0
     alignas(ALIGN) __m512d thread_local mw01_fft1_a;
@@ -1175,12 +1175,12 @@ int aligned_int(int start,int increment) {
 
 template <class Type>
 void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,int N,Type pi,int init) {
-    alignas(ALIGN) int thread_local g,ginv;
+    int thread_local g,ginv;
     alignas(ALIGN) int thread_local mapg[MAXN];
     alignas(ALIGN) int thread_local mapginv[MAXN];
-    alignas(ALIGN) int thread_local newN;
-    alignas(ALIGN) Type thread_local newN2;
-    alignas(ALIGN) int thread_local i;
+    int thread_local newN;
+    Type thread_local newN2;
+    int thread_local i;
     alignas(ALIGN) complex<Type> thread_local padded[MAXN];
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];

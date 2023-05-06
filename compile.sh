@@ -30,7 +30,7 @@ if [ $compiler == "gnu" ]; then
     #command="g++ $vector_flags -std=c++17 -fopenmp -Ofast -march=skylake-avx512 $macros"
     command="g++ $vector_flags -std=c++17 -fopenmp -Ofast $macros"
 elif [ $compiler == "intel" ]; then
-    command="icc $vector_flags -std=c++17 -diag-disable=10441 -qopenmp -Ofast $macros"
+    command="icpx $vector_flags -std=c++17 -qopenmp -Ofast $macros"
 elif [ $compiler == "clang" ]; then
     #command="clang++ $vector_flags -std=c++17 -fopenmp=libomp -Ofast -march=skylake-avx512 $macros"
     command="clang++ $vector_flags -std=c++17 -fopenmp=libomp -Ofast $macros"

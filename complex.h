@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#if AVX > 0 || AVX512 > 0 || FMA > 0
+#if AVX > 0 || AVX512F > 0 || AVX512VL > 0 || FMA > 0
     #include <immintrin.h>
 #endif
 using namespace std;
@@ -136,7 +136,7 @@ class complex {
 
 
 
-#if AVX512 > 0
+#if AVX512F > 0
 // 512 bit double multiply
 inline __m512d complex_mul_512register(__m512d mw01_mul512d_a,__m512d mw01_mul512d_b) {
     return _mm512_fmaddsub_pd(mw01_mul512d_a,_mm512_permute_pd(mw01_mul512d_b,0b00000000),_mm512_mul_pd(_mm512_permute_pd(mw01_mul512d_a,0b01010101),_mm512_permute_pd(mw01_mul512d_b,0b11111111)));

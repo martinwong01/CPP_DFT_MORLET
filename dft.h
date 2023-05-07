@@ -36,7 +36,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     alignas(ALIGN) complex<Type> thread_local datatemp[MAXN];
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
-#if AVX512 > 0
+#if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_dft_a;
     alignas(ALIGN) __m512d thread_local mw01_dft_b;
     alignas(ALIGN) __m512d thread_local mw01_dft_c;
@@ -73,7 +73,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();     //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnright();          //     copy to next quadrant
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
 		    for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnright();
 		    for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0))); 
@@ -94,7 +94,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap();
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
 		    for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnleft();
 		    for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0))); 
@@ -114,7 +114,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             }
 #if !defined(AVX) || AVX == 0
             for(i=N/2;i<N;i++) roots[i] = roots[i-N/2].reverse();                   // copy to whole circle
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 for(i=N/2;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(sizeof(Type) == 4) {
@@ -136,7 +136,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 	    for(i=j+1;i<N/2;i++) roots[i] = roots[N/2-i].realconjugate();               // copy to next quadrant
 #if !defined(AVX) || AVX == 0
             for(i=N/2;i<N;i++) roots[i] = roots[i-N/2].reverse();                       
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {    // N/2 must be odd
 	        for(i=N/2;i<aligned_int(N/2,2);i++) roots[i] = roots[i-N/2].reverse();
                 for(i=aligned_int(N/2,2);i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
@@ -161,7 +161,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         if((sign > 0 && roots[1].getimga() > 0.) || (sign < 0 && roots[1].getimga() < 0.)) {
 #if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = roots[i].conjugate();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 for(i=0;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i]),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
             } else if constexpr(sizeof(Type) == 4) {
@@ -216,7 +216,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     outptr[kkleft+t] = dataptr[kkright+t] + datasub2[t];
 		    outptr[kkleft+mleft+t] = dataptr[kkright+t] - datasub2[t]; 
                 }
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
                     i = (kkright+nright)%2;
                     n = kkleft%2;
@@ -306,7 +306,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         } else if(Factor[j] <= RaderMin) {
 #if !defined(AVX) || AVX == 0
             memset(outptr,0,N*sizeof(complex<Type>));
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 mw01_dft_a = _mm256_setzero_pd();
                 for(i=0;i<N;i+=2)
@@ -349,7 +349,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 			    outptr[kkleft+(Factor[j]-m)*mleft+t] += datasub3[m]-datasub4[m];
 		        }
 		    }
-#elif AVX512 == 0
+#elif AVX512F == 0
                     if constexpr(sizeof(Type) == 8) {
                         q = (kkright+nnright)%2;   // kkright = k*N/P    nnright = n*NoverPF
                         p = kkleft%2;              // kkleft = k*NoverPF 
@@ -533,7 +533,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         } else {                                            // Rader
 #if !defined(AVX) || AVX == 0
             memset(outptr,0,N*sizeof(complex<Type>));
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 mw01_dft_a = _mm256_setzero_pd();
                 for(i=0;i<N;i+=2)
@@ -567,7 +567,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #if !defined(AVX) || AVX == 0
                     for(t=0;t<tail;t++) 
 		        outptr[kkleft+0*mleft+t] += c[0]*dataptr[kkright+nnright+t];
-#elif AVX512 == 0
+#elif AVX512F == 0
                     if constexpr(sizeof(Type) == 8) {
                         // tail is NoverPF, or product of the remaining factors. must be odd.
                         i = (kkright+nnright)%2;   // kkright = k*N/P   nnright = n*NoverPF
@@ -652,7 +652,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 a = 1./N;
 #if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
 		    mw01_dft_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_dft_a));
@@ -690,7 +690,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     alignas(ALIGN) complex<Type> thread_local datatemp[MAXN];
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
-#if AVX512 > 0
+#if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_fft0_a;
     alignas(ALIGN) __m512d thread_local mw01_fft0_b;
     alignas(ALIGN) __m512 thread_local mw01_fft0_af;
@@ -712,7 +712,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();          //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0 
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnright();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
 	        for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnright();
 		for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
@@ -733,7 +733,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap();
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
 	        for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnleft();
 		for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0)));
@@ -755,7 +755,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         if((sign > 0 && roots[1].getimga() > 0.) || (sign < 0 && roots[1].getimga() < 0.)) {
 #if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = roots[i].conjugate();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 for(i=0;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i]),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
             } else if constexpr(sizeof(Type) == 4) {
@@ -813,7 +813,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 outptr[kkleft+t] = dataptr[kkright+t] + c[1];
 	        outptr[kkleft+mleft+t] = dataptr[kkright+t] - c[1]; 
             }
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 for(t=0;t<tail-1;t+=2) {  // tail = 1,2,4,.... = kleft = nright    mleft = N/2   kkright = 2*kkleft     
                     mw01_fft0_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],0);
@@ -860,7 +860,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 a = 1./N;
 #if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
 		    mw01_fft0_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_fft0_a));
@@ -896,7 +896,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local PF,NoverPF;
     int thread_local head,hhead;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
-#if AVX512 > 0
+#if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_fft1_a;
     alignas(ALIGN) __m512d thread_local mw01_fft1_b;
     alignas(ALIGN) __m512 thread_local mw01_fft1_af;
@@ -918,7 +918,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();           //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnright();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
 	        for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnright();
 		for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
@@ -939,7 +939,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap();
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = roots[i-j].turnleft();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
 	        for(i=j;i<aligned_int(j,2);i++) roots[i] = roots[i-j].turnleft();
 		for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0)));
@@ -961,7 +961,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         if((sign > 0 && roots[1].getimga() > 0.) || (sign < 0 && roots[1].getimga() < 0.)) {
 #if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = roots[i].conjugate();
-#elif AVX512 == 0
+#elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
                 for(i=0;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i]),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
             } else if constexpr(sizeof(Type) == 4) {
@@ -1007,7 +1007,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     out[hhead+k] = c[0] + c[1];
                     out[hhead+Product+k] = c[0] - c[1];
                 }
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
                     for(k=0;k<Product-1;k+=2) {
                         p += NoverPF; c[0] = roots[p];
@@ -1060,7 +1060,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 a = 1./N;
 #if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
-#elif AVX512 == 0
+#elif AVX512F == 0
                 if constexpr(sizeof(Type) == 8) {
 		    mw01_fft1_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_fft1_a));
@@ -1184,7 +1184,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     alignas(ALIGN) complex<Type> thread_local padded[MAXN];
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];
-#if AVX512 > 0
+#if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_rader_a;
     alignas(ALIGN) __m512 thread_local mw01_rader_af;
 #elif AVX > 0
@@ -1213,7 +1213,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     
 #if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
-#elif AVX512 == 0
+#elif AVX512F == 0
     if constexpr(sizeof(Type) == 8) {
         mw01_rader_a = _mm256_setzero_pd();
         for(i=0;i<newN;i+=2)
@@ -1238,7 +1238,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     fft_func<Type>(padded,result1,newN,1,pi,1,init);
 #if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
-#elif AVX512 == 0
+#elif AVX512F == 0
     if constexpr(sizeof(Type) == 8) {
         mw01_rader_a = _mm256_setzero_pd();
         for(i=0;i<newN;i+=2)
@@ -1265,7 +1265,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     newN2 = 1.*newN;
 #if !defined(AVX) || AVX == 0 
     for(int q=0;q<newN;q++) result1[q] *= result2[q]*newN2;
-#elif AVX512 == 0
+#elif AVX512F == 0
     if constexpr(sizeof(Type) == 8) {
         mw01_rader_a = _mm256_set1_pd(newN2);
         for(int q=0;q<newN;q+=2)

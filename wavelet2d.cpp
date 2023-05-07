@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
     int Nthreads,thread; 
 	
-#if AVX512 > 0
+#if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_wavelet2d_a;
     alignas(ALIGN) __m512d thread_local mw01_wavelet2d_b;
 #elif AVX > 0
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
                     cwt2[x][i][y].setreal((float)(transform_real[x][i][y].getreal() + transform_imga[x][i][y].getimga()));
                     cwt2[x][i][y].setimga((float)(transform_imga[x][i][y].getreal() - transform_real[x][i][y].getimga()));
                 }
-#elif AVX512 == 0
+#elif AVX512F == 0
                 for(i=0;i<Sy;i++)
                 for(y=0;y<Ny;y+=2) {
                     mw01_wavelet2d_a = _mm256_load_pd((double *)&transform_real[x][i][y]);

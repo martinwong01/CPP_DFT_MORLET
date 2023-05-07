@@ -118,7 +118,42 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     }
 
     
+#if !defined(AVX) || AVX == 0    
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);
+#elif AVX512 == 0
+    if constexpr(sizeof(Type) == 8) {
+        mw01_morlet_b = _mm256_setzero_pd();
+        for(n=0;n<N;n+=4) {
+	    mw01_morlet_a = _mm256_load_pd((double *)&data[n]);
+	    _mm256_store_pd((double *)&datacomplex[n],_mm256_permutex2var_pd(mw01_morlet_a,_mm256_setr_epi64x(0,4,1,5),mw01_morlet_b));
+	    _mm256_store_pd((double *)&datacomplex[n+2],_mm256_permutex2var_pd(mw01_morlet_a,_mm256_setr_epi64x(2,6,3,7),mw01_morlet_b));
+	}
+    } else if constexpr(sizeof(Type) == 4) {
+        mw01_morlet_bf = _mm256_setzero_ps();
+        for(n=0;n<N;n+=8) {
+	    mw01_morlet_af = _mm256_load_ps((float *)&data[n]);
+	    _mm256_store_ps((float *)&datacomplex[n],_mm256_permutex2var_ps(mw01_morlet_af,_mm256_setr_epi32(0,8,1,9,2,10,3,11),mw01_morlet_bf));
+	    _mm256_store_ps((float *)&datacomplex[n+4],_mm256_permutex2var_ps(mw01_morlet_af,_mm256_setr_epi32(4,12,5,13,6,14,7,15),mw01_morlet_bf));
+	}
+    }
+#else
+    if constexpr(sizeof(Type) == 8) {
+        mw01_morlet_b = _mm512_setzero_pd();
+        for(n=0;n<N;n+=8) {
+	    mw01_morlet_a = _mm512_load_pd((double *)&data[n]);
+	    _mm512_store_pd((double *)&datacomplex[n],_mm512_permutex2var_pd(mw01_morlet_a,_mm512_setr_epi64(0,8,1,9,2,10,3,11),mw01_morlet_b));
+	    _mm512_store_pd((double *)&datacomplex[n+4],_mm512_permutex2var_pd(mw01_morlet_a,_mm512_setr_epi64(4,12,5,13,6,14,7,15),mw01_morlet_b));
+	}
+    } else if constexpr(sizeof(Type) == 4) {
+        mw01_morlet_bf = _mm512_setzero_ps();
+        for(n=0;n<N;n+=16) {
+	    mw01_morlet_af = _mm512_load_ps((float *)&data[n]);
+	    _mm512_store_ps((float *)&datacomplex[n],_mm512_permutex2var_ps(mw01_morlet_af,_mm512_setr_epi32(0,16,1,17,2,18,3,19,4,20,5,21,6,22,7,23),mw01_morlet_bf));
+	    _mm512_store_ps((float *)&datacomplex[n+8],_mm512_permutex2var_ps(mw01_morlet_af,_mm512_setr_epi32(8,24,9,25,10,26,11,27,12,28,13,29,14,30,15,31),mw01_morlet_bf));
+	}
+    }
+#endif
+    
     
     dft_func<Type>(datacomplex,dft,N,1,pi,1,init);
 

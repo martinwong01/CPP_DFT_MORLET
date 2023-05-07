@@ -11,22 +11,25 @@ maxs=64                        # maximum number of wavelet scales
 
 
 avx=0
-avx512=0
+avx512f=0
+avx512vl=0
 fma=0
 svml=0
 if [ $vector -eq 1 ]; then
     fma=$(grep " fma " /proc/cpuinfo|wc -l)
     if [ $fma -gt 0 ]; then
         avx=$(grep " avx " /proc/cpuinfo|wc -l)
-        avx512=$(grep " avx512f " /proc/cpuinfo|wc -l)
+        avx512f=$(grep " avx512f " /proc/cpuinfo|wc -l)
+        avx512vl=$(grep " avx512vl " /proc/cpuinfo|wc -l)
     fi
     if [ $compiler == "intel" ]; then
         svml=1
     fi
 fi
-macros="-D AVX512=${avx512} -D AVX=${avx} -D FMA=${fma} -D SVML=${svml} -D MAXN=${maxn} -D MAXS=${maxs}"
+macros="-D AVX512F=${avx512f} -D AVX512VL=${avx512vl} -D AVX=${avx} -D FMA=${fma} -D SVML=${svml} -D MAXN=${maxn} -D MAXS=${maxs}"
 vector_flags=""
-if [ $avx512 -gt 0 ]; then vector_flags="-mavx512f"; fi 
+if [ $avx512f -gt 0 ]; then vector_flags="-mavx512f"; fi
+if [ $avx512vl -gt 0 ]; then vector_flags="-mavx512vl"; fi 
 if [ $avx -gt 0 ]; then vector_flags="$vector_flags -mavx"; fi
 if [ $fma -gt 0 ]; then vector_flags="$vector_flags -mfma"; fi
 

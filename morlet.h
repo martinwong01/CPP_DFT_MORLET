@@ -13,7 +13,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) complex<Type> thread_local dft[MAXN];
     alignas(ALIGN) complex<Type> thread_local dft_product[MAXS][MAXN];
     alignas(ALIGN) complex<Type> thread_local datacomplex[MAXN];
-#if AVX512 > 0
+#if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_morlet_a;
     alignas(ALIGN) __m512d thread_local mw01_morlet_b;
     alignas(ALIGN) __m512 thread_local mw01_morlet_af;
@@ -58,7 +58,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	    for(;k<N;k++)
 	        wavefunc[s][k] = 0.;
 	}
-#elif AVX512 == 0
+#elif AVX512F == 0
         if constexpr(sizeof(Type) == 8) {
             for(s=0;s<S;s++) {
                 mw01_morlet_a = _mm256_set1_pd(-0.5);
@@ -118,9 +118,10 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     }
 
     
-#if !defined(AVX) || AVX == 0    
+#if !defined(AVX) || AVX == 0 || AVX512VL == 0    
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);
-#elif AVX512 == 0
+/*
+#elif AVX512F == 0
     if constexpr(sizeof(Type) == 8) {
         mw01_morlet_b = _mm256_setzero_pd();
         for(n=0;n<N;n+=4) {
@@ -136,6 +137,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	    _mm256_store_ps((float *)&datacomplex[n+4],_mm256_permutex2var_ps(mw01_morlet_af,_mm256_setr_epi32(4,12,5,13,6,14,7,15),mw01_morlet_bf));
 	}
     }
+*/
 #else
     if constexpr(sizeof(Type) == 8) {
         mw01_morlet_b = _mm512_setzero_pd();
@@ -160,7 +162,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     for(s=0;s<S;s++)
 #if !defined(AVX) || AVX == 0    
         for(k=0;k<N;k++) dft_product[s][k] = dft[k]*wavefunc[s][k];
-#elif AVX512 == 0
+#elif AVX512F == 0
         if constexpr(sizeof(Type) == 8) {
 	    for(k=0;k<N;k+=2) _mm256_store_pd((double *)&dft_product[s][k],_mm256_mul_pd(_mm256_load_pd((double *)&dft[k]),_mm256_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1])));
 	} else if constexpr(sizeof(Type) == 4) {
@@ -180,7 +182,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
         a = sqrt(2.*pi*scale[s]/dx);
 #if !defined(AVX) || AVX == 0
         for(n=0;n<N;n++) transform[s][n] *= a;
-#elif AVX512 == 0
+#elif AVX512F == 0
         if constexpr(sizeof(Type) == 8) {
     	    mw01_morlet_a = _mm256_set1_pd(a);
 	    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&transform[s][n],_mm256_mul_pd(_mm256_load_pd((double *)&transform[s][n]),mw01_morlet_a));

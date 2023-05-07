@@ -46,25 +46,14 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
         a = 2.*pi/N/dx;
         b = 1./pow(pi,0.25);
         for(s=0;s<S;s++) scale[s] = pow(2.,s/4.);                                        // set scales with dj=0.25
-        for(k=0;k<N;k++)
-            if(k <= N/2)
-                freq[k] = a*k;
-	    else
-                freq[k] = a*(k-N); 
-/*
-        for(s=0;s<S;s++)
-        for(k=0;k<N;k++)
-            if(freq[k] > 0.)
-                wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
-	    else
-	        wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
-	        //wavefunc[s][k] = 0.;
-*/
+	for(k=0;k<=N/2;k++) freq[k] = a*k;                                               // k>N/2 not set, left as 0s
+//	for(k=N/2+1;k<N;k++) freq[k] = a*(k-N);                                          // should not be useful
+
 
 #if !defined(AVX) || AVX == 0 || SVML == 0
         for(s=0;s<S;s++)
 	for(k=0;k<=N/2;k++)
-            wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;
+            wavefunc[s][k] = exp(-0.5*pow(scale[s]*freq[k]-param,2.))*b;                // k>N/2 not set
 #elif AVX512 == 0
         if constexpr(sizeof(Type) == 8) {
             for(s=0;s<S;s++) {
@@ -124,10 +113,6 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
         }
 #endif
     }
-
-
-
-
 
     
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);

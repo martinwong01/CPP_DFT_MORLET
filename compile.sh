@@ -29,7 +29,7 @@ fi
 macros="-D AVX512F=${avx512f} -D AVX512VL=${avx512vl} -D AVX=${avx} -D FMA=${fma} -D SVML=${svml} -D MAXN=${maxn} -D MAXS=${maxs}"
 vector_flags=""
 if [ $avx512f -gt 0 ]; then vector_flags="-mavx512f"; fi
-if [ $avx512vl -gt 0 ]; then vector_flags="-mavx512vl"; fi 
+if [ $avx512vl -gt 0 ]; then vector_flags="$vector_flags -mavx512vl"; fi 
 if [ $avx -gt 0 ]; then vector_flags="$vector_flags -mavx"; fi
 if [ $fma -gt 0 ]; then vector_flags="$vector_flags -mfma"; fi
 

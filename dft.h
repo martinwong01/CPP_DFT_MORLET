@@ -37,27 +37,27 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512F > 0
-    alignas(ALIGN) __m512d thread_local mw01_dft_a;
-    alignas(ALIGN) __m512d thread_local mw01_dft_b;
-    alignas(ALIGN) __m512d thread_local mw01_dft_c;
-    alignas(ALIGN) __m512d thread_local mw01_dft_d;
-    alignas(ALIGN) __m512d thread_local mw01_dft_e;
-    alignas(ALIGN) __m512 thread_local mw01_dft_af;
-    alignas(ALIGN) __m512 thread_local mw01_dft_bf;
-    alignas(ALIGN) __m512 thread_local mw01_dft_cf;
-    alignas(ALIGN) __m512 thread_local mw01_dft_df;
-    alignas(ALIGN) __m512 thread_local mw01_dft_ef;
+    alignas(ALIGN) __m512d mw01_dft_a;
+    alignas(ALIGN) __m512d mw01_dft_b;
+    alignas(ALIGN) __m512d mw01_dft_c;
+    alignas(ALIGN) __m512d mw01_dft_d;
+    alignas(ALIGN) __m512d mw01_dft_e;
+    alignas(ALIGN) __m512 mw01_dft_af;
+    alignas(ALIGN) __m512 mw01_dft_bf;
+    alignas(ALIGN) __m512 mw01_dft_cf;
+    alignas(ALIGN) __m512 mw01_dft_df;
+    alignas(ALIGN) __m512 mw01_dft_ef;
 #elif AVX > 0
-    alignas(ALIGN) __m256d thread_local mw01_dft_a;
-    alignas(ALIGN) __m256d thread_local mw01_dft_b;
-    alignas(ALIGN) __m256d thread_local mw01_dft_c;
-    alignas(ALIGN) __m256d thread_local mw01_dft_d;
-    alignas(ALIGN) __m256d thread_local mw01_dft_e;
-    alignas(ALIGN) __m256 thread_local mw01_dft_af;
-    alignas(ALIGN) __m256 thread_local mw01_dft_bf;
-    alignas(ALIGN) __m256 thread_local mw01_dft_cf;
-    alignas(ALIGN) __m256 thread_local mw01_dft_df;
-    alignas(ALIGN) __m256 thread_local mw01_dft_ef;
+    alignas(ALIGN) __m256d mw01_dft_a;
+    alignas(ALIGN) __m256d mw01_dft_b;
+    alignas(ALIGN) __m256d mw01_dft_c;
+    alignas(ALIGN) __m256d mw01_dft_d;
+    alignas(ALIGN) __m256d mw01_dft_e;
+    alignas(ALIGN) __m256 mw01_dft_af;
+    alignas(ALIGN) __m256 mw01_dft_bf;
+    alignas(ALIGN) __m256 mw01_dft_cf;
+    alignas(ALIGN) __m256 mw01_dft_df;
+    alignas(ALIGN) __m256 mw01_dft_ef;
 #endif
     
     i = N & (N - 1);                                                               //  if 2^, use fft
@@ -756,19 +756,19 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512F > 0
-    alignas(ALIGN) __m512d thread_local mw01_fft0_a;
-    alignas(ALIGN) __m512d thread_local mw01_fft0_b;
-    alignas(ALIGN) __m512d thread_local mw01_fft0_c;
-    alignas(ALIGN) __m512 thread_local mw01_fft0_af;
-    alignas(ALIGN) __m512 thread_local mw01_fft0_bf;
-    alignas(ALIGN) __m512 thread_local mw01_fft0_cf;
+    alignas(ALIGN) __m512d mw01_fft0_a;
+    alignas(ALIGN) __m512d mw01_fft0_b;
+    alignas(ALIGN) __m512d mw01_fft0_c;
+    alignas(ALIGN) __m512 mw01_fft0_af;
+    alignas(ALIGN) __m512 mw01_fft0_bf;
+    alignas(ALIGN) __m512 mw01_fft0_cf;
 #elif AVX > 0
-    alignas(ALIGN) __m256d thread_local mw01_fft0_a;
-    alignas(ALIGN) __m256d thread_local mw01_fft0_b;
-    alignas(ALIGN) __m256d thread_local mw01_fft0_c;
-    alignas(ALIGN) __m256 thread_local mw01_fft0_af;
-    alignas(ALIGN) __m256 thread_local mw01_fft0_bf;
-    alignas(ALIGN) __m256 thread_local mw01_fft0_cf;
+    alignas(ALIGN) __m256d mw01_fft0_a;
+    alignas(ALIGN) __m256d mw01_fft0_b;
+    alignas(ALIGN) __m256d mw01_fft0_c;
+    alignas(ALIGN) __m256 mw01_fft0_af;
+    alignas(ALIGN) __m256 mw01_fft0_bf;
+    alignas(ALIGN) __m256 mw01_fft0_cf;
 #endif
 
 
@@ -974,15 +974,15 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local head,hhead;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
 #if AVX512F > 0
-    alignas(ALIGN) __m512d thread_local mw01_fft1_a;
-    alignas(ALIGN) __m512d thread_local mw01_fft1_b;
-    alignas(ALIGN) __m512 thread_local mw01_fft1_af;
-    alignas(ALIGN) __m512 thread_local mw01_fft1_bf;
+    alignas(ALIGN) __m512d mw01_fft1_a;
+    alignas(ALIGN) __m512d mw01_fft1_b;
+    alignas(ALIGN) __m512 mw01_fft1_af;
+    alignas(ALIGN) __m512 mw01_fft1_bf;
 #elif AVX > 0
-    alignas(ALIGN) __m256d thread_local mw01_fft1_a;
-    alignas(ALIGN) __m256d thread_local mw01_fft1_b;
-    alignas(ALIGN) __m256 thread_local mw01_fft1_af;
-    alignas(ALIGN) __m256 thread_local mw01_fft1_bf;
+    alignas(ALIGN) __m256d mw01_fft1_a;
+    alignas(ALIGN) __m256d mw01_fft1_b;
+    alignas(ALIGN) __m256 mw01_fft1_af;
+    alignas(ALIGN) __m256 mw01_fft1_bf;
 #endif
 
 
@@ -1262,11 +1262,11 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];
 #if AVX512F > 0
-    alignas(ALIGN) __m512d thread_local mw01_rader_a;
-    alignas(ALIGN) __m512 thread_local mw01_rader_af;
+    alignas(ALIGN) __m512d mw01_rader_a;
+    alignas(ALIGN) __m512 mw01_rader_af;
 #elif AVX > 0
-    alignas(ALIGN) __m256d thread_local mw01_rader_a;
-    alignas(ALIGN) __m256 thread_local mw01_rader_af;
+    alignas(ALIGN) __m256d mw01_rader_a;
+    alignas(ALIGN) __m256 mw01_rader_af;
 #endif
 
 

@@ -1336,7 +1336,19 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     }
 #endif
     for(int q=0;q<N-1;q++) padded[q] = datasub2[mapginv[q]];
+//#if !defined(AVX) || AVX == 0
     memcpy(&padded[newN-N+2],&padded[1],(N-2)*sizeof(complex<Type>));
+/*#elif AVX512F == 0
+    if constexpr(sizeof(Type) == 8) {
+        for(q=1;q<aligned_int(1,2);q++) padded[q+newN-N+1] = padded[q];
+        for(q=aligned_int(1,2);q<N-1;q+=2)
+    } else if constexpr(sizeof(Type) == 4) {
+    }
+#else
+#endif
+*/
+
+    
     fft_func<Type>(padded,result2,newN,1,pi,1,0);
     newN2 = 1.*newN;
 #if !defined(AVX) || AVX == 0 

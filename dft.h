@@ -72,6 +72,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
         if(N%4 == 0) {
             k = N>>3;
             j = N>>2;
+//	    _mm256_cos_pd(__m256d v1);   SVML
             for(i=0;i<=k;i++) roots[i].setangle(a*i);                          //     1/8 values
             if(sign > 0) {
                 for(i=k+1;i<j;i++) roots[i] = roots[j-i].swap().reverse();     //     values remaining in quadrant

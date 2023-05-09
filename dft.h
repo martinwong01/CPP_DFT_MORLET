@@ -377,8 +377,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     if constexpr(sizeof(Type) == 8) {
                         q = (kkright+nnright)%2;   // kkright = k*N/P    nnright = n*NoverPF
                         p = kkleft%2;              // kkleft = k*NoverPF 
+			mw01_dft_e = _mm256_setr_pd(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                         for(t=0;t<tail-1;t+=2) {   // tail = NoverPF, must be odd
-                            mw01_dft_c = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
+			    if(q == 0)
+			        mw01_dft_c = complex_mul_256register(mw01_dft_e,_mm256_load_pd((double *)&dataptr[kkright+nnright+t]));
+			    else
+    			        mw01_dft_c = complex_mul_256register(mw01_dft_e,_mm256_loadu_pd((double *)&dataptr[kkright+nnright+t]));
+                            //mw01_dft_c = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
                             _mm256_store_pd((double *)&datasub2[t],mw01_dft_c);
                             if(p == 0)
                                 _mm256_store_pd((double *)&outptr[kkleft+t],_mm256_add_pd(_mm256_load_pd((double *)&outptr[kkleft+t]),mw01_dft_c));  
@@ -422,8 +427,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     } else if constexpr(sizeof(Type) == 4) {
                         q = (kkright+nnright)%4;
                         p = kkleft%4;
+			mw01_dft_ef = _mm256_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                         for(t=0;t<tail-3;t+=4) { 
-                            mw01_dft_cf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
+			    if(q == 0)
+			        mw01_dft_cf = complex_mul_256register(mw01_dft_ef,_mm256_load_ps((float *)&dataptr[kkright+nnright+t]));
+			    else
+    			        mw01_dft_cf = complex_mul_256register(mw01_dft_ef,_mm256_loadu_ps((float *)&dataptr[kkright+nnright+t]));
+                            //mw01_dft_cf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
                             _mm256_store_ps((float *)&datasub2[t],mw01_dft_cf);
                             if(p == 0)
                                 _mm256_store_ps((float *)&outptr[kkleft+t],_mm256_add_ps(_mm256_load_ps((float *)&outptr[kkleft+t]),mw01_dft_cf));  
@@ -463,8 +473,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     if constexpr(sizeof(Type) == 8) {
                         q = (kkright+nnright)%4;   // kkright = k*N/P    nnright = n*NoverPF
                         p = kkleft%4;              // kkleft = k*NoverPF 
+			mw01_dft_e = _mm512_setr_pd(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                         for(t=0;t<tail-3;t+=4) {   // tail = NoverPF, must be odd
-                            mw01_dft_c = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
+			    if(q == 0)
+			        mw01_dft_c = complex_mul_512register(mw01_dft_e,_mm512_load_pd((double *)&dataptr[kkright+nnright+t]));
+			    else
+    			        mw01_dft_c = complex_mul_512register(mw01_dft_e,_mm512_loadu_pd((double *)&dataptr[kkright+nnright+t]));
+                            //mw01_dft_c = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nnright+t],q);
                             _mm512_store_pd((double *)&datasub2[t],mw01_dft_c);
                             if(p == 0)
                                 _mm512_store_pd((double *)&outptr[kkleft+t],_mm512_add_pd(_mm512_load_pd((double *)&outptr[kkleft+t]),mw01_dft_c));  
@@ -502,8 +517,13 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     } else if constexpr(sizeof(Type) == 4) {
                         q = (kkright+nnright)%8;
                         p = kkleft%8;
+			mw01_dft_ef = _mm512_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                         for(t=0;t<tail-7;t+=8) { 
-                            mw01_dft_cf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
+			    if(q == 0)
+			        mw01_dft_cf = complex_mul_512register(mw01_dft_ef,_mm512_load_ps((float *)&dataptr[kkright+nnright+t]));
+			    else
+    			        mw01_dft_cf = complex_mul_512register(mw01_dft_ef,_mm512_loadu_ps((float *)&dataptr[kkright+nnright+t]));
+                            //mw01_dft_cf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nnright+t],q);
                             _mm512_store_ps((float *)&datasub2[t],mw01_dft_cf);
                             if(p == 0)
                                 _mm512_store_ps((float *)&outptr[kkleft+t],_mm512_add_ps(_mm512_load_ps((float *)&outptr[kkleft+t]),mw01_dft_cf));  

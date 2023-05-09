@@ -1256,7 +1256,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     alignas(ALIGN) int thread_local mapginv[MAXN];
     int thread_local newN;
     Type thread_local newN2;
-    int thread_local i;
+    int thread_local i,p,q;
     alignas(ALIGN) complex<Type> thread_local padded[MAXN];
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];
@@ -1273,9 +1273,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         g = generator(N);
         ginv = modulo_inverse(g,N);
         mapg[0] = 1;
-        for(int q=1;q<N-1;q++) mapg[q] = mapg[q-1]*g%N;                     // n = g^q    (mod N)  , q=[0,N-2]
+        for(q=1;q<N-1;q++) mapg[q] = mapg[q-1]*g%N;                     // n = g^q    (mod N)  , q=[0,N-2]
         mapginv[0] = 1;
-        for(int p=1;p<N-1;p++) mapginv[p] = mapg[N-p-1];                    // k/m = ginv^p (mod N)  , p=[0,N-2]
+        for(p=1;p<N-1;p++) mapginv[p] = mapg[N-p-1];                    // k/m = ginv^p (mod N)  , p=[0,N-2]
 
         // padding to 2^
         newN = 2;
@@ -1310,7 +1310,7 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
             _mm512_store_ps((float *)&padded[i],mw01_rader_af);
     }
 #endif
-    for(int q=0;q<N-1;q++) padded[q] = datasub1[mapg[q]];
+    for(q=0;q<N-1;q++) padded[q] = datasub1[mapg[q]];
     fft_func<Type>(padded,result1,newN,1,pi,1,init);
 #if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
@@ -1352,30 +1352,30 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     fft_func<Type>(padded,result2,newN,1,pi,1,0);
     newN2 = 1.*newN;
 #if !defined(AVX) || AVX == 0 
-    for(int q=0;q<newN;q++) result1[q] *= result2[q]*newN2;
+    for(q=0;q<newN;q++) result1[q] *= result2[q]*newN2;
 #elif AVX512F == 0
     if constexpr(sizeof(Type) == 8) {
         mw01_rader_a = _mm256_set1_pd(newN2);
-        for(int q=0;q<newN;q+=2)
+        for(q=0;q<newN;q+=2)
             _mm256_store_pd((double *)&result1[q],_mm256_mul_pd(mw01_rader_a,complex_mul_256register((double *)&result1[q],(double *)&result2[q],0,0)));  
     } else if constexpr(sizeof(Type) == 4) {
         mw01_rader_af = _mm256_set1_ps(newN2); 
-        for(int q=0;q<newN;q+=4)
+        for(q=0;q<newN;q+=4)
             _mm256_store_ps((float *)&result1[q],_mm256_mul_ps(mw01_rader_af,complex_mul_256register((float *)&result1[q],(float *)&result2[q],0,0)));  
     }     
 #else
     if constexpr(sizeof(Type) == 8) {
         mw01_rader_a = _mm512_set1_pd(newN2);
-        for(int q=0;q<newN;q+=4)
+        for(q=0;q<newN;q+=4)
             _mm512_store_pd((double *)&result1[q],_mm512_mul_pd(mw01_rader_a,complex_mul_512register((double *)&result1[q],(double *)&result2[q],0,0)));
     } else if constexpr(sizeof(Type) == 4) {
         mw01_rader_af = _mm512_set1_ps(newN2);
-        for(int q=0;q<newN;q+=8)
+        for(q=0;q<newN;q+=8)
             _mm512_store_ps((float *)&result1[q],_mm512_mul_ps(mw01_rader_af,complex_mul_512register((float *)&result1[q],(float *)&result2[q],0,0)));
     }
 #endif
     fftinv_func<Type>(result1,result2,newN,pi,0); 
-    for(int p=0;p<N-1;p++) out[mapginv[p]] = result2[p];                                     // rearrange    
+    for(p=0;p<N-1;p++) out[mapginv[p]] = result2[p];                                     // rearrange    
 }
 
 

@@ -757,13 +757,17 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 #if AVX512F > 0
     alignas(ALIGN) __m512d thread_local mw01_fft0_a;
     alignas(ALIGN) __m512d thread_local mw01_fft0_b;
+    alignas(ALIGN) __m512d thread_local mw01_fft0_c;
     alignas(ALIGN) __m512 thread_local mw01_fft0_af;
     alignas(ALIGN) __m512 thread_local mw01_fft0_bf;
+    alignas(ALIGN) __m512 thread_local mw01_fft0_cf;
 #elif AVX > 0
     alignas(ALIGN) __m256d thread_local mw01_fft0_a;
     alignas(ALIGN) __m256d thread_local mw01_fft0_b;
+    alignas(ALIGN) __m256d thread_local mw01_fft0_c;
     alignas(ALIGN) __m256 thread_local mw01_fft0_af;
     alignas(ALIGN) __m256 thread_local mw01_fft0_bf;
+    alignas(ALIGN) __m256 thread_local mw01_fft0_cf;
 #endif
 
 
@@ -879,15 +883,19 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             }
 #elif AVX512F == 0
             if constexpr(sizeof(Type) == 8) {
+	        mw01_fft0_c = _mm256_setr_pd(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                 for(t=0;t<tail-1;t+=2) {  // tail = 1,2,4,.... = kleft = nright    mleft = N/2   kkright = 2*kkleft     
-                    mw01_fft0_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],0);
+                    mw01_fft0_b = complex_mul_256register(mw01_fft0_c,_mm256_load_pd((double *)&dataptr[kkright+nright+t]));
+		    //mw01_fft0_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],0);
                     mw01_fft0_a = _mm256_load_pd((double *)&dataptr[kkright+t]);
                     _mm256_store_pd((double *)&outptr[kkleft+t],_mm256_add_pd(mw01_fft0_a,mw01_fft0_b));
                     _mm256_store_pd((double *)&outptr[kkleft+mleft+t],_mm256_sub_pd(mw01_fft0_a,mw01_fft0_b));
                 }
             } else if constexpr(sizeof(Type) == 4) {
-                for(t=0;t<tail-3;t+=4) {     
-                    mw01_fft0_bf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
+	    	mw01_fft0_cf = _mm256_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
+                for(t=0;t<tail-3;t+=4) {   
+                    mw01_fft0_bf = complex_mul_256register(mw01_fft0_cf,_mm256_load_ps((float *)&dataptr[kkright+nright+t]));
+                    //mw01_fft0_bf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
                     mw01_fft0_af = _mm256_load_ps((float *)&dataptr[kkright+t]);
                     _mm256_store_ps((float *)&outptr[kkleft+t],_mm256_add_ps(mw01_fft0_af,mw01_fft0_bf));
                     _mm256_store_ps((float *)&outptr[kkleft+mleft+t],_mm256_sub_ps(mw01_fft0_af,mw01_fft0_bf));
@@ -895,15 +903,19 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
             }
 #else
             if constexpr(sizeof(Type) == 8) {
+       	    	mw01_fft0_c = _mm512_setr_pd(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                 for(t=0;t<tail-3;t+=4) {       
-                    mw01_fft0_b = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],0);
+                    mw01_fft0_b = complex_mul_512register(mw01_fft0_c,_mm512_load_pd((double *)&dataptr[kkright+nright+t]));
+                    //mw01_fft0_b = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(double *)&dataptr[kkright+nright+t],0);
                     mw01_fft0_a = _mm512_load_pd((double *)&dataptr[kkright+t]);
                     _mm512_store_pd((double *)&outptr[kkleft+t],_mm512_add_pd(mw01_fft0_a,mw01_fft0_b));
                     _mm512_store_pd((double *)&outptr[kkleft+mleft+t],_mm512_sub_pd(mw01_fft0_a,mw01_fft0_b));
                 }
             } else if constexpr(sizeof(Type) == 4) {
-                for(t=0;t<tail-7;t+=8) {     
-                    mw01_fft0_bf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
+       	    	mw01_fft0_cf = _mm512_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
+                for(t=0;t<tail-7;t+=8) {
+		    mw01_fft0_bf = complex_mul_512register(mw01_fft0_cf,_mm512_load_ps((float *)&dataptr[kkright+nright+t]));
+                    //mw01_fft0_bf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
                     mw01_fft0_af = _mm512_load_ps((float *)&dataptr[kkright+t]);
                     _mm512_store_ps((float *)&outptr[kkleft+t],_mm512_add_ps(mw01_fft0_af,mw01_fft0_bf));
                     _mm512_store_ps((float *)&outptr[kkleft+mleft+t],_mm512_sub_ps(mw01_fft0_af,mw01_fft0_bf));

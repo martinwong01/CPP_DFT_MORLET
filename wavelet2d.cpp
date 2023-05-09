@@ -36,11 +36,11 @@ int main(int argc, char *argv[]) {
     int Nthreads,thread; 
 	
 #if AVX512F > 0
-    alignas(ALIGN) __m512d thread_local mw01_wavelet2d_a;
-    alignas(ALIGN) __m512d thread_local mw01_wavelet2d_b;
+    alignas(ALIGN) __m512d mw01_wavelet2d_a;
+    alignas(ALIGN) __m512d mw01_wavelet2d_b;
 #elif AVX > 0
-    alignas(ALIGN) __m256d thread_local mw01_wavelet2d_a;
-    alignas(ALIGN) __m256d thread_local mw01_wavelet2d_b;
+    alignas(ALIGN) __m256d mw01_wavelet2d_a;
+    alignas(ALIGN) __m256d mw01_wavelet2d_b;
 #endif
 
 

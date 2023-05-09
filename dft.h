@@ -41,19 +41,23 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     alignas(ALIGN) __m512d thread_local mw01_dft_b;
     alignas(ALIGN) __m512d thread_local mw01_dft_c;
     alignas(ALIGN) __m512d thread_local mw01_dft_d;
+    alignas(ALIGN) __m512d thread_local mw01_dft_e;
     alignas(ALIGN) __m512 thread_local mw01_dft_af;
     alignas(ALIGN) __m512 thread_local mw01_dft_bf;
     alignas(ALIGN) __m512 thread_local mw01_dft_cf;
     alignas(ALIGN) __m512 thread_local mw01_dft_df;
+    alignas(ALIGN) __m512 thread_local mw01_dft_ef;
 #elif AVX > 0
     alignas(ALIGN) __m256d thread_local mw01_dft_a;
     alignas(ALIGN) __m256d thread_local mw01_dft_b;
     alignas(ALIGN) __m256d thread_local mw01_dft_c;
     alignas(ALIGN) __m256d thread_local mw01_dft_d;
+    alignas(ALIGN) __m256d thread_local mw01_dft_e;
     alignas(ALIGN) __m256 thread_local mw01_dft_af;
     alignas(ALIGN) __m256 thread_local mw01_dft_bf;
     alignas(ALIGN) __m256 thread_local mw01_dft_cf;
     alignas(ALIGN) __m256 thread_local mw01_dft_df;
+    alignas(ALIGN) __m256 thread_local mw01_dft_ef;
 #endif
     
     i = N & (N - 1);                                                               //  if 2^, use fft

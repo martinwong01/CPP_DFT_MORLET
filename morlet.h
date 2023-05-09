@@ -14,30 +14,30 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) complex<Type> thread_local dft_product[MAXS][MAXN];
     alignas(ALIGN) complex<Type> thread_local datacomplex[MAXN];
 #if AVX512F > 0
-    alignas(ALIGN) __m512d thread_local mw01_morlet_a;
-    alignas(ALIGN) __m512d thread_local mw01_morlet_b;
-    alignas(ALIGN) __m512 thread_local mw01_morlet_af;
-    alignas(ALIGN) __m512 thread_local mw01_morlet_bf;
+    alignas(ALIGN) __m512d mw01_morlet_a;
+    alignas(ALIGN) __m512d mw01_morlet_b;
+    alignas(ALIGN) __m512 mw01_morlet_af;
+    alignas(ALIGN) __m512 mw01_morlet_bf;
 #if SVML > 0
-    alignas(ALIGN) __m512d thread_local mw01_morlet_c;
-    alignas(ALIGN) __m512d thread_local mw01_morlet_d;
-    alignas(ALIGN) __m512d thread_local mw01_morlet_e;
-    alignas(ALIGN) __m512 thread_local mw01_morlet_cf;
-    alignas(ALIGN) __m512 thread_local mw01_morlet_df;
-    alignas(ALIGN) __m512 thread_local mw01_morlet_ef;
+    alignas(ALIGN) __m512d mw01_morlet_c;
+    alignas(ALIGN) __m512d mw01_morlet_d;
+    alignas(ALIGN) __m512d mw01_morlet_e;
+    alignas(ALIGN) __m512 mw01_morlet_cf;
+    alignas(ALIGN) __m512 mw01_morlet_df;
+    alignas(ALIGN) __m512 mw01_morlet_ef;
 #endif
 #elif AVX > 0
-    alignas(ALIGN) __m256d thread_local mw01_morlet_a;
-    alignas(ALIGN) __m256d thread_local mw01_morlet_b;
-    alignas(ALIGN) __m256 thread_local mw01_morlet_af;
-    alignas(ALIGN) __m256 thread_local mw01_morlet_bf;
+    alignas(ALIGN) __m256d mw01_morlet_a;
+    alignas(ALIGN) __m256d mw01_morlet_b;
+    alignas(ALIGN) __m256 mw01_morlet_af;
+    alignas(ALIGN) __m256 mw01_morlet_bf;
 #if SVML > 0
-    alignas(ALIGN) __m256d thread_local mw01_morlet_c;
-    alignas(ALIGN) __m256d thread_local mw01_morlet_d;
-    alignas(ALIGN) __m256d thread_local mw01_morlet_e;
-    alignas(ALIGN) __m256 thread_local mw01_morlet_cf;
-    alignas(ALIGN) __m256 thread_local mw01_morlet_df;
-    alignas(ALIGN) __m256 thread_local mw01_morlet_ef;
+    alignas(ALIGN) __m256d mw01_morlet_c;
+    alignas(ALIGN) __m256d mw01_morlet_d;
+    alignas(ALIGN) __m256d mw01_morlet_e;
+    alignas(ALIGN) __m256 mw01_morlet_cf;
+    alignas(ALIGN) __m256 mw01_morlet_df;
+    alignas(ALIGN) __m256 mw01_morlet_ef;
 #endif
 #endif
 

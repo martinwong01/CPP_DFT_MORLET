@@ -1336,17 +1336,41 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     }
 #endif
     for(int q=0;q<N-1;q++) padded[q] = datasub2[mapginv[q]];
-//#if !defined(AVX) || AVX == 0
+#if !defined(AVX) || AVX == 0
     memcpy(&padded[newN-N+2],&padded[1],(N-2)*sizeof(complex<Type>));
-/*#elif AVX512F == 0
+    //for(q=N-2;q>0;q--) padded[q+newN-N+1] = padded[q];
+#elif AVX512F == 0
     if constexpr(sizeof(Type) == 8) {
-        for(q=1;q<aligned_int(1,2);q++) padded[q+newN-N+1] = padded[q];
-        for(q=aligned_int(1,2);q<N-1;q+=2)
+        if((N-3)%2 == 0)
+            for(q=N-3;q>0;q-=2) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_load_pd((double *)&padded[q]));
+        else
+            for(q=N-3;q>0;q-=2) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_loadu_pd((double *)&padded[q]));
+        q = q + 2 - 1;
     } else if constexpr(sizeof(Type) == 4) {
+        if((N-5)%4 == 0)
+            for(q=N-5;q>0;q-=4) _mm256_store_ps((float *)&padded[q+newN-N+1],_mm256_load_ps((float *)&padded[q]));
+        else
+            for(q=N-5;q>0;q-=4) _mm256_store_ps((float *)&padded[q+newN-N+1],_mm256_loadu_ps((float *)&padded[q]));
+        q = q + 4 - 1;
     }
+    for(;q>0;q--) padded[q+newN-N+1] = padded[q];
 #else
+    if constexpr(sizeof(Type) == 8) {
+        if((N-5)%4 == 0)
+            for(q=N-5;q>0;q-=4) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_load_pd((double *)&padded[q]));
+        else
+            for(q=N-5;q>0;q-=4) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_loadu_pd((double *)&padded[q]));
+        q = q + 4 - 1;
+    } else if constexpr(sizeof(Type) == 4) {
+        if((N-9)%8 == 0)
+            for(q=N-9;q>0;q-=8) _mm512_store_ps((float *)&padded[q+newN-N+1],_mm512_load_ps((float *)&padded[q]));
+        else
+            for(q=N-9;q>0;q-=8) _mm512_store_ps((float *)&padded[q+newN-N+1],_mm512_loadu_ps((float *)&padded[q]));
+        q = q + 8 - 1;
+    }
+    for(;q>0;q--) padded[q+newN-N+1] = padded[q];
 #endif
-*/
+
 
     
     fft_func<Type>(padded,result2,newN,1,pi,1,0);

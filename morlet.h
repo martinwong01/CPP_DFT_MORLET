@@ -23,7 +23,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) avxtype mw01_morlet_e;
 #endif
 #elif AVX > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__256d,__m256>::type avxtype;
+    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_morlet_a;
     alignas(ALIGN) avxtype mw01_morlet_b;
 #if SVML > 0

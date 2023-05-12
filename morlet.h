@@ -14,30 +14,22 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     alignas(ALIGN) complex<Type> thread_local dft_product[MAXS][MAXN];
     alignas(ALIGN) complex<Type> thread_local datacomplex[MAXN];
 #if AVX512F > 0
-    alignas(ALIGN) __m512d mw01_morlet_a;
-    alignas(ALIGN) __m512d mw01_morlet_b;
-    alignas(ALIGN) __m512 mw01_morlet_af;
-    alignas(ALIGN) __m512 mw01_morlet_bf;
+    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    alignas(ALIGN) avxtype mw01_morlet_a;
+    alignas(ALIGN) avxtype mw01_morlet_b;
 #if SVML > 0
-    alignas(ALIGN) __m512d mw01_morlet_c;
-    alignas(ALIGN) __m512d mw01_morlet_d;
-    alignas(ALIGN) __m512d mw01_morlet_e;
-    alignas(ALIGN) __m512 mw01_morlet_cf;
-    alignas(ALIGN) __m512 mw01_morlet_df;
-    alignas(ALIGN) __m512 mw01_morlet_ef;
+    alignas(ALIGN) avxtype mw01_morlet_c;
+    alignas(ALIGN) avxtype mw01_morlet_d;
+    alignas(ALIGN) avxtype mw01_morlet_e;
 #endif
 #elif AVX > 0
-    alignas(ALIGN) __m256d mw01_morlet_a;
-    alignas(ALIGN) __m256d mw01_morlet_b;
-    alignas(ALIGN) __m256 mw01_morlet_af;
-    alignas(ALIGN) __m256 mw01_morlet_bf;
+    typedef typename std::conditional<sizeof(Type) == 8,__256d,__m256>::type avxtype;
+    alignas(ALIGN) avxtype mw01_morlet_a;
+    alignas(ALIGN) avxtype mw01_morlet_b;
 #if SVML > 0
-    alignas(ALIGN) __m256d mw01_morlet_c;
-    alignas(ALIGN) __m256d mw01_morlet_d;
-    alignas(ALIGN) __m256d mw01_morlet_e;
-    alignas(ALIGN) __m256 mw01_morlet_cf;
-    alignas(ALIGN) __m256 mw01_morlet_df;
-    alignas(ALIGN) __m256 mw01_morlet_ef;
+    alignas(ALIGN) avxtype mw01_morlet_c;
+    alignas(ALIGN) avxtype mw01_morlet_d;
+    alignas(ALIGN) avxtype mw01_morlet_e;
 #endif
 #endif
 
@@ -74,16 +66,16 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
             }
         } else if constexpr(sizeof(Type) == 4) {
             for(s=0;s<S;s++) {
-                mw01_morlet_af = _mm256_set1_ps(-0.5);
-                mw01_morlet_bf = _mm256_set1_ps(scale[s]);
-                mw01_morlet_cf = _mm256_set1_ps(param);
-                mw01_morlet_df = _mm256_set1_ps(b);
+                mw01_morlet_a = _mm256_set1_ps(-0.5);
+                mw01_morlet_b = _mm256_set1_ps(scale[s]);
+                mw01_morlet_c = _mm256_set1_ps(param);
+                mw01_morlet_d = _mm256_set1_ps(b);
                 for(k=0;k<=N/2;k+=8) {
-                    mw01_morlet_ef = _mm256_fmsub_ps(mw01_morlet_bf,_mm256_load_ps((float *)&freq[k]),mw01_morlet_cf);
-                    _mm256_store_ps((float *)&wavefunc[s][k],_mm256_mul_ps(_mm256_exp_ps(_mm256_mul_ps(_mm256_mul_ps(mw01_morlet_ef,mw01_morlet_ef),mw01_morlet_af)),mw01_morlet_df));
+                    mw01_morlet_e = _mm256_fmsub_ps(mw01_morlet_b,_mm256_load_ps((float *)&freq[k]),mw01_morlet_c);
+                    _mm256_store_ps((float *)&wavefunc[s][k],_mm256_mul_ps(_mm256_exp_ps(_mm256_mul_ps(_mm256_mul_ps(mw01_morlet_e,mw01_morlet_e),mw01_morlet_a)),mw01_morlet_d));
                 }
-		mw01_morlet_af = _mm256_setzero_ps();
-		for(;k<N;k+=8) _mm256_store_ps((float *)&wavefunc[s][k],mw01_morlet_af);
+		mw01_morlet_a = _mm256_setzero_ps();
+		for(;k<N;k+=8) _mm256_store_ps((float *)&wavefunc[s][k],mw01_morlet_a);
             }
         }
 #else
@@ -102,16 +94,16 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
             }
         } else if constexpr(sizeof(Type) == 4) {
             for(s=0;s<S;s++) {
-                mw01_morlet_af = _mm512_set1_ps(-0.5);
-                mw01_morlet_bf = _mm512_set1_ps(scale[s]);
-                mw01_morlet_cf = _mm512_set1_ps(param);
-                mw01_morlet_df = _mm512_set1_ps(b);
+                mw01_morlet_a = _mm512_set1_ps(-0.5);
+                mw01_morlet_b = _mm512_set1_ps(scale[s]);
+                mw01_morlet_c = _mm512_set1_ps(param);
+                mw01_morlet_d = _mm512_set1_ps(b);
                 for(k=0;k<=N/2;k+=16) {
-                    mw01_morlet_ef = _mm512_fmsub_ps(mw01_morlet_bf,_mm512_load_ps((float *)&freq[k]),mw01_morlet_cf);
-                    _mm512_store_ps((float *)&wavefunc[s][k],_mm512_mul_ps(_mm512_exp_ps(_mm512_mul_ps(_mm512_mul_ps(mw01_morlet_ef,mw01_morlet_ef),mw01_morlet_af)),mw01_morlet_df));
+                    mw01_morlet_e = _mm512_fmsub_ps(mw01_morlet_b,_mm512_load_ps((float *)&freq[k]),mw01_morlet_c);
+                    _mm512_store_ps((float *)&wavefunc[s][k],_mm512_mul_ps(_mm512_exp_ps(_mm512_mul_ps(_mm512_mul_ps(mw01_morlet_e,mw01_morlet_e),mw01_morlet_a)),mw01_morlet_d));
                 }
-		mw01_morlet_af = _mm512_setzero_ps();
-		for(;k<N;k+=16) _mm512_store_ps((float *)&wavefunc[s][k],mw01_morlet_af);
+		mw01_morlet_a = _mm512_setzero_ps();
+		for(;k<N;k+=16) _mm512_store_ps((float *)&wavefunc[s][k],mw01_morlet_a);
             }
         }
 #endif
@@ -130,11 +122,11 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	    _mm256_store_pd((double *)&datacomplex[n+2],_mm256_permutex2var_pd(mw01_morlet_a,_mm256_setr_epi64x(2,6,3,7),mw01_morlet_b));
 	}
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_morlet_bf = _mm256_setzero_ps();
+        mw01_morlet_b = _mm256_setzero_ps();
         for(n=0;n<N;n+=8) {
-	    mw01_morlet_af = _mm256_load_ps((float *)&data[n]);
-	    _mm256_store_ps((float *)&datacomplex[n],_mm256_permutex2var_ps(mw01_morlet_af,_mm256_setr_epi32(0,8,1,9,2,10,3,11),mw01_morlet_bf));
-	    _mm256_store_ps((float *)&datacomplex[n+4],_mm256_permutex2var_ps(mw01_morlet_af,_mm256_setr_epi32(4,12,5,13,6,14,7,15),mw01_morlet_bf));
+	    mw01_morlet_a = _mm256_load_ps((float *)&data[n]);
+	    _mm256_store_ps((float *)&datacomplex[n],_mm256_permutex2var_ps(mw01_morlet_a,_mm256_setr_epi32(0,8,1,9,2,10,3,11),mw01_morlet_b));
+	    _mm256_store_ps((float *)&datacomplex[n+4],_mm256_permutex2var_ps(mw01_morlet_a,_mm256_setr_epi32(4,12,5,13,6,14,7,15),mw01_morlet_b));
 	}
     }
 */
@@ -147,11 +139,11 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	    _mm512_store_pd((double *)&datacomplex[n+4],_mm512_permutex2var_pd(mw01_morlet_a,_mm512_setr_epi64(4,12,5,13,6,14,7,15),mw01_morlet_b));
 	}
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_morlet_bf = _mm512_setzero_ps();
+        mw01_morlet_b = _mm512_setzero_ps();
         for(n=0;n<N;n+=16) {
-	    mw01_morlet_af = _mm512_load_ps((float *)&data[n]);
-	    _mm512_store_ps((float *)&datacomplex[n],_mm512_permutex2var_ps(mw01_morlet_af,_mm512_setr_epi32(0,16,1,17,2,18,3,19,4,20,5,21,6,22,7,23),mw01_morlet_bf));
-	    _mm512_store_ps((float *)&datacomplex[n+8],_mm512_permutex2var_ps(mw01_morlet_af,_mm512_setr_epi32(8,24,9,25,10,26,11,27,12,28,13,29,14,30,15,31),mw01_morlet_bf));
+	    mw01_morlet_a = _mm512_load_ps((float *)&data[n]);
+	    _mm512_store_ps((float *)&datacomplex[n],_mm512_permutex2var_ps(mw01_morlet_a,_mm512_setr_epi32(0,16,1,17,2,18,3,19,4,20,5,21,6,22,7,23),mw01_morlet_b));
+	    _mm512_store_ps((float *)&datacomplex[n+8],_mm512_permutex2var_ps(mw01_morlet_a,_mm512_setr_epi32(8,24,9,25,10,26,11,27,12,28,13,29,14,30,15,31),mw01_morlet_b));
 	}
     }
 #endif
@@ -187,16 +179,16 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     	    mw01_morlet_a = _mm256_set1_pd(a);
 	    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&transform[s][n],_mm256_mul_pd(_mm256_load_pd((double *)&transform[s][n]),mw01_morlet_a));
 	} else if constexpr(sizeof(Type) == 4) {
-       	    mw01_morlet_af = _mm256_set1_ps(a);
-	    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&transform[s][n],_mm256_mul_ps(_mm256_load_ps((float *)&transform[s][n]),mw01_morlet_af));
+       	    mw01_morlet_a = _mm256_set1_ps(a);
+	    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&transform[s][n],_mm256_mul_ps(_mm256_load_ps((float *)&transform[s][n]),mw01_morlet_a));
 	}
 #else
         if constexpr(sizeof(Type) == 8) {
     	    mw01_morlet_a = _mm512_set1_pd(a);
 	    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&transform[s][n],_mm512_mul_pd(_mm512_load_pd((double *)&transform[s][n]),mw01_morlet_a));
 	} else if constexpr(sizeof(Type) == 4) {
-       	    mw01_morlet_af = _mm512_set1_ps(a);
-	    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&transform[s][n],_mm512_mul_ps(_mm512_load_ps((float *)&transform[s][n]),mw01_morlet_af));
+       	    mw01_morlet_a = _mm512_set1_ps(a);
+	    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&transform[s][n],_mm512_mul_ps(_mm512_load_ps((float *)&transform[s][n]),mw01_morlet_a));
 	}
 #endif
     }

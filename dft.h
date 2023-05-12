@@ -8,7 +8,7 @@
 #ifndef ALIGN
     #define ALIGN 64                                         // Bytes
 #endif 
-#define RaderMin 25                                          // if prime factor larger than this, use Rader algorithm
+#define RaderMin 45                                          // if prime factor larger than this, use Rader algorithm
 #if fft_bit_reverse == 1
     #include "table.h"
 #endif

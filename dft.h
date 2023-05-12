@@ -748,19 +748,15 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512F > 0
-    alignas(ALIGN) __m512d mw01_fft0_a;
-    alignas(ALIGN) __m512d mw01_fft0_b;
-    alignas(ALIGN) __m512d mw01_fft0_c;
-    alignas(ALIGN) __m512 mw01_fft0_af;
-    alignas(ALIGN) __m512 mw01_fft0_bf;
-    alignas(ALIGN) __m512 mw01_fft0_cf;
+    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    alignas(ALIGN) avxtype mw01_fft0_a;
+    alignas(ALIGN) avxtype mw01_fft0_b;
+    alignas(ALIGN) avxtype mw01_fft0_c;
 #elif AVX > 0
-    alignas(ALIGN) __m256d mw01_fft0_a;
-    alignas(ALIGN) __m256d mw01_fft0_b;
-    alignas(ALIGN) __m256d mw01_fft0_c;
-    alignas(ALIGN) __m256 mw01_fft0_af;
-    alignas(ALIGN) __m256 mw01_fft0_bf;
-    alignas(ALIGN) __m256 mw01_fft0_cf;
+    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    alignas(ALIGN) avxtype mw01_fft0_a;
+    alignas(ALIGN) avxtype mw01_fft0_b;
+    alignas(ALIGN) avxtype mw01_fft0_c;
 #endif
 
 
@@ -885,13 +881,13 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     _mm256_store_pd((double *)&outptr[kkleft+mleft+t],_mm256_sub_pd(mw01_fft0_a,mw01_fft0_b));
                 }
             } else if constexpr(sizeof(Type) == 4) {
-	    	mw01_fft0_cf = _mm256_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
+	    	mw01_fft0_c = _mm256_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                 for(t=0;t<tail-3;t+=4) {   
-                    mw01_fft0_bf = complex_mul_256register(mw01_fft0_cf,_mm256_load_ps((float *)&dataptr[kkright+nright+t]));
-                    //mw01_fft0_bf = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
-                    mw01_fft0_af = _mm256_load_ps((float *)&dataptr[kkright+t]);
-                    _mm256_store_ps((float *)&outptr[kkleft+t],_mm256_add_ps(mw01_fft0_af,mw01_fft0_bf));
-                    _mm256_store_ps((float *)&outptr[kkleft+mleft+t],_mm256_sub_ps(mw01_fft0_af,mw01_fft0_bf));
+                    mw01_fft0_b = complex_mul_256register(mw01_fft0_c,_mm256_load_ps((float *)&dataptr[kkright+nright+t]));
+                    //mw01_fft0_b = complex_mul_256register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
+                    mw01_fft0_a = _mm256_load_ps((float *)&dataptr[kkright+t]);
+                    _mm256_store_ps((float *)&outptr[kkleft+t],_mm256_add_ps(mw01_fft0_a,mw01_fft0_b));
+                    _mm256_store_ps((float *)&outptr[kkleft+mleft+t],_mm256_sub_ps(mw01_fft0_a,mw01_fft0_b));
                 }
             }
 #else
@@ -905,13 +901,13 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                     _mm512_store_pd((double *)&outptr[kkleft+mleft+t],_mm512_sub_pd(mw01_fft0_a,mw01_fft0_b));
                 }
             } else if constexpr(sizeof(Type) == 4) {
-       	    	mw01_fft0_cf = _mm512_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
+       	    	mw01_fft0_c = _mm512_setr_ps(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga());
                 for(t=0;t<tail-7;t+=8) {
-		    mw01_fft0_bf = complex_mul_512register(mw01_fft0_cf,_mm512_load_ps((float *)&dataptr[kkright+nright+t]));
-                    //mw01_fft0_bf = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
-                    mw01_fft0_af = _mm512_load_ps((float *)&dataptr[kkright+t]);
-                    _mm512_store_ps((float *)&outptr[kkleft+t],_mm512_add_ps(mw01_fft0_af,mw01_fft0_bf));
-                    _mm512_store_ps((float *)&outptr[kkleft+mleft+t],_mm512_sub_ps(mw01_fft0_af,mw01_fft0_bf));
+		    mw01_fft0_b = complex_mul_512register(mw01_fft0_c,_mm512_load_ps((float *)&dataptr[kkright+nright+t]));
+                    //mw01_fft0_b = complex_mul_512register(c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),c[0].getreal(),c[0].getimga(),(float *)&dataptr[kkright+nright+t],0);
+                    mw01_fft0_a = _mm512_load_ps((float *)&dataptr[kkright+t]);
+                    _mm512_store_ps((float *)&outptr[kkleft+t],_mm512_add_ps(mw01_fft0_a,mw01_fft0_b));
+                    _mm512_store_ps((float *)&outptr[kkleft+mleft+t],_mm512_sub_ps(mw01_fft0_a,mw01_fft0_b));
                 }
             }
 #endif
@@ -934,16 +930,16 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    mw01_fft0_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_fft0_a));
 		} else if constexpr(sizeof(Type) == 4) {
-		    mw01_fft0_af = _mm256_set1_ps(a);
-    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_fft0_af));
+		    mw01_fft0_a = _mm256_set1_ps(a);
+    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_fft0_a));
 		}
 #else
                 if constexpr(sizeof(Type) == 8) {
 		    mw01_fft0_a = _mm512_set1_pd(a);
     		    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_fft0_a));
 		} else if constexpr(sizeof(Type) == 4) {
-		    mw01_fft0_af = _mm512_set1_ps(a);
-       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_fft0_af));
+		    mw01_fft0_a = _mm512_set1_ps(a);
+       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_fft0_a));
 		}
 #endif
 	    }
@@ -966,15 +962,13 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local head,hhead;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
 #if AVX512F > 0
-    alignas(ALIGN) __m512d mw01_fft1_a;
-    alignas(ALIGN) __m512d mw01_fft1_b;
-    alignas(ALIGN) __m512 mw01_fft1_af;
-    alignas(ALIGN) __m512 mw01_fft1_bf;
+    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    alignas(ALIGN) avxtype mw01_fft1_a;
+    alignas(ALIGN) avxtype mw01_fft1_b;
 #elif AVX > 0
-    alignas(ALIGN) __m256d mw01_fft1_a;
-    alignas(ALIGN) __m256d mw01_fft1_b;
-    alignas(ALIGN) __m256 mw01_fft1_af;
-    alignas(ALIGN) __m256 mw01_fft1_bf;
+    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    alignas(ALIGN) avxtype mw01_fft1_a;
+    alignas(ALIGN) avxtype mw01_fft1_b;
 #endif
 
 
@@ -1089,10 +1083,10 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 } else if constexpr(sizeof(Type) == 4) {
                     for(k=0;k<Product-3;k+=4) {
                         for(i=0;i<4;i++) { p += NoverPF; c[i] = roots[p]; }
-                        mw01_fft1_bf = complex_mul_256register((float *)&c[0],(float *)&out[hhead+Product+k],0,0);
-                        mw01_fft1_af = _mm256_load_ps((float *)&out[hhead+k]);   // hhead = h*PF
-                        _mm256_store_ps((float *)&out[hhead+k],_mm256_add_ps(mw01_fft1_af,mw01_fft1_bf));
-                        _mm256_store_ps((float *)&out[hhead+Product+k],_mm256_sub_ps(mw01_fft1_af,mw01_fft1_bf));
+                        mw01_fft1_b = complex_mul_256register((float *)&c[0],(float *)&out[hhead+Product+k],0,0);
+                        mw01_fft1_a = _mm256_load_ps((float *)&out[hhead+k]);   // hhead = h*PF
+                        _mm256_store_ps((float *)&out[hhead+k],_mm256_add_ps(mw01_fft1_a,mw01_fft1_b));
+                        _mm256_store_ps((float *)&out[hhead+Product+k],_mm256_sub_ps(mw01_fft1_a,mw01_fft1_b));
                     }
                 }
 #else
@@ -1107,10 +1101,10 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
                 } else if constexpr(sizeof(Type) == 4) {
                     for(k=0;k<Product-7;k+=8) {
                         for(i=0;i<8;i++) { p += NoverPF; c[i] = roots[p]; } 
-                        mw01_fft1_bf = complex_mul_512register((float *)&c[0],(float *)&out[hhead+Product+k],0,0);
-                        mw01_fft1_af = _mm512_load_ps((float *)&out[hhead+k]);   
-                        _mm512_store_ps((float *)&out[hhead+k],_mm512_add_ps(mw01_fft1_af,mw01_fft1_bf));
-                        _mm512_store_ps((float *)&out[hhead+Product+k],_mm512_sub_ps(mw01_fft1_af,mw01_fft1_bf));
+                        mw01_fft1_b = complex_mul_512register((float *)&c[0],(float *)&out[hhead+Product+k],0,0);
+                        mw01_fft1_a = _mm512_load_ps((float *)&out[hhead+k]);   
+                        _mm512_store_ps((float *)&out[hhead+k],_mm512_add_ps(mw01_fft1_a,mw01_fft1_b));
+                        _mm512_store_ps((float *)&out[hhead+Product+k],_mm512_sub_ps(mw01_fft1_a,mw01_fft1_b));
                     }
                 }
 #endif
@@ -1134,16 +1128,16 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
 		    mw01_fft1_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_fft1_a));
 		} else if constexpr(sizeof(Type) == 4) {
-		    mw01_fft1_af = _mm256_set1_ps(a);
-    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_fft1_af));
+		    mw01_fft1_a = _mm256_set1_ps(a);
+    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_fft1_a));
 		}
 #else
                 if constexpr(sizeof(Type) == 8) {
 		    mw01_fft1_a = _mm512_set1_pd(a);
     		    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_fft1_a));
 		} else if constexpr(sizeof(Type) == 4) {
-		    mw01_fft1_af = _mm512_set1_ps(a);
-       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_fft1_af));
+		    mw01_fft1_a = _mm512_set1_ps(a);
+       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_fft1_a));
 		}
 #endif
             }
@@ -1254,11 +1248,11 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];
 #if AVX512F > 0
-    alignas(ALIGN) __m512d mw01_rader_a;
-    alignas(ALIGN) __m512 mw01_rader_af;
+    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    alignas(ALIGN) avxtype mw01_rader_a;
 #elif AVX > 0
-    alignas(ALIGN) __m256d mw01_rader_a;
-    alignas(ALIGN) __m256 mw01_rader_af;
+    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    alignas(ALIGN) avxtype mw01_rader_a;
 #endif
 
 
@@ -1288,9 +1282,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         for(i=0;i<newN;i+=2)
             _mm256_store_pd((double *)&padded[i],mw01_rader_a);
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_rader_af = _mm256_setzero_ps();
+        mw01_rader_a = _mm256_setzero_ps();
         for(i=0;i<newN;i+=4)
-            _mm256_store_ps((float *)&padded[i],mw01_rader_af);
+            _mm256_store_ps((float *)&padded[i],mw01_rader_a);
     }
 #else
     if constexpr(sizeof(Type) == 8) {
@@ -1298,9 +1292,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         for(i=0;i<newN;i+=4)
             _mm512_store_pd((double *)&padded[i],mw01_rader_a);
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_rader_af = _mm512_setzero_ps();
+        mw01_rader_a = _mm512_setzero_ps();
         for(i=0;i<newN;i+=8)
-            _mm512_store_ps((float *)&padded[i],mw01_rader_af);
+            _mm512_store_ps((float *)&padded[i],mw01_rader_a);
     }
 #endif
     for(q=0;q<N-1;q++) padded[q] = datasub1[mapg[q]];
@@ -1313,9 +1307,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         for(i=0;i<newN;i+=2)
             _mm256_store_pd((double *)&padded[i],mw01_rader_a);
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_rader_af = _mm256_setzero_ps();
+        mw01_rader_a = _mm256_setzero_ps();
         for(i=0;i<newN;i+=4)
-            _mm256_store_ps((float *)&padded[i],mw01_rader_af);
+            _mm256_store_ps((float *)&padded[i],mw01_rader_a);
     }
 #else
     if constexpr(sizeof(Type) == 8) {
@@ -1323,9 +1317,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         for(i=0;i<newN;i+=4)
             _mm512_store_pd((double *)&padded[i],mw01_rader_a);
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_rader_af = _mm512_setzero_ps();
+        mw01_rader_a = _mm512_setzero_ps();
         for(i=0;i<newN;i+=8)
-            _mm512_store_ps((float *)&padded[i],mw01_rader_af);
+            _mm512_store_ps((float *)&padded[i],mw01_rader_a);
     }
 #endif
     for(int q=0;q<N-1;q++) padded[q] = datasub2[mapginv[q]];
@@ -1376,9 +1370,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         for(q=0;q<newN;q+=2)
             _mm256_store_pd((double *)&result1[q],_mm256_mul_pd(mw01_rader_a,complex_mul_256register((double *)&result1[q],(double *)&result2[q],0,0)));  
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_rader_af = _mm256_set1_ps(newN2); 
+        mw01_rader_a = _mm256_set1_ps(newN2); 
         for(q=0;q<newN;q+=4)
-            _mm256_store_ps((float *)&result1[q],_mm256_mul_ps(mw01_rader_af,complex_mul_256register((float *)&result1[q],(float *)&result2[q],0,0)));  
+            _mm256_store_ps((float *)&result1[q],_mm256_mul_ps(mw01_rader_a,complex_mul_256register((float *)&result1[q],(float *)&result2[q],0,0)));  
     }     
 #else
     if constexpr(sizeof(Type) == 8) {
@@ -1386,9 +1380,9 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
         for(q=0;q<newN;q+=4)
             _mm512_store_pd((double *)&result1[q],_mm512_mul_pd(mw01_rader_a,complex_mul_512register((double *)&result1[q],(double *)&result2[q],0,0)));
     } else if constexpr(sizeof(Type) == 4) {
-        mw01_rader_af = _mm512_set1_ps(newN2);
+        mw01_rader_a = _mm512_set1_ps(newN2);
         for(q=0;q<newN;q+=8)
-            _mm512_store_ps((float *)&result1[q],_mm512_mul_ps(mw01_rader_af,complex_mul_512register((float *)&result1[q],(float *)&result2[q],0,0)));
+            _mm512_store_ps((float *)&result1[q],_mm512_mul_ps(mw01_rader_a,complex_mul_512register((float *)&result1[q],(float *)&result2[q],0,0)));
     }
 #endif
     fftinv_func<Type>(result1,result2,newN,pi,0); 

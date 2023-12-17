@@ -131,6 +131,13 @@ class complex {
     void print() {
         cout << real << " " << imga << endl;
     }
+    friend ostream &operator<< (ostream &s,complex<Type> &c) {
+        if(c.imga >= 0)
+            s << c.real << "+" << c.imga << "i";
+        else
+            s << c.real << c.imga << "i";
+        return s;
+    }
 };
 
 

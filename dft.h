@@ -37,14 +37,14 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512F > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m512d,__m512>::type avxtype;
     alignas(ALIGN) avxtype mw01_dft_a;
     alignas(ALIGN) avxtype mw01_dft_b;
     alignas(ALIGN) avxtype mw01_dft_c;
     alignas(ALIGN) avxtype mw01_dft_d;
     alignas(ALIGN) avxtype mw01_dft_e;
 #elif AVX > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_dft_a;
     alignas(ALIGN) avxtype mw01_dft_b;
     alignas(ALIGN) avxtype mw01_dft_c;
@@ -748,12 +748,12 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local kkleft,kkright,mmleft,nnright;
     complex<Type> thread_local *dataptr,*outptr;
 #if AVX512F > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m512d,__m512>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft0_a;
     alignas(ALIGN) avxtype mw01_fft0_b;
     alignas(ALIGN) avxtype mw01_fft0_c;
 #elif AVX > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft0_a;
     alignas(ALIGN) avxtype mw01_fft0_b;
     alignas(ALIGN) avxtype mw01_fft0_c;
@@ -962,11 +962,11 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,Type pi,i
     int thread_local head,hhead;
     alignas(ALIGN) complex<Type> thread_local roots[MAXN];
 #if AVX512F > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m512d,__m512>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft1_a;
     alignas(ALIGN) avxtype mw01_fft1_b;
 #elif AVX > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft1_a;
     alignas(ALIGN) avxtype mw01_fft1_b;
 #endif
@@ -1248,10 +1248,10 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     alignas(ALIGN) complex<Type> thread_local result1[MAXN];
     alignas(ALIGN) complex<Type> thread_local result2[MAXN];
 #if AVX512F > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m512d,__m512>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m512d,__m512>::type avxtype;
     alignas(ALIGN) avxtype mw01_rader_a;
 #elif AVX > 0
-    typedef typename std::conditional<sizeof(Type) == 8,__m256d,__m256>::type avxtype;
+    typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_rader_a;
 #endif
 

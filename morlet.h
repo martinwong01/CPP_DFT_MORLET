@@ -51,7 +51,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 	        wavefunc[s][k] = 0.;
 	}
 #elif AVX512F == 0
-        if constexpr(sizeof(Type) == 8) {
+        if constexpr(std::is_same_v<double,Type>) {
             for(s=0;s<S;s++) {
                 mw01_morlet_a = _mm256_set1_pd(-0.5);
                 mw01_morlet_b = _mm256_set1_pd(scale[s]);
@@ -64,7 +64,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 		mw01_morlet_a = _mm256_setzero_pd();
 		for(;k<N;k+=4) _mm256_store_pd((double *)&wavefunc[s][k],mw01_morlet_a);
             }
-        } else if constexpr(sizeof(Type) == 4) {
+        } else if constexpr(std::is_same_v<float,Type>) {
             for(s=0;s<S;s++) {
                 mw01_morlet_a = _mm256_set1_ps(-0.5);
                 mw01_morlet_b = _mm256_set1_ps(scale[s]);
@@ -79,7 +79,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
             }
         }
 #else
-        if constexpr(sizeof(Type) == 8) {
+        if constexpr(std::is_same_v<double,Type>) {
             for(s=0;s<S;s++) {
                 mw01_morlet_a = _mm512_set1_pd(-0.5);
                 mw01_morlet_b = _mm512_set1_pd(scale[s]);
@@ -92,7 +92,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 		mw01_morlet_a = _mm512_setzero_pd();
 		for(;k<N;k+=8) _mm512_store_pd((double *)&wavefunc[s][k],mw01_morlet_a);
             }
-        } else if constexpr(sizeof(Type) == 4) {
+        } else if constexpr(std::is_same_v<float,Type>) {
             for(s=0;s<S;s++) {
                 mw01_morlet_a = _mm512_set1_ps(-0.5);
                 mw01_morlet_b = _mm512_set1_ps(scale[s]);
@@ -114,14 +114,14 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     for(n=0;n<N;n++) datacomplex[n].setrealimga(data[n],0);
 /*
 #elif AVX512F == 0
-    if constexpr(sizeof(Type) == 8) {
+    if constexpr(std::is_same_v<double,Type>) {
         mw01_morlet_b = _mm256_setzero_pd();
         for(n=0;n<N;n+=4) {
 	    mw01_morlet_a = _mm256_load_pd((double *)&data[n]);
 	    _mm256_store_pd((double *)&datacomplex[n],_mm256_permutex2var_pd(mw01_morlet_a,_mm256_setr_epi64x(0,4,1,5),mw01_morlet_b));
 	    _mm256_store_pd((double *)&datacomplex[n+2],_mm256_permutex2var_pd(mw01_morlet_a,_mm256_setr_epi64x(2,6,3,7),mw01_morlet_b));
 	}
-    } else if constexpr(sizeof(Type) == 4) {
+    } else if constexpr(std::is_same_v<float,Type>) {
         mw01_morlet_b = _mm256_setzero_ps();
         for(n=0;n<N;n+=8) {
 	    mw01_morlet_a = _mm256_load_ps((float *)&data[n]);
@@ -131,14 +131,14 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
     }
 */
 #else
-    if constexpr(sizeof(Type) == 8) {
+    if constexpr(std::is_same_v<double,Type>) {
         mw01_morlet_b = _mm512_setzero_pd();
         for(n=0;n<N;n+=8) {
 	    mw01_morlet_a = _mm512_load_pd((double *)&data[n]);
 	    _mm512_store_pd((double *)&datacomplex[n],_mm512_permutex2var_pd(mw01_morlet_a,_mm512_setr_epi64(0,8,1,9,2,10,3,11),mw01_morlet_b));
 	    _mm512_store_pd((double *)&datacomplex[n+4],_mm512_permutex2var_pd(mw01_morlet_a,_mm512_setr_epi64(4,12,5,13,6,14,7,15),mw01_morlet_b));
 	}
-    } else if constexpr(sizeof(Type) == 4) {
+    } else if constexpr(std::is_same_v<float,Type>) {
         mw01_morlet_b = _mm512_setzero_ps();
         for(n=0;n<N;n+=16) {
 	    mw01_morlet_a = _mm512_load_ps((float *)&data[n]);
@@ -155,15 +155,15 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 #if !defined(AVX) || AVX == 0    
         for(k=0;k<N;k++) dft_product[s][k] = dft[k]*wavefunc[s][k];
 #elif AVX512F == 0
-        if constexpr(sizeof(Type) == 8) {
+        if constexpr(std::is_same_v<double,Type>) {
 	    for(k=0;k<N;k+=2) _mm256_store_pd((double *)&dft_product[s][k],_mm256_mul_pd(_mm256_load_pd((double *)&dft[k]),_mm256_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1])));
-	} else if constexpr(sizeof(Type) == 4) {
+	} else if constexpr(std::is_same_v<float,Type>) {
 	    for(k=0;k<N;k+=4) _mm256_store_ps((float *)&dft_product[s][k],_mm256_mul_ps(_mm256_load_ps((float *)&dft[k]),_mm256_setr_ps(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3])));
         }
 #else
-        if constexpr(sizeof(Type) == 8) {
+        if constexpr(std::is_same_v<double,Type>) {
 	    for(k=0;k<N;k+=4) _mm512_store_pd((double *)&dft_product[s][k],_mm512_mul_pd(_mm512_load_pd((double *)&dft[k]),_mm512_setr_pd(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3])));
-	} else if constexpr(sizeof(Type) == 4) {
+	} else if constexpr(std::is_same_v<float,Type>) {
 	    for(k=0;k<N;k+=8) _mm512_store_ps((float *)&dft_product[s][k],_mm512_mul_ps(_mm512_load_ps((float *)&dft[k]),_mm512_setr_ps(wavefunc[s][k],wavefunc[s][k],wavefunc[s][k+1],wavefunc[s][k+1],wavefunc[s][k+2],wavefunc[s][k+2],wavefunc[s][k+3],wavefunc[s][k+3],wavefunc[s][k+4],wavefunc[s][k+4],wavefunc[s][k+5],wavefunc[s][k+5],wavefunc[s][k+6],wavefunc[s][k+6],wavefunc[s][k+7],wavefunc[s][k+7])));
         }
 #endif
@@ -175,18 +175,18 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx,
 #if !defined(AVX) || AVX == 0
         for(n=0;n<N;n++) transform[s][n] *= a;
 #elif AVX512F == 0
-        if constexpr(sizeof(Type) == 8) {
+        if constexpr(std::is_same_v<double,Type>) {
     	    mw01_morlet_a = _mm256_set1_pd(a);
 	    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&transform[s][n],_mm256_mul_pd(_mm256_load_pd((double *)&transform[s][n]),mw01_morlet_a));
-	} else if constexpr(sizeof(Type) == 4) {
+	} else if constexpr(std::is_same_v<float,Type>) {
        	    mw01_morlet_a = _mm256_set1_ps(a);
 	    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&transform[s][n],_mm256_mul_ps(_mm256_load_ps((float *)&transform[s][n]),mw01_morlet_a));
 	}
 #else
-        if constexpr(sizeof(Type) == 8) {
+        if constexpr(std::is_same_v<double,Type>) {
     	    mw01_morlet_a = _mm512_set1_pd(a);
 	    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&transform[s][n],_mm512_mul_pd(_mm512_load_pd((double *)&transform[s][n]),mw01_morlet_a));
-	} else if constexpr(sizeof(Type) == 4) {
+	} else if constexpr(std::is_same_v<float,Type>) {
        	    mw01_morlet_a = _mm512_set1_ps(a);
 	    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&transform[s][n],_mm512_mul_ps(_mm512_load_ps((float *)&transform[s][n]),mw01_morlet_a));
 	}

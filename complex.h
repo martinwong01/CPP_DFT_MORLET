@@ -111,6 +111,12 @@ class complex {
 	real = u;
 	imga = v;
     }
+    bool operator==(complex<Type> c) {
+        if(real == c.real && imga == c.imga) return true; else return false;
+    }
+    bool operator!=(complex<Type> c) {
+        if(real != c.real || imga != c.imga) return true; else return false;
+    }
     void setzero() {
         real = 0.;
 	imga = 0.;

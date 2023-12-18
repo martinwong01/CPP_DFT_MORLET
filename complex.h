@@ -12,7 +12,7 @@ class complex {
     public:
     complex<Type>() { real = 0.; imga = 0.; }                                  // constructors
     complex<Type>(Type r,Type i) { real = r; imga = i; }
-    complex<Type>(Type angle) { real = cos(angle); imga = sin(angle); } 
+    complex<Type>(Type r) { real = r; imga = 0.; } 
     void operator=(complex<Type> c) {
         real = c.real;
 	imga = c.imga;

@@ -138,13 +138,13 @@ class complex {
         cout << real << " " << imga << endl;
     }
     template <typename Type2>
-    friend Type2 abs(complex<Type2>);
+    friend Type2 fabs(complex<Type2>);
     template <typename Type2>
     friend ostream &operator<< (ostream &,complex<Type2> &);
 };
 
 template <typename Type2>
-Type2 abs(complex<Type2> c) {
+Type2 fabs(complex<Type2> c) {
     return sqrt(c.real*c.real+c.imga*c.imga);
 }
 

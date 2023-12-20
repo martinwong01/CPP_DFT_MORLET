@@ -137,15 +137,25 @@ class complex {
     void print() {
         cout << real << " " << imga << endl;
     }
-    friend ostream &operator<< (ostream &s,complex<Type> &c) {
-        if(c.imga >= 0)
-            s << c.real << "+" << c.imga << "i";
-        else
-            s << c.real << c.imga << "i";
-        return s;
-    }
+    template <typename Type2>
+    friend Type2 abs(complex<Type2>);
+    template <typename Type2>
+    friend ostream &operator<< (ostream &,complex<Type2> &);
 };
 
+template <typename Type2>
+Type2 abs(complex<Type2> c) {
+    return sqrt(c.real*c.real+c.imga*c.imga);
+}
+
+template <typename Type2>
+ostream &operator<< (ostream &s,complex<Type2> &c) {
+    if(c.imga >= 0)
+        s << c.real << "+" << c.imga << "i";
+    else
+        s << c.real << c.imga << "i";
+    return s;
+}
 
 
 

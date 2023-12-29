@@ -11,37 +11,37 @@ class complex {
     Type imga;
     public:
     complex<Type>() { real = 0.; imga = 0.; }                                  // constructors
-    complex<Type>(Type r,Type i) { real = r; imga = i; }
-    complex<Type>(Type r) { real = r; imga = 0.; } 
-    void operator=(complex<Type> c) {
+    complex<Type>(const Type& r,const Type& i) { real = r; imga = i; }
+    complex<Type>(const Type& r) { real = r; imga = 0.; } 
+    void operator=(const complex<Type>& c) {
         real = c.real;
 	imga = c.imga;
     }
-    complex<Type> operator+(complex<Type> c) {
+    complex<Type> operator+(const complex<Type>& c) {
         complex<Type> cc;
 	cc.real = real + c.real;
 	cc.imga = imga + c.imga;
 	return cc;
     }
-    complex<Type> operator-(complex<Type> c) {
+    complex<Type> operator-(const complex<Type>& c) {
         complex<Type> cc;
 	cc.real = real - c.real;
 	cc.imga = imga - c.imga;
 	return cc;
     }
-    complex<Type> operator*(complex<Type> c) {
+    complex<Type> operator*(const complex<Type>& c) {
         complex<Type> cc;
 	cc.real = real*c.real - imga*c.imga;
 	cc.imga = real*c.imga + imga*c.real;
 	return cc;
     }
-    complex<Type> operator*(Type c) {
+    complex<Type> operator*(const Type& c) {
         complex<Type> cc;
 	cc.real = real*c;
 	cc.imga = imga*c;
 	return cc;
     }
-    complex<Type> operator/(complex<Type> c) {
+    complex<Type> operator/(const complex<Type>& c) {
         complex<Type> cc;
 	Type a = c.real*c.real+c.imga*c.imga;
 	cc.real = (real*c.real+imga*c.imga)/a;
@@ -84,26 +84,26 @@ class complex {
 	cc.imga = imga;
 	return cc;
     }
-    void operator+=(complex<Type> c) {
+    void operator+=(const complex<Type>& c) {
 	real += c.real;
 	imga += c.imga;
     }
-    void operator-=(complex<Type> c) {
+    void operator-=(const complex<Type>& c) {
 	real -= c.real;
 	imga -= c.imga;
     }
-    void operator*=(complex<Type> c) {
+    void operator*=(const complex<Type>& c) {
         Type a,b;
 	a = real*c.real - imga*c.imga;
 	b = real*c.imga + imga*c.real;
 	real = a;
 	imga = b;
     }
-    void operator*=(Type c) {
+    void operator*=(const Type& c) {
         real *= c;
 	imga *= c;
     }
-    void operator/=(complex<Type> c) {
+    void operator/=(const complex<Type>& c) {
         Type a,u,v;
 	a = c.real*c.real+c.imga*c.imga;
         u = (real*c.real+imga*c.imga)/a;
@@ -111,23 +111,23 @@ class complex {
 	real = u;
 	imga = v;
     }
-    bool operator==(complex<Type> c) {
+    bool operator==(const complex<Type>& c) {
         if(real == c.real && imga == c.imga) return true; else return false;
     }
-    bool operator!=(complex<Type> c) {
+    bool operator!=(const complex<Type>& c) {
         if(real != c.real || imga != c.imga) return true; else return false;
     }
     void setzero() {
         real = 0.;
 	imga = 0.;
     }
-    void setrealimga(Type r,Type i) {
+    void setrealimga(const Type& r,const Type& i) {
         real = r;
 	imga = i;
     }
-    void setreal(Type r) { real = r; }
-    void setimga(Type i) { imga = i; }
-    void setangle(Type angle) { real = cos(angle); imga = sin(angle); }
+    void setreal(const Type& r) { real = r; }
+    void setimga(const Type& i) { imga = i; }
+    void setangle(const Type& angle) { real = cos(angle); imga = sin(angle); }
     Type getreal() {
         return real;
     }
@@ -138,18 +138,18 @@ class complex {
         cout << real << " " << imga << endl;
     }
     template <typename Type2>
-    friend Type2 fabs(complex<Type2>);
+    friend Type2 fabs(const complex<Type2>&);
     template <typename Type2>
-    friend ostream &operator<< (ostream &,complex<Type2> &);
+    friend ostream &operator<< (ostream &,const complex<Type2>&);
 };
 
 template <typename Type2>
-Type2 fabs(complex<Type2> c) {
+Type2 fabs(const complex<Type2>& c) {
     return sqrt(c.real*c.real+c.imga*c.imga);
 }
 
 template <typename Type2>
-ostream &operator<< (ostream &s,complex<Type2> &c) {
+ostream &operator<< (ostream &s,const complex<Type2>& c) {
     if(c.imga >= 0)
         s << c.real << "+" << c.imga << "i";
     else

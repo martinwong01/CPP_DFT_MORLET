@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 
 
         system("date");
+        #pragma omp parallel for default(shared)
         for(int y=0;y<5000;y++)
             fft_func<double>(data_d,result1_d,i,1,pi_d,1,1);     //   FFT
         system("date");

@@ -6,7 +6,7 @@ v1.1  major changes:
 
 
 ---------------------------------------------------------------------------------------------
-Programs to compute Discrete Fourier Transform and Morlet continuous wavelet transform. Tested on Debian x86_64 with clang++/icc/g++/nvc++ compilers.
+Programs to compute Discrete Fourier Transform and Morlet continuous wavelet transform. Tested on Intel Xeon E5-2620v3 Debian 12, with clang++/icc/g++/nvc++ compilers.
 
 
 5 header files, 6 test cpp files, 2 bash scripts:

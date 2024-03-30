@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
         for(x=0;x<Nx;x++)
 	for(k=0;k<Sy;k++)	
 	for(y=0;y<Ny;y++)
-            cov[x][k][y] = (cwt1[x][k][y]*cwt2[x][k][y].conjugate()).getreal();
+            cov[x][k][y] = real(cwt1[x][k][y]*conj(cwt2[x][k][y]));
 	
 
         counter = 0;

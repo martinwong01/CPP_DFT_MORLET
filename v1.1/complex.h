@@ -10,34 +10,30 @@ class complex {
     Type real;
     Type imag;
   public:
-    constexpr complex<Type>() { real = 0.; imag = 0.; }                                  // constructors
+    constexpr complex<Type>() { real = 0.; imag = 0.; }                                  
     constexpr complex<Type>(const Type& r,const Type& i) { real = r; imag = i; }
     constexpr complex<Type>(const Type& r) { real = r; imag = 0.; } 
 
-    constexpr complex(const complex<Type>& c) {                            // copy construct   complex c = c1;
-        //cout << "copy construct\n" << endl;
+    constexpr complex(const complex<Type>& c) {                            
         real = c.real;
         imag = c.imag;
     }
 
-    constexpr complex(complex<Type>&& c) {                                  // move constructor. need to modify v, no const
-        //cout << "move construct &&\n" << endl;                    // class a = std::move(b);
+    constexpr complex(complex<Type>&& c) {                   
         if(this == &c) return;
         real = c.real;
         imag = c.imag;
     }
 
-    constexpr complex<Type>& operator=(complex<Type>&& c) {               // move assignment. need to modify v, no const
-        //cout << "move assignement\n" << endl;                   // v3 = v1 - v2;
+    constexpr complex<Type>& operator=(complex<Type>&& c) {      
         if(this == &c) return *this;
         real = c.real;                                          
         imag = c.imag;
         return *this;
     }
 
-    constexpr complex<Type>& operator=(const complex<Type>& c) {          // copy assignment    c1 = c2
+    constexpr complex<Type>& operator=(const complex<Type>& c) {      
         if(this == &c) return *this;
-        //cout << "copy assignment\n" << endl;
         real = c.real;
         imag = c.imag;
         return *this;
@@ -48,14 +44,12 @@ class complex {
         temp.real = real + c.real;
         temp.imag = imag + c.imag;
         return temp;
-        //return complex<Type>(real+c.real,imag+c.imag);
     }
     constexpr complex<Type> operator-(const complex<Type>& c) {
         complex<Type> temp;
         temp.real = real - c.real;
         temp.imag = imag - c.imag;
         return temp;
-        //return complex<Type>(real-c.real,imag-c.imag);
     }
     constexpr complex<Type> operator*(const complex<Type>& c) {
         complex<Type> temp;
@@ -68,7 +62,6 @@ class complex {
         temp.real = real*a;
         temp.imag = imag*a;
         return temp;
-        //return complex<Type>(real*a,imag*a);
     }
     template <typename Type2>
     friend constexpr complex<Type2> operator*(const Type2& a,const complex<Type2>&);
@@ -84,7 +77,6 @@ class complex {
         c.real = real/a;
         c.imag = imag/a;
         return c; 
-        //return complex<Type>(real/a,imag/a);
     }
     template <typename Type2>
     friend constexpr complex<Type2> operator/(const Type2&,const complex<Type2>&);
@@ -147,16 +139,6 @@ class complex {
     friend ostream &operator<< (ostream &,const complex<Type2>&);
 };
 
-/*
-template <typename Type2>
-complex<Type2> operator+(const complex<Type2>& c1,const complex<Type2>& c2) {
-    alignas(64) complex<Type2> temp;
-    temp.real = c1.real + c2.real;
-    temp.imag = c1.imag + c2.imag;
-    return temp;
-}
-*/
-
 template <typename Type2>
 constexpr complex<Type2> operator*(const Type2& a,const complex<Type2>& c) {
     complex<Type2> cc;
@@ -181,7 +163,6 @@ constexpr complex<Type2> swapcomplex(const complex<Type2>& c) {
     cc.real = c.imag;
     cc.imag = c.real;
     return cc;
-    //return complex<Type2>(c.imag,c.real);
 }
 
 template <typename Type2>
@@ -190,7 +171,6 @@ constexpr complex<Type2> turnleft(const complex<Type2>& c) {
     cc.real = -1*c.imag;
     cc.imag = c.real;
     return cc;
-    //return complex<Type2>(-1*c.imag,c.real);
 }
 
 template <typename Type2>
@@ -199,7 +179,6 @@ constexpr complex<Type2> turnright(const complex<Type2>& c) {
     cc.real = c.imag;
     cc.imag = -1*c.real;
     return cc;
-    //return complex<Type2>(c.imag,-1*c.real);
 }
 
 template <typename Type2>
@@ -208,7 +187,6 @@ constexpr complex<Type2> conj(const complex<Type2>& c) {
     cc.real = c.real;
     cc.imag = -1*c.imag;
     return cc;
-    //return complex<Type2>(c.real,-1*c.imag);
 }
 
 template <typename Type2>
@@ -217,7 +195,6 @@ constexpr complex<Type2> realconj(const complex<Type2>& c) {
     cc.real = -1*c.real;
     cc.imag = c.imag;
     return cc;
-    //return complex<Type2>(-1*c.real,c.imag);
 }
 
 template <typename Type2>
@@ -245,7 +222,6 @@ constexpr Type2 fabs(const complex<Type2>& c) {
     Type2 a;
     a = sqrt(c.real*c.real+c.imag*c.imag);
     return a;
-    //return sqrt(c.real*c.real+c.imag*c.imag);
 }
 
 template <typename Type2>
@@ -253,7 +229,6 @@ constexpr Type2 norm(const complex<Type2>& c) {
     Type2 a;
     a = c.real*c.real+c.imag*c.imag;
     return a;
-    //return c.real*c.real+c.imag*c.imag;
 }
 
 template <typename Type2>

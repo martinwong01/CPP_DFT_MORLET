@@ -10,32 +10,32 @@ using namespace std::complex_literals;
 template <class Type>
 constexpr std::complex<Type> realconj(const std::complex<Type>& z) {
     std::complex<Type> temp;
-    temp.real = -real(z);
-    temp.imag = imag(z);
+    temp.real(-real(z));
+    temp.imag(imag(z));
     return temp;
 }
 
 template <class Type>
 std::complex<Type> turnleft(const std::complex<Type>& z) {
     std::complex<Type> temp;
-    temp.real = -imag(z);
-    temp.imag = real(z);
+    temp.real(-imag(z));
+    temp.imag(real(z));
     return temp;
 }
 
 template <class Type>
 std::complex<Type> turnright(const std::complex<Type>& z) {
     std::complex<Type> temp;
-    temp.real = imag(z);
-    temp.imag = -real(z);
+    temp.real(imag(z));
+    temp.imag(-real(z));
     return temp;
 }
 
 template <class Type>
 std::complex<Type> swapcomplex(const std::complex<Type>& z) {
     std::complex<Type> temp;
-    temp.real = imag(z);
-    temp.imag = real(z);
+    temp.real(imag(z));
+    temp.imag(real(z));
     return temp;
 }
 

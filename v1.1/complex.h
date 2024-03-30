@@ -145,7 +145,6 @@ constexpr complex<Type2> operator*(const Type2& a,const complex<Type2>& c) {
     cc.real = c.real*a;
     cc.imag = c.imag*a;
     return cc;    
-    //return complex<Type2>(c.real*a,c.imag*a);
 }
 
 template <typename Type2>

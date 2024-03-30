@@ -2,9 +2,10 @@
 
 
 vector=1                       # 1: use avx/avx512/fma/svml, 0: not used
-compiler="clang"               # "clang" or "intel" or "gnu" or "nvidia"
+compiler="gnu"                 # "gnu" or "intel" or "clang" or "nvidia"
 maxn=131072                    # set to 2^
 maxs=64                        # maximum number of wavelet scales
+align=64                       # 512-bit avx, set 64, 256-bit AVX, set 32
 
 ### you may not need to modify beyond this
 
@@ -26,7 +27,7 @@ if [ $vector -eq 1 ]; then
         svml=1
     fi
 fi
-macros="-D AVX512F=${avx512f} -D AVX512VL=${avx512vl} -D AVX=${avx} -D FMA=${fma} -D SVML=${svml} -D MAXN=${maxn} -D MAXS=${maxs}"
+macros="-D AVX512F=${avx512f} -D AVX512VL=${avx512vl} -D AVX=${avx} -D FMA=${fma} -D SVML=${svml} -D MAXN=${maxn} -D MAXS=${maxs} -D ALIGN=${align}"
 vector_flags=""
 if [ $avx512f -gt 0 ]; then vector_flags="-mavx512f"; fi
 if [ $avx512vl -gt 0 ]; then vector_flags="$vector_flags -mavx512vl"; fi 
@@ -34,16 +35,16 @@ if [ $avx -gt 0 ]; then vector_flags="$vector_flags -mavx"; fi
 if [ $fma -gt 0 ]; then vector_flags="$vector_flags -mfma"; fi
 
 if [ $compiler == "gnu" ]; then
-    #command="g++ $vector_flags -std=c++17 -fopenmp -Ofast -march=skylake-avx512 $macros"
-    command="g++ $vector_flags -std=c++17 -fopenmp -Ofast $macros"
+    #command="g++ $vector_flags -std=c++23 -fopenmp -Ofast -march=skylake-avx512 $macros"
+    command="g++ $vector_flags -std=c++23 -fopenmp -Ofast $macros"
 elif [ $compiler == "intel" ]; then
-    command="icc $vector_flags -std=c++17 -qopenmp -Ofast -diag-disable=10441 $macros"
+    command="icpx $vector_flags -std=c++23 -qopenmp -Ofast -diag-disable=10441 $macros"
 elif [ $compiler == "clang" ]; then
-    #command="clang++ $vector_flags -std=c++17 -fopenmp=libomp -Ofast -march=skylake-avx512 $macros"
-    command="clang++ $vector_flags -std=c++17 -fopenmp=libomp -Ofast $macros"
+    #command="clang++-18 $vector_flags -std=c++23 -fopenmp=libomp -Ofast -march=skylake-avx512 $macros"
+    command="clang++-18 $vector_flags -std=c++23 -fopenmp=libomp -Ofast $macros"
 elif [ $compiler == "nvidia" ]; then
-    #command="nvc++ $vector_flags -std=c++17 -fopenmp -Ofast -march=skylake-avx512 $macros --diag_suppress declared_but_not_referenced --diag_suppress set_but_not_used"
-    command="nvc++ $vector_flags -std=c++17 -fopenmp -Ofast $macros --diag_suppress declared_but_not_referenced --diag_suppress set_but_not_used"
+    #command="nvc++ $vector_flags -std=c++23 -fopenmp -Ofast -march=skylake-avx512 $macros --diag_suppress declared_but_not_referenced --diag_suppress set_but_not_used"
+    command="nvc++ $vector_flags -std=c++23 -fopenmp -Ofast $macros --diag_suppress declared_but_not_referenced --diag_suppress set_but_not_used"
 fi
 
 

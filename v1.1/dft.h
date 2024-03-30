@@ -72,7 +72,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 //	    _mm256_cos_pd(__m256d v1);   SVML
             for(i=0;i<=k;i++) roots[i] = complex<Type>(cos(a*i),sin(a*i));                   //     1/8 values
             if(sign > 0) {
-                for(i=k+1;i<j;i++) roots[i] = swapcomplex(roots[j-i])*Type(-1.);     //     values remaining in quadrant
+                for(i=k+1;i<j;i++) roots[i] = reverse(swapcomplex(roots[j-i]));     //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);           //     copy to next quadrant
 #elif AVX512F == 0
@@ -115,20 +115,20 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #endif
             }
 #if !defined(AVX) || AVX == 0
-            for(i=N/2;i<N;i++) roots[i] = roots[i-N/2]*Type(-1.);                   // copy to whole circle
+            for(i=N/2;i<N;i++) roots[i] = reverse(roots[i-N/2]);                   // copy to whole circle
 #elif AVX512F == 0
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=N/2;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
 		for(i=aligned_int(N/2,4);i<N;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             }
 #else
             if constexpr(std::is_same_v<double,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
 		for(i=aligned_int(N/2,4);i<N;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,8);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,8);i++) roots[i] = reverse(roots[i-N/2]);
 		for(i=aligned_int(N/2,8);i<N;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_load_ps((float *)&roots[i-N/2]),_mm512_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #endif
@@ -137,21 +137,21 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
             for(i=0;i<=j;i++) roots[i] = complex<Type>(cos(a*i),sin(a*i));        // quadrant values
 	    for(i=j+1;i<N/2;i++) roots[i] = realconj(roots[N/2-i]);               // copy to next quadrant
 #if !defined(AVX) || AVX == 0
-            for(i=N/2;i<N;i++) roots[i] = roots[i-N/2]*Type(-1.);                       
+            for(i=N/2;i<N;i++) roots[i] = reverse(roots[i-N/2]);                       
 #elif AVX512F == 0
             if constexpr(std::is_same_v<double,Type>) {    // N/2 must be odd
-	        for(i=N/2;i<aligned_int(N/2,2);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,2);i++) roots[i] = reverse(roots[i-N/2]);
                 for(i=aligned_int(N/2,2);i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
                 for(i=aligned_int(N/2,4);i<N;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #else
             if constexpr(std::is_same_v<double,Type>) {    // N/2 must be odd
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
                 for(i=aligned_int(N/2,4);i<N;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,8);i++) roots[i] = roots[i-N/2]*Type(-1.);
+	        for(i=N/2;i<aligned_int(N/2,8);i++) roots[i] = reverse(roots[i-N/2]);
                 for(i=aligned_int(N/2,8);i<N;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_load_ps((float *)&roots[i-N/2]),_mm512_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #endif
@@ -774,7 +774,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
         j = N>>2;
         for(i=0;i<=k;i++) roots[i] = complex<Type>(cos(a*i),sin(a*i));          //     1/8 values
         if(sign > 0) {
-            for(i=k+1;i<j;i++) roots[i] = swapcomplex(roots[j-i])*Type(-1.);          //     values remaining in quadrant
+            for(i=k+1;i<j;i++) roots[i] = reverse(swapcomplex(roots[j-i]);          //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0 
             for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);
 #elif AVX512F == 0
@@ -989,7 +989,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
         j = N>>2;
         for(i=0;i<=k;i++) roots[i] = complex<Type>(cos(a*i),sin(a*i));           //     1/8 values
         if(sign > 0) {
-            for(i=k+1;i<j;i++) roots[i] = swapcomplex(roots[j-i])*Type(-1.);           //     values remaining in quadrant
+            for(i=k+1;i<j;i++) roots[i] = reverse(swapcomplex(roots[j-i]));           //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);
 #elif AVX512F == 0

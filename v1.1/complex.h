@@ -87,6 +87,8 @@ class complex {
     template <typename Type2>
     friend constexpr complex<Type2> turnright(const complex<Type2>&);
     template <typename Type2>
+    friend constexpr complex<Type2> reverse(const complex<Type2>&);
+    template <typename Type2>
     friend constexpr complex<Type2> conj(const complex<Type2>&);
     template <typename Type2>
     friend constexpr complex<Type2> realconj(const complex<Type2>&);
@@ -167,7 +169,7 @@ constexpr complex<Type2> swapcomplex(const complex<Type2>& c) {
 template <typename Type2>
 constexpr complex<Type2> turnleft(const complex<Type2>& c) {
     complex<Type2> cc;
-    cc.real = -1*c.imag;
+    cc.real = -c.imag;
     cc.imag = c.real;
     return cc;
 }
@@ -176,7 +178,15 @@ template <typename Type2>
 constexpr complex<Type2> turnright(const complex<Type2>& c) {
     complex<Type2> cc;
     cc.real = c.imag;
-    cc.imag = -1*c.real;
+    cc.imag = -c.real;
+    return cc;
+}
+
+template <typename Type2>
+constexpr complex<Type2> reverse(const complex<Type2>& c) {
+    complex<Type2> cc;
+    cc.real = -c.imag;
+    cc.imag = -c.real;
     return cc;
 }
 
@@ -184,14 +194,14 @@ template <typename Type2>
 constexpr complex<Type2> conj(const complex<Type2>& c) {
     complex<Type2> cc;
     cc.real = c.real;
-    cc.imag = -1*c.imag;
+    cc.imag = -c.imag;
     return cc;
 }
 
 template <typename Type2>
 constexpr complex<Type2> realconj(const complex<Type2>& c) {
     complex<Type2> cc;
-    cc.real = -1*c.real;
+    cc.real = -c.real;
     cc.imag = c.imag;
     return cc;
 }

@@ -774,7 +774,7 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
         j = N>>2;
         for(i=0;i<=k;i++) roots[i] = complex<Type>(cos(a*i),sin(a*i));          //     1/8 values
         if(sign > 0) {
-            for(i=k+1;i<j;i++) roots[i] = reverse(swapcomplex(roots[j-i]);          //     values remaining in quadrant
+            for(i=k+1;i<j;i++) roots[i] = reverse(swapcomplex(roots[j-i]));          //     values remaining in quadrant
 #if !defined(AVX) || AVX == 0 
             for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);
 #elif AVX512F == 0

@@ -185,8 +185,8 @@ constexpr complex<Type2> turnright(const complex<Type2>& c) {
 template <typename Type2>
 constexpr complex<Type2> reverse(const complex<Type2>& c) {
     complex<Type2> cc;
-    cc.real = -c.imag;
-    cc.imag = -c.real;
+    cc.real = -c.real;
+    cc.imag = -c.imag;
     return cc;
 }
 

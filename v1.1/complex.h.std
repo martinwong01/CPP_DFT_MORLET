@@ -13,7 +13,6 @@ constexpr std::complex<Type> realconj(const std::complex<Type>& z) {
     temp.real = -real(z);
     temp.imag = imag(z);
     return temp;
-    //return std::complex<Type>(-real(z),imag(z)); 
 }
 
 template <class Type>
@@ -22,7 +21,6 @@ std::complex<Type> turnleft(const std::complex<Type>& z) {
     temp.real = -imag(z);
     temp.imag = real(z);
     return temp;
-    //return std::complex<Type>(-imag(z),real(z));
 }
 
 template <class Type>
@@ -31,7 +29,6 @@ std::complex<Type> turnright(const std::complex<Type>& z) {
     temp.real = imag(z);
     temp.imag = -real(z);
     return temp;
-    //return std::complex<Type>(imag(z),-real(z));
 }
 
 template <class Type>
@@ -40,7 +37,6 @@ std::complex<Type> swapcomplex(const std::complex<Type>& z) {
     temp.real = imag(z);
     temp.imag = real(z);
     return temp;
-    //return std::complex<Type>(imag(z),real(z));
 }
 
 template<class Type>
@@ -52,31 +48,6 @@ template<class Type>
 Type& imag(std::complex<Type> &z) {
     return reinterpret_cast<Type*>(&z)[1];
 }
-
-
-//template <class Type>
-//Type fabs(const std::complex<Type>& z) {
-//    return sqrt(z.real*z.real+z.imag*z.imag);
-//}
-
-
-
-
-/*
-template <class Type>
-class complex {
-    Type real;
-    Type imag;
-    public:
-    complex<Type>() { real = 0.; imag = 0.; }                                  // constructors
-    complex<Type>(const Type& r,const Type& i) { real = r; imag = i; }
-    complex<Type>(const Type& r) { real = r; imag = 0.; } 
-    //void operator=(const complex<Type>& c) {
-    //    real = c.real;
-    // 	imag = c.imag;
-    //}
-};
-*/
 
 
 #if AVX512F > 0

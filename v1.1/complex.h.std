@@ -32,6 +32,14 @@ std::complex<Type> turnright(const std::complex<Type>& z) {
 }
 
 template <class Type>
+std::complex<Type> reverse(const std::complex<Type>& z) {
+    std::complex<Type> temp;
+    temp.real(-real(z));
+    temp.imag(-imag(z));
+    return temp;
+}
+
+template <class Type>
 std::complex<Type> swapcomplex(const std::complex<Type>& z) {
     std::complex<Type> temp;
     temp.real(imag(z));

@@ -2,7 +2,7 @@
 
 
 vector=1                       # 1: use avx/avx512/fma/svml, 0: not used
-compiler="intel"               # "gnu" or "intel" or "clang" or "nvidia"
+compiler="clang"               # "clang" or "intel" or "gnu" or "nvidia"
 maxn=131072                    # set to 2^
 maxs=64                        # maximum number of wavelet scales
 align=64                       # 512-bit avx, set 64, 256-bit AVX, set 32

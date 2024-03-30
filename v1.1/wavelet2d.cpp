@@ -99,7 +99,11 @@ int main(int argc, char *argv[]) {
         printf("s= %d\n",s);
         system("date");
 
+#if !defined(AVX) || AVX == 0
+        #pragma omp parallel for default(shared) private(thread,y,i)
+#else
         #pragma omp parallel for default(shared) private(thread,y,i,mw01_wavelet2d_a,mw01_wavelet2d_b)
+#endif
 	for(x=0;x<Nx;x++) {                                                 // each Nx
             thread = omp_get_thread_num();
 

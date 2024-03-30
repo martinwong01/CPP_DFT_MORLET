@@ -8,148 +8,148 @@ using namespace std;
 template <class Type>
 class complex {
     Type real;
-    Type imga;
+    Type imag;
     public:
-    complex<Type>() { real = 0.; imga = 0.; }                                  // constructors
-    complex<Type>(const Type& r,const Type& i) { real = r; imga = i; }
-    complex<Type>(const Type& r) { real = r; imga = 0.; } 
+    complex<Type>() { real = 0.; imag = 0.; }                                  // constructors
+    complex<Type>(const Type& r,const Type& i) { real = r; imag = i; }
+    complex<Type>(const Type& r) { real = r; imag = 0.; } 
     //void operator=(const complex<Type>& c) {
     //    real = c.real;
-    //	imga = c.imga;
+    //	imag = c.imag;
     //}
     complex<Type> operator+(const complex<Type>& c) {
         complex<Type> cc;
 	cc.real = real + c.real;
-	cc.imga = imga + c.imga;
+	cc.imag = imag + c.imag;
 	return cc;
     }
     complex<Type> operator-(const complex<Type>& c) {
         complex<Type> cc;
 	cc.real = real - c.real;
-	cc.imga = imga - c.imga;
+	cc.imag = imag - c.imag;
 	return cc;
     }
     complex<Type> operator*(const complex<Type>& c) {
         complex<Type> cc;
-	cc.real = real*c.real - imga*c.imga;
-	cc.imga = real*c.imga + imga*c.real;
+	cc.real = real*c.real - imag*c.imag;
+	cc.imag = real*c.imag + imag*c.real;
 	return cc;
     }
     complex<Type> operator*(const Type& a) {
         complex<Type> cc;
 	cc.real = real*a;
-	cc.imga = imga*a;
+	cc.imag = imag*a;
 	return cc;
     }
     template <typename Type2>
     friend complex<Type2> operator*(const Type2&,const complex<Type2>&);
     complex<Type> operator/(const complex<Type>& c) {
         complex<Type> cc;
-	Type a = c.real*c.real+c.imga*c.imga;
-	cc.real = (real*c.real+imga*c.imga)/a;
-	cc.imga = (imga*c.real-real*c.imga)/a;
+	Type a = c.real*c.real+c.imag*c.imag;
+	cc.real = (real*c.real+imag*c.imag)/a;
+	cc.imag = (imag*c.real-real*c.imag)/a;
 	return cc;
     }
     complex<Type> operator/(const Type& a) {
         complex<Type> cc;
         cc.real = real/a;
-        cc.imga = imga/a;
+        cc.imag = imag/a;
         return cc;
     }
     template <typename Type2>
     friend complex<Type2> operator/(const Type2&,const complex<Type2>&);
     complex<Type> swap() {
         complex<Type> cc;
-	cc.real = imga;
-	cc.imga = real;
+	cc.real = imag;
+	cc.imag = real;
         return cc;
     }
     complex<Type> turnleft() {
         complex<Type> cc;
-	cc.real = -imga;
-	cc.imga = real;
+	cc.real = -imag;
+	cc.imag = real;
 	return cc;
     }
     complex<Type> turnright() {
         complex<Type> cc;
-	cc.real = imga;
-	cc.imga = -real;
+	cc.real = imag;
+	cc.imag = -real;
 	return cc;
     }
     complex<Type> reverse() {
         complex<Type> cc;
 	cc.real = -real;
-	cc.imga = -imga;
+	cc.imag = -imag;
 	return cc;
     }
     complex<Type> conjugate() {
         complex<Type> cc;
         cc.real = real;
-	cc.imga = -1.*imga;
+	cc.imag = -1.*imag;
 	return cc;
     }
     complex<Type> realconjugate() {
         complex<Type> cc;
         cc.real = -real;
-	cc.imga = imga;
+	cc.imag = imag;
 	return cc;
     }
     void operator+=(const complex<Type>& c) {
 	real += c.real;
-	imga += c.imga;
+	imag += c.imag;
     }
     void operator-=(const complex<Type>& c) {
 	real -= c.real;
-	imga -= c.imga;
+	imag -= c.imag;
     }
     void operator*=(const complex<Type>& c) {
         Type a,b;
-	a = real*c.real - imga*c.imga;
-	b = real*c.imga + imga*c.real;
+	a = real*c.real - imag*c.imag;
+	b = real*c.imag + imag*c.real;
 	real = a;
-	imga = b;
+	imag = b;
     }
     void operator*=(const Type& a) {
         real *= a;
-	imga *= a;
+	imag *= a;
     }
     void operator/=(const complex<Type>& c) {
         Type a,u,v;
-	a = c.real*c.real+c.imga*c.imga;
-        u = (real*c.real+imga*c.imga)/a;
-	v = (imga*c.real-real*c.imga)/a;
+	a = c.real*c.real+c.imag*c.imag;
+        u = (real*c.real+imag*c.imag)/a;
+	v = (imag*c.real-real*c.imag)/a;
 	real = u;
-	imga = v;
+	imag = v;
     }
     void operator/=(const Type& a) {
         real /= a;
-        imga /= a;
+        imag /= a;
     }
     bool operator==(const complex<Type>& c) {
-        if(real == c.real && imga == c.imga) return true; else return false;
+        if(real == c.real && imag == c.imag) return true; else return false;
     }
     bool operator!=(const complex<Type>& c) {
-        if(real != c.real || imga != c.imga) return true; else return false;
+        if(real != c.real || imag != c.imag) return true; else return false;
     }
     void setzero() {
         real = 0.;
-	imga = 0.;
+	imag = 0.;
     }
-    void setrealimga(const Type& r,const Type& i) {
+    void setrealimag(const Type& r,const Type& i) {
         real = r;
-	imga = i;
+	imag = i;
     }
     void setreal(const Type& r) { real = r; }
-    void setimga(const Type& i) { imga = i; }
-    void setangle(const Type& angle) { real = cos(angle); imga = sin(angle); }
+    void setimag(const Type& i) { imag = i; }
+    void setangle(const Type& angle) { real = cos(angle); imag = sin(angle); }
     Type getreal() {
         return real;
     }
-    Type getimga() {
-        return imga;
+    Type getimag() {
+        return imag;
     }
     void print() {
-        cout << real << " " << imga << endl;
+        cout << real << " " << imag << endl;
     }
     template <typename Type2>
     friend Type2 fabs(const complex<Type2>&);
@@ -161,30 +161,30 @@ template <typename Type2>
 complex<Type2> operator*(const Type2& a,const complex<Type2>& c) {
     complex<Type2> cc;
     cc.real = c.real*a;
-    cc.imga = c.imga*a;
+    cc.imag = c.imag*a;
     return cc;
 }
 
 template <typename Type2>
 complex<Type2> operator/(const Type2& a,const complex<Type2>& c) {
     complex<Type2> cc;
-    Type2 b = c.real*c.real+c.imga*c.imga;
+    Type2 b = c.real*c.real+c.imag*c.imag;
     cc.real = a/b*c.real;
-    cc.imga = -a/b*c.imga;
+    cc.imag = -a/b*c.imag;
     return cc;
 }
 
 template <typename Type2>
 Type2 fabs(const complex<Type2>& c) {
-    return sqrt(c.real*c.real+c.imga*c.imga);
+    return sqrt(c.real*c.real+c.imag*c.imag);
 }
 
 template <typename Type2>
 ostream &operator<< (ostream &s,const complex<Type2>& c) {
-    if(c.imga >= 0)
-        s << c.real << "+" << c.imga << "i";
+    if(c.imag >= 0)
+        s << c.real << "+" << c.imag << "i";
     else
-        s << c.real << c.imga << "i";
+        s << c.real << c.imag << "i";
     return s;
 }
 

@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
             for(y=0;y<Ny;y+=2) {
                 mw01_wavelet2d_a = _mm256_load_pd((double *)&transform_real[x][i][y]);    
                 mw01_wavelet2d_b = _mm256_permute_pd(_mm256_load_pd((double *)&transform_imag[x][i][y]),0b0101);
-                _mm_store_ps((float *)&cwt1[x][i][y],_mm256_cvtpd_ps(_mm256_addsub_pd(mw01_wavelet2d_b,mw01_wavelet2d_a)));
+                _mm_store_ps((float *)&cwt1[x][i][y],_mm256_cvtpd_ps(_mm256_addsub_pd(mw01_wavelet2d_a,mw01_wavelet2d_b)));
                 _mm_store_ps((float *)&cwt2[x][i][y],_mm256_cvtpd_ps(_mm256_add_pd(_mm256_xor_pd(mw01_wavelet2d_a,_mm256_setr_pd(0.0,-0.0,0.0,-0.0)),mw01_wavelet2d_b)));
                 //_mm_store_ps((float *)&cwt1[x][i][y],_mm256_cvtpd_ps(_mm256_addsub_pd(_mm256_permute_pd(_mm256_load_pd((double *)&transform_imag[x][i][y]),0b0101),_mm256_load_pd((double *)&transform_real[x][i][y]))));
                 //_mm_store_ps((float *)&cwt2[x][i][y],_mm256_cvtpd_ps(_mm256_add_pd(_mm256_xor_pd(_mm256_load_pd((double *)&transform_real[x][i][y]),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)),_mm256_permute_pd(_mm256_load_pd((double *)&transform_imag[x][i][y]),0b0101))));

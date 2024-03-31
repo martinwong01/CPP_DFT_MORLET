@@ -1,6 +1,6 @@
 v1.1  major changes:
 * updated complex.h, added complex.h.std based on std::complex
-* bug fixed wavelet2d.cpp (mw01_wavelet2d_a mw01_wavelet2d_b are openmp private) 
+* bugs fixed wavelet2d.cpp (AVX256/512 did not work) 
 * simplified function arguments
 
 

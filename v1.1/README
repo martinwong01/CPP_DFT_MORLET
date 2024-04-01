@@ -1,6 +1,6 @@
 v1.1  major changes:
 * updated complex.h, added complex.h.std based on std::complex
-* bugs fixed wavelet2d.cpp (AVX256/512 did not work) 
+* bugs fixed wavelet2d.cpp (AVX256 did not work) 
 * simplified function arguments
 
 

@@ -1346,33 +1346,35 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     memcpy(&padded[newN-N+2],&padded[1],(N-2)*sizeof(complex<Type>));
     //for(q=N-2;q>0;q--) padded[q+newN-N+1] = padded[q];
 #elif AVX512F == 0
+    inc = 32/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
-        if((N-3)%2 == 0)
-            for(q=N-3;q>0;q-=2) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_load_pd((double *)&padded[q]));
+        if((N-inc-1)%inc == 0)
+            for(q=N-inc-1;q>0;q-=inc) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_load_pd((double *)&padded[q]));
         else
-            for(q=N-3;q>0;q-=2) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_loadu_pd((double *)&padded[q]));
-        q = q + 2 - 1;
+            for(q=N-inc-1;q>0;q-=inc) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_loadu_pd((double *)&padded[q]));
+        q = q + inc - 1;
     } else if constexpr(std::is_same_v<float,Type>) {
-        if((N-5)%4 == 0)
-            for(q=N-5;q>0;q-=4) _mm256_store_ps((float *)&padded[q+newN-N+1],_mm256_load_ps((float *)&padded[q]));
+        if((N-inc-1)%inc == 0)
+            for(q=N-inc-1;q>0;q-=inc) _mm256_store_ps((float *)&padded[q+newN-N+1],_mm256_load_ps((float *)&padded[q]));
         else
-            for(q=N-5;q>0;q-=4) _mm256_store_ps((float *)&padded[q+newN-N+1],_mm256_loadu_ps((float *)&padded[q]));
-        q = q + 4 - 1;
+            for(q=N-inc-1;q>0;q-=inc) _mm256_store_ps((float *)&padded[q+newN-N+1],_mm256_loadu_ps((float *)&padded[q]));
+        q = q + inc - 1;
     }
     for(;q>0;q--) padded[q+newN-N+1] = padded[q];
 #else
+    inc = 64/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
-        if((N-5)%4 == 0)
-            for(q=N-5;q>0;q-=4) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_load_pd((double *)&padded[q]));
+        if((N-inc-1)%inc == 0)
+            for(q=N-inc-1;q>0;q-=inc) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_load_pd((double *)&padded[q]));
         else
-            for(q=N-5;q>0;q-=4) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_loadu_pd((double *)&padded[q]));
-        q = q + 4 - 1;
+            for(q=N-inc-1;q>0;q-=inc) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_loadu_pd((double *)&padded[q]));
+        q = q + inc - 1;
     } else if constexpr(std::is_same_v<float,Type>) {
-        if((N-9)%8 == 0)
-            for(q=N-9;q>0;q-=8) _mm512_store_ps((float *)&padded[q+newN-N+1],_mm512_load_ps((float *)&padded[q]));
+        if((N-inc-1)%inc == 0)
+            for(q=N-inc-1;q>0;q-=inc) _mm512_store_ps((float *)&padded[q+newN-N+1],_mm512_load_ps((float *)&padded[q]));
         else
-            for(q=N-9;q>0;q-=8) _mm512_store_ps((float *)&padded[q+newN-N+1],_mm512_loadu_ps((float *)&padded[q]));
-        q = q + 8 - 1;
+            for(q=N-inc-1;q>0;q-=inc) _mm512_store_ps((float *)&padded[q+newN-N+1],_mm512_loadu_ps((float *)&padded[q]));
+        q = q + inc - 1;
     }
     for(;q>0;q--) padded[q+newN-N+1] = padded[q];
 #endif

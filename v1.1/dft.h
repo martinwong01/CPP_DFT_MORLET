@@ -26,7 +26,7 @@ template <class Type>
 void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign) {
     Type thread_local pi = acos(-1.);      
     int thread_local oldN = 0;
-    int thread_local i,j,k,m,n,p,q,r,t;
+    int thread_local i,j,k,m,n,p,q,r,t,inc;
     alignas(ALIGN) complex<Type> thread_local datasub1[MAXN];
     alignas(ALIGN) complex<Type> thread_local datasub2[MAXN];
     alignas(ALIGN) complex<Type> thread_local datasub3[MAXN];
@@ -76,20 +76,20 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);           //     copy to next quadrant
 #elif AVX512F == 0
+		inc = 32/sizeof(complex<Type>);
+                for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
-		    for(i=j;i<aligned_int(j,2);i++) roots[i] = turnright(roots[i-j]);
-		    for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0))); 
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0))); 
                 } else if constexpr(std::is_same_v<float,Type>) {
-		    for(i=j;i<aligned_int(j,4);i++) roots[i] = turnright(roots[i-j]); 
-                    for(i=aligned_int(j,4);i<N/2;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
+                    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
                 }
 #else
+		inc = 64/sizeof(complex<Type>);
+                for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
-		    for(i=j;i<aligned_int(j,4);i++) roots[i] = turnright(roots[i-j]);
-		    for(i=aligned_int(j,4);i<N/2;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));  
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));  
                 } else if constexpr(std::is_same_v<float,Type>) {
-		    for(i=j;i<aligned_int(j,8);i++) roots[i] = turnright(roots[i-j]);
-		    for(i=aligned_int(j,8);i<N/2;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_permute_ps(_mm512_load_ps((float *)&roots[i-j]),0b10110001),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))); 
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_permute_ps(_mm512_load_ps((float *)&roots[i-j]),0b10110001),_mm512_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))); 
                 }
 #endif
             } else {
@@ -97,20 +97,20 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = turnleft(roots[i-j]);
 #elif AVX512F == 0
+	        inc = 32/sizeof(complex<Type>);
+                for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
-		    for(i=j;i<aligned_int(j,2);i++) roots[i] = turnleft(roots[i-j]);
-		    for(i=aligned_int(j,2);i<N/2;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0))); 
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0))); 
                 } else if constexpr(std::is_same_v<float,Type>) {
-		    for(i=j;i<aligned_int(j,4);i++) roots[i] = turnleft(roots[i-j]);
-		    for(i=aligned_int(j,4);i<N/2;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
                 }
 #else
+    	        inc = 64/sizeof(complex<Type>);
+                for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
-		    for(i=j;i<aligned_int(j,4);i++) roots[i] = turnleft(roots[i-j]);
-		    for(i=aligned_int(j,4);i<N/2;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
                 } else if constexpr(std::is_same_v<float,Type>) {
-		    for(i=j;i<aligned_int(j,8);i++) roots[i] = turnleft(roots[i-j]);
-		    for(i=aligned_int(j,8);i<N/2;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_permute_ps(_mm512_load_ps((float *)&roots[i-j]),0b10110001),_mm512_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
+		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_permute_ps(_mm512_load_ps((float *)&roots[i-j]),0b10110001),_mm512_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
                 }
 #endif
             }
@@ -120,16 +120,17 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=N/2;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
-		for(i=aligned_int(N/2,4);i<N;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
+		inc = 32/sizeof(complex<Type>);
+	        for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
+		for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             }
 #else
+            inc = 64/sizeof(complex<Type>);
+            for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
             if constexpr(std::is_same_v<double,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
-		for(i=aligned_int(N/2,4);i<N;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
+		for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,8);i++) roots[i] = reverse(roots[i-N/2]);
-		for(i=aligned_int(N/2,8);i<N;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_load_ps((float *)&roots[i-N/2]),_mm512_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
+		for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_load_ps((float *)&roots[i-N/2]),_mm512_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #endif
         } else if(N%2 == 0) {
@@ -139,20 +140,20 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=N/2;i<N;i++) roots[i] = reverse(roots[i-N/2]);                       
 #elif AVX512F == 0
+            inc = 32/sizeof(complex<Type>);
+            for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
             if constexpr(std::is_same_v<double,Type>) {    // N/2 must be odd
-	        for(i=N/2;i<aligned_int(N/2,2);i++) roots[i] = reverse(roots[i-N/2]);
-                for(i=aligned_int(N/2,2);i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
+                for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
-                for(i=aligned_int(N/2,4);i<N;i+=4) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
+                for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #else
+            inc = 64/sizeof(complex<Type>);
+            for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
             if constexpr(std::is_same_v<double,Type>) {    // N/2 must be odd
-	        for(i=N/2;i<aligned_int(N/2,4);i++) roots[i] = reverse(roots[i-N/2]);
-                for(i=aligned_int(N/2,4);i<N;i+=4) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
+                for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-	        for(i=N/2;i<aligned_int(N/2,8);i++) roots[i] = reverse(roots[i-N/2]);
-                for(i=aligned_int(N/2,8);i<N;i+=8) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_load_ps((float *)&roots[i-N/2]),_mm512_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
+                for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm512_store_ps((float *)&roots[i],_mm512_xor_ps(_mm512_load_ps((float *)&roots[i-N/2]),_mm512_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #endif
         } else {

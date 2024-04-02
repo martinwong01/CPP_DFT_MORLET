@@ -11,7 +11,7 @@ void morlet(Type *data,complex<Type> **transform,int N,int S,Type param,Type dx)
     Type thread_local oldparam = 0.;
     Type thread_local olddx = 0.;
 
-    int thread_local k,n,s;
+    int thread_local k,n,s,inc;
     Type thread_local a,b;
     alignas(ALIGN) Type thread_local freq[MAXN];
     alignas(ALIGN) Type thread_local scale[MAXS];

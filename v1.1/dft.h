@@ -48,6 +48,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
     alignas(ALIGN) avxtype mw01_dft_c;
     alignas(ALIGN) avxtype mw01_dft_d;
     alignas(ALIGN) avxtype mw01_dft_e;
+    inc = 64/sizeof(complex<Type>);
 #elif AVX > 0
     typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_dft_a;
@@ -55,6 +56,7 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
     alignas(ALIGN) avxtype mw01_dft_c;
     alignas(ALIGN) avxtype mw01_dft_d;
     alignas(ALIGN) avxtype mw01_dft_e;
+    inc = 32/sizeof(complex<Type>);
 #endif
     
     i = N & (N - 1);                                                               //  if 2^, use fft
@@ -76,7 +78,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);           //     copy to next quadrant
 #elif AVX512F == 0
-		inc = 32/sizeof(complex<Type>);
                 for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
 		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0))); 
@@ -84,7 +85,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                     for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
                 }
 #else
-		inc = 64/sizeof(complex<Type>);
                 for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
 		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));  
@@ -97,7 +97,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
                 for(i=j;i<N/2;i++) roots[i] = turnleft(roots[i-j]);
 #elif AVX512F == 0
-	        inc = 32/sizeof(complex<Type>);
                 for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
 		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0))); 
@@ -105,7 +104,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
                 }
 #else
-    	        inc = 64/sizeof(complex<Type>);
                 for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
                 if constexpr(std::is_same_v<double,Type>) {
 		    for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
@@ -120,12 +118,10 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=N/2;i<N;i+=2) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
-		inc = 32/sizeof(complex<Type>);
 	        for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
 		for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
@@ -140,7 +136,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=N/2;i<N;i++) roots[i] = reverse(roots[i-N/2]);                       
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
             if constexpr(std::is_same_v<double,Type>) {    // N/2 must be odd
                 for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i-N/2]),_mm256_setr_pd(-0.0,-0.0,-0.0,-0.0)));
@@ -148,7 +143,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                 for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i-N/2]),_mm256_setr_ps(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0))); 
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             for(i=N/2;i<aligned_int(N/2,inc);i++) roots[i] = reverse(roots[i-N/2]);
             if constexpr(std::is_same_v<double,Type>) {    // N/2 must be odd
                 for(i=aligned_int(N/2,inc);i<N;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i-N/2]),_mm512_setr_pd(-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-0.0)));
@@ -220,7 +214,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		    outptr[kkleft+mleft+t] = dataptr[kkright+t] - datasub2[t]; 
                 }
 #elif AVX512F == 0
-                inc = 32/sizeof(complex<Type>);
                 i = (kkright+nright)%inc;
                 m = kkright%inc;                 
                 n = kkleft%inc;
@@ -266,7 +259,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                     }
                 }
 #else
-                inc = 64/sizeof(complex<Type>);
                 i = (kkright+nright)%inc;
                 m = kkright%inc;                 
                 n = kkleft%inc;
@@ -368,7 +360,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		        }
 		    }
 #elif AVX512F == 0
-                    inc = 32/sizeof(complex<Type>);
                     q = (kkright+nnright)%inc;   // kkright = k*N/P    nnright = n*NoverPF
                     p = kkleft%inc;              // kkleft = k*NoverPF 
                     if constexpr(std::is_same_v<double,Type>) {
@@ -463,7 +454,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                         }
                     }
 #else
-                    inc = 64/sizeof(complex<Type>);
                     q = (kkright+nnright)%inc;   // kkright = k*N/P    nnright = n*NoverPF
                     p = kkleft%inc;              // kkleft = k*NoverPF 
                     if constexpr(std::is_same_v<double,Type>) {
@@ -572,21 +562,21 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #elif AVX512F == 0
             if constexpr(std::is_same_v<double,Type>) {
                 mw01_dft_a = _mm256_setzero_pd();
-                for(i=0;i<N;i+=2)
+                for(i=0;i<N;i+=inc)
                     _mm256_store_pd((double *)&outptr[i],mw01_dft_a);
             } else if constexpr(std::is_same_v<float,Type>) {
                 mw01_dft_a = _mm256_setzero_ps();
-                for(i=0;i<N;i+=4)
+                for(i=0;i<N;i+=inc)
                     _mm256_store_ps((float *)&outptr[i],mw01_dft_a);
             }
 #else
             if constexpr(std::is_same_v<double,Type>) {
                 mw01_dft_a = _mm512_setzero_pd();
-                for(i=0;i<N;i+=4)
+                for(i=0;i<N;i+=inc)
                     _mm512_store_pd((double *)&outptr[i],mw01_dft_a);
             } else if constexpr(std::is_same_v<float,Type>) {
                 mw01_dft_a = _mm512_setzero_ps();
-                for(i=0;i<N;i+=8)
+                for(i=0;i<N;i+=inc)
                     _mm512_store_ps((float *)&outptr[i],mw01_dft_a);
             }
 #endif
@@ -604,7 +594,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                     for(t=0;t<tail;t++) 
 		        outptr[kkleft+0*mleft+t] += c[0]*dataptr[kkright+nnright+t];
 #elif AVX512F == 0
-                    inc = 32/sizeof(complex<Type>);
                     // tail is NoverPF, or product of the remaining factors. must be odd.
                     i = (kkright+nnright)%inc;   // kkright = k*N/P   nnright = n*NoverPF
                     m = kkleft%inc;              // kkleft = k*NoverPF
@@ -644,7 +633,6 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                         }
                     }
 #else
-                    inc = 64/sizeof(complex<Type>);
                     i = (kkright+nnright)%inc;
                     m = kkleft%inc;
                     if constexpr(std::is_same_v<double,Type>) {
@@ -709,18 +697,18 @@ void dft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #elif AVX512F == 0
                 if constexpr(std::is_same_v<double,Type>) {
 		    mw01_dft_a = _mm256_set1_pd(a);
-		    for(n=0;n<N;n+=2) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_dft_a));
+		    for(n=0;n<N;n+=inc) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_dft_a));
 		} else if constexpr(std::is_same_v<float,Type>) {
 		    mw01_dft_a = _mm256_set1_ps(a);
-    		    for(n=0;n<N;n+=4) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_dft_a));
+    		    for(n=0;n<N;n+=inc) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_dft_a));
 		}
 #else
                 if constexpr(std::is_same_v<double,Type>) {
 		    mw01_dft_a = _mm512_set1_pd(a);
-    		    for(n=0;n<N;n+=4) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_dft_a));
+    		    for(n=0;n<N;n+=inc) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_dft_a));
 		} else if constexpr(std::is_same_v<float,Type>) {
 		    mw01_dft_a = _mm512_set1_ps(a);
-       		    for(n=0;n<N;n+=8) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_dft_a));
+       		    for(n=0;n<N;n+=inc) _mm512_store_ps((float *)&out[n],_mm512_mul_ps(_mm512_load_ps((float *)&out[n]),mw01_dft_a));
 		}
 #endif
 	    }
@@ -752,11 +740,13 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
     alignas(ALIGN) avxtype mw01_fft0_a;
     alignas(ALIGN) avxtype mw01_fft0_b;
     alignas(ALIGN) avxtype mw01_fft0_c;
+    inc = 64/sizeof(complex<Type>);
 #elif AVX > 0
     typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft0_a;
     alignas(ALIGN) avxtype mw01_fft0_b;
     alignas(ALIGN) avxtype mw01_fft0_c;
+    inc = 32/sizeof(complex<Type>);
 #endif
 
 
@@ -770,7 +760,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0 
             for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
@@ -778,7 +767,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))); 
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
@@ -791,7 +779,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = turnleft(roots[i-j]);
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0)));
@@ -799,7 +786,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0))); 
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
@@ -813,14 +799,12 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = conj(roots[i]);
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=0;i<N;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i]),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
                 for(i=0;i<N;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i]),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=0;i<N;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i]),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
@@ -873,7 +857,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 	        outptr[kkleft+mleft+t] = dataptr[kkright+t] - c[1]; 
             }
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             if constexpr(std::is_same_v<double,Type>) {
 	        mw01_fft0_c = _mm256_setr_pd(real(c[0]),imag(c[0]),real(c[0]),imag(c[0]));
                 for(t=0;t<tail+inc-1;t+=inc) {  // tail = 1,2,4,.... = kleft = nright    mleft = N/2   kkright = 2*kkleft     
@@ -894,7 +877,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                 }
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             if constexpr(std::is_same_v<double,Type>) {
        	    	mw01_fft0_c = _mm512_setr_pd(real(c[0]),imag(c[0]),real(c[0]),imag(c[0]),real(c[0]),imag(c[0]),real(c[0]),imag(c[0]));
                 for(t=0;t<tail+inc-1;t+=inc) {       
@@ -930,7 +912,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
 #elif AVX512F == 0
-                inc = 32/sizeof(complex<Type>);
                 if constexpr(std::is_same_v<double,Type>) {
 		    mw01_fft0_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=inc) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_fft0_a));
@@ -939,7 +920,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
     		    for(n=0;n<N;n+=inc) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_fft0_a));
 		}
 #else
-                inc = 64/sizeof(complex<Type>);
                 if constexpr(std::is_same_v<double,Type>) {
 		    mw01_fft0_a = _mm512_set1_pd(a);
     		    for(n=0;n<N;n+=inc) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_fft0_a));
@@ -974,10 +954,12 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
     typedef typename std::conditional<std::is_same_v<double,Type>,__m512d,__m512>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft1_a;
     alignas(ALIGN) avxtype mw01_fft1_b;
+    inc = 64/sizeof(complex<Type>);
 #elif AVX > 0
     typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_fft1_a;
     alignas(ALIGN) avxtype mw01_fft1_b;
+    inc = 32/sizeof(complex<Type>);
 #endif
 
 
@@ -991,7 +973,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = turnright(roots[i-j]);
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
@@ -999,7 +980,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnright(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0))); 
@@ -1012,7 +992,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=j;i<N/2;i++) roots[i] = turnleft(roots[i-j]);
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_permute_pd(_mm256_load_pd((double *)&roots[i-j]),0b0101),_mm256_setr_pd(-0.0,0.0,-0.0,0.0)));
@@ -1020,7 +999,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_permute_ps(_mm256_load_ps((float *)&roots[i-j]),0b10110001),_mm256_setr_ps(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             for(i=j;i<aligned_int(j,inc);i++) roots[i] = turnleft(roots[i-j]);
             if constexpr(std::is_same_v<double,Type>) {
 		for(i=aligned_int(j,inc);i<N/2;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_permute_pd(_mm512_load_pd((double *)&roots[i-j]),0b01010101),_mm512_setr_pd(-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0)));
@@ -1034,14 +1012,12 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
             for(i=0;i<N;i++) roots[i] = conj(roots[i]);
 #elif AVX512F == 0
-            inc = 32/sizeof(complex<Type>);
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=0;i<N;i+=inc) _mm256_store_pd((double *)&roots[i],_mm256_xor_pd(_mm256_load_pd((double *)&roots[i]),_mm256_setr_pd(0.0,-0.0,0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
                 for(i=0;i<N;i+=inc) _mm256_store_ps((float *)&roots[i],_mm256_xor_ps(_mm256_load_ps((float *)&roots[i]),_mm256_setr_ps(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
             }
 #else
-            inc = 64/sizeof(complex<Type>);
             if constexpr(std::is_same_v<double,Type>) {
                 for(i=0;i<N;i+=inc) _mm512_store_pd((double *)&roots[i],_mm512_xor_pd(_mm512_load_pd((double *)&roots[i]),_mm512_setr_pd(0.0,-0.0,0.0,-0.0,0.0,-0.0,0.0,-0.0)));
             } else if constexpr(std::is_same_v<float,Type>) {
@@ -1082,7 +1058,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                     out[hhead+Product+k] = c[0] - c[1];
                 }
 #elif AVX512F == 0
-                inc = 32/sizeof(complex<Type>);
                 if constexpr(std::is_same_v<double,Type>) {
                     for(k=0;k<Product+inc-1;k+=inc) {
                         for(i=0;i<inc;i++) { p += NoverPF; c[i] = roots[p]; }
@@ -1101,7 +1076,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
                     }
                 }
 #else
-                inc = 64/sizeof(complex<Type>);
                 if constexpr(std::is_same_v<double,Type>) {
                     for(k=0;k<Product+inc-1;k+=inc) {
                         for(i=0;i<inc;i++) { p += NoverPF; c[i] = roots[p]; }
@@ -1136,7 +1110,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
 #if !defined(AVX) || AVX == 0
                 for(n=0;n<N;n++) out[n] *= a;
 #elif AVX512F == 0
-                inc = 32/sizeof(complex<Type>);
                 if constexpr(std::is_same_v<double,Type>) {
 		    mw01_fft1_a = _mm256_set1_pd(a);
 		    for(n=0;n<N;n+=inc) _mm256_store_pd((double *)&out[n],_mm256_mul_pd(_mm256_load_pd((double *)&out[n]),mw01_fft1_a));
@@ -1145,7 +1118,6 @@ void fft_func(complex<Type> *data,complex<Type> *out,int N,int Product,int sign)
     		    for(n=0;n<N;n+=inc) _mm256_store_ps((float *)&out[n],_mm256_mul_ps(_mm256_load_ps((float *)&out[n]),mw01_fft1_a));
 		}
 #else
-                inc = 64/sizeof(complex<Type>);
                 if constexpr(std::is_same_v<double,Type>) {
 		    mw01_fft1_a = _mm512_set1_pd(a);
     		    for(n=0;n<N;n+=inc) _mm512_store_pd((double *)&out[n],_mm512_mul_pd(_mm512_load_pd((double *)&out[n]),mw01_fft1_a));
@@ -1265,9 +1237,11 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
 #if AVX512F > 0
     typedef typename std::conditional<std::is_same_v<double,Type>,__m512d,__m512>::type avxtype;
     alignas(ALIGN) avxtype mw01_rader_a;
+    inc = 64/sizeof(complex<Type>);
 #elif AVX > 0
     typedef typename std::conditional<std::is_same_v<double,Type>,__m256d,__m256>::type avxtype;
     alignas(ALIGN) avxtype mw01_rader_a;
+    inc = 32/sizeof(complex<Type>);
 #endif
 
 
@@ -1292,7 +1266,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
 #if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
 #elif AVX512F == 0
-    inc = 32/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         mw01_rader_a = _mm256_setzero_pd();
         for(i=0;i<newN;i+=inc)
@@ -1303,7 +1276,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
             _mm256_store_ps((float *)&padded[i],mw01_rader_a);
     }
 #else
-    inc = 64/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         mw01_rader_a = _mm512_setzero_pd();
         for(i=0;i<newN;i+=inc)
@@ -1319,7 +1291,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
 #if !defined(AVX) || AVX == 0
     memset(padded,0,newN*sizeof(complex<Type>));
 #elif AVX512F == 0
-    inc = 32/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         mw01_rader_a = _mm256_setzero_pd();
         for(i=0;i<newN;i+=inc)
@@ -1330,7 +1301,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
             _mm256_store_ps((float *)&padded[i],mw01_rader_a);
     }
 #else
-    inc = 64/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         mw01_rader_a = _mm512_setzero_pd();
         for(i=0;i<newN;i+=inc)
@@ -1346,7 +1316,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     memcpy(&padded[newN-N+2],&padded[1],(N-2)*sizeof(complex<Type>));
     //for(q=N-2;q>0;q--) padded[q+newN-N+1] = padded[q];
 #elif AVX512F == 0
-    inc = 32/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         if((N-inc-1)%inc == 0)
             for(q=N-inc-1;q>0;q-=inc) _mm256_store_pd((double *)&padded[q+newN-N+1],_mm256_load_pd((double *)&padded[q]));
@@ -1362,7 +1331,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
     }
     for(;q>0;q--) padded[q+newN-N+1] = padded[q];
 #else
-    inc = 64/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         if((N-inc-1)%inc == 0)
             for(q=N-inc-1;q>0;q-=inc) _mm512_store_pd((double *)&padded[q+newN-N+1],_mm512_load_pd((double *)&padded[q]));
@@ -1386,7 +1354,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
 #if !defined(AVX) || AVX == 0 
     for(q=0;q<newN;q++) result1[q] *= result2[q]*newN2;
 #elif AVX512F == 0
-    inc = 32/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         mw01_rader_a = _mm256_set1_pd(newN2);
         for(q=0;q<newN;q+=inc)
@@ -1397,7 +1364,6 @@ void Rader(complex<Type> *datasub1,complex<Type> *datasub2,complex<Type> *out,in
             _mm256_store_ps((float *)&result1[q],_mm256_mul_ps(mw01_rader_a,complex_mul_256register((float *)&result1[q],(float *)&result2[q],0,0)));  
     }     
 #else
-    inc = 64/sizeof(complex<Type>);
     if constexpr(std::is_same_v<double,Type>) {
         mw01_rader_a = _mm512_set1_pd(newN2);
         for(q=0;q<newN;q+=inc)
